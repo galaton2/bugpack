@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <!-- Для мобильных устройств -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crossy Road 3D Vertical с меню и таймером</title>
+
+  <!-- Font: Press Start 2P -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+  <!-- Telegram Web App API -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <!-- Three.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <style>
+    /* Общие стили */
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #00103c;
+      font-family: 'Press Start 2P', monospace;
+    }
+    /* Header с информацией о пользователе */
+    #header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 50px;
+      background: #6d4fba;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    #info {
+      display: flex;
+      gap: 20px;
+      font-size: 10px;
+      color: #fff;
+      align-items: center;
+    }
+    #info span {
+      white-space: nowrap;
+    }
+    .balance {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .balance img {
+      width: 16px;
+      height: 16px;
+    }
+    /* Кнопка Back */
+    #backContainer {
+      position: absolute;
+      top: 50px;
+      left: 10px;
+      z-index: 1000;
+    }
+    #backBtn {
+      font-size: 10px;
+      padding: 5px 10px;
+      background: #06B6D1;
+      color: #262626;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      box-shadow: 0 3px #6b6b6b;
+    }
+    /* Меню игры – изначально видимо */
+    #gameWrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+    /* Кнопка Start – по центру меню */
+    #startBtn {
+      position: absolute;
+      z-index: 1100;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 12px;
+      padding: 10px 20px;
+      background: #06B6D1;
+      color: #262626;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      box-shadow: 0 3px #6b6b6b;
+    }
+    /* Временной индикатор - изначально скрыт, появляется после старта игры */
+    #timeBarContainer {
+      position: absolute;
+      top: 20px; /* поднят выше */
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      height: 5px;
+      background: #555;
+      z-index: 1100;
+      display: none;
+    }
+    #timeBar {
+      width: 100%;
+      height: 100%;
+      background: #ff66cc;
+    }
+    /* Игровой счётчик */
+    #counter {
+      position: absolute;
+      top: 40px; /* сдвинут ниже time bar */
+      right: 20px;
+      z-index: 1000;
+    }
+    /* Контролы игры – изначально скрыты */
+    #controlls {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 1100;
+    }
+    #controlls div {
+      display: grid;
+      grid-template-columns: 60px 60px 60px;
+      grid-template-rows: 60px 60px 60px;
+      gap: 10px;
+      margin-bottom: 20px;
+      grid-template-areas:
+        ". forward ."
+        "left . right"
+        ". backward .";
+    }
+    #forward { grid-area: forward; }
+    #left { grid-area: left; }
+    #backward { grid-area: backward; }
+    #right { grid-area: right; }
+    #controlls button {
+      background: black;
+      border: 1px solid white;
+      box-shadow: 3px 5px 0 rgba(0, 0, 0, 0.75);
+      cursor: pointer;
+    }
+    #controlls button svg path {
+      fill: white;
+    }
+    /* Модальное окно для окончания игры/уведомлений */
+    #end {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      visibility: hidden;
+      z-index: 1200;
+      background: rgba(0,0,0,0.7);
+    }
+    #end .modal {
+      background: #222;
+      border: 2px solid #0f0;
+      border-radius: 8px;
+      padding: 20px;
+      width: 80%;
+      max-width: 400px;
+      text-align: center;
+      color: #FF00FF;
+      font-size: 14px;
+    }
+    #end .modal button {
+      margin-top: 10px;
+      font-size: 12px;
+      padding: 6px 12px;
+      background: #06B6D1;
+      color: #262626;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      box-shadow: 0 3px #6b6b6b;
+    }
+    /* Canvas занимает весь экран, ниже контролов */
+    canvas {
+      position: absolute;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+  <!-- Меню с информацией о пользователе -->
+  <div id="header">
+    <div id="info">
+      <span id="username">@User</span>
+      <div class="balance">
+        <img src="https://raw.githubusercontent.com/qnexst/404token/main/ticket.png" alt="Ticket">
+        <span id="ticketCount">0</span>
+      </div>
+      <div class="balance">
+        <img src="https://raw.githubusercontent.com/qnexst/404token/main/star.png" alt="Points">
+        <span id="pointCount">0</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Временной индикатор (появится после старта игры) -->
+  <div id="timeBarContainer">
+    <div id="timeBar"></div>
+  </div>
+
+  <!-- Кнопка Back -->
+  <div id="backContainer">
+    <button id="backBtn" onclick="goBack()">Back</button>
+  </div>
+
+  <!-- Меню игры -->
+  <div id="gameWrapper">
+    <button id="startBtn" onclick="startGame()">Start (1 Ticket)</button>
+    <!-- Здесь будет добавлен canvas Three.js после старта игры -->
+  </div>
+
+  <!-- Игровой счётчик и контролы (контролы изначально скрыты) -->
+  <div id="counter">0</div>
+  <div id="controlls">
+    <div>
+      <button id="forward">
+        <svg width="30" height="30" viewBox="0 0 10 10">
+          <g transform="rotate(0,5,5)">
+            <path d="M5,4 L7,6 L3,6 L5,4" />
+          </g>
+        </svg>
+      </button>
+      <button id="left">
+        <svg width="30" height="30" viewBox="0 0 10 10">
+          <g transform="rotate(-90,5,5)">
+            <path d="M5,4 L7,6 L3,6 L5,4" />
+          </g>
+        </svg>
+      </button>
+      <button id="backward">
+        <svg width="30" height="30" viewBox="0 0 10 10">
+          <g transform="rotate(180,5,5)">
+            <path d="M5,4 L7,6 L3,6 L5,4" />
+          </g>
+        </svg>
+      </button>
+      <button id="right">
+        <svg width="30" height="30" viewBox="0 0 10 10">
+          <g transform="rotate(90,5,5)">
+            <path d="M5,4 L7,6 L3,6 L5,4" />
+          </g>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Модальное окно для окончания игры/уведомлений -->
+  <div id="end">
+    <div class="modal">
+      <h2 id="endTitle"></h2>
+      <p id="endMessage"></p>
+      <button id="endBtn">OK</button>
+    </div>
+  </div>
+
+  <!-- Звуки -->
+  <audio id="bgSound" src="background.mp3" loop></audio>
+  <audio id="moveSound" src="move.mp3"></audio>
+  <audio id="deathSound" src="death.mp3"></audio>
+
+  <script>
+    /* ----------------------------------------
+       1. Firebase и Telegram инициализация
+    ---------------------------------------- */
+    const firebaseConfig = {
+      apiKey: "AIzaSyB90ev-ex",
+      authDomain: "test-with-likes.firebaseapp.com",
+      databaseURL: "https://test-with-likes-default-rtdb.firebaseio.com",
+      projectId: "test-with-likes",
+      storageBucket: "test-with-likes.appspot.com",
+      messagingSenderId: "764738820142",
+      appId: "1:764738820142:web:b22c6608a30e46cdcea7bf",
+      measurementId: "G-WJNF0HSN9P"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    let tg = null;
+    if (window.Telegram && window.Telegram.WebApp) {
+      tg = window.Telegram.WebApp;
+      tg.expand();
+    }
+
+    let currentUser = null;
+    let userRef = null;
+    let localUserData = { tickets: 0, points: 0 };
+    // Флаг, что данные загружены
+    let dataLoaded = false;
+    // Если данные не загрузились в течение 3 секунд, dataLoaded станет true
+    setTimeout(() => { dataLoaded = true; }, 3000);
+
+    if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+      currentUser = tg.initDataUnsafe.user;
+      document.getElementById('username').textContent = '@' + currentUser.username;
+      userRef = db.ref('users/' + currentUser.username);
+      userRef.once('value').then(snapshot => {
+        if (!snapshot.exists()) {
+          userRef.set({ tickets: 5, points: 0 });
+        }
+      });
+      userRef.on('value', snapshot => {
+        const data = snapshot.val() || {};
+        localUserData.tickets = data.tickets || 0;
+        localUserData.points = data.points || 0;
+        updateHeader();
+        dataLoaded = true;
+      });
+    } else {
+      currentUser = { username: 'TestUser' };
+      document.getElementById('username').textContent = '@TestUser';
+      userRef = db.ref('users/TestUser');
+      userRef.once('value').then(snapshot => {
+        if (!snapshot.exists()) {
+          userRef.set({ tickets: 5, points: 0 });
+        }
+      });
+      userRef.on('value', snapshot => {
+        const data = snapshot.val() || {};
+        localUserData.tickets = data.tickets || 0;
+        localUserData.points = data.points || 0;
+        updateHeader();
+        dataLoaded = true;
+      });
+    }
+
+    function updateHeader() {
+      document.getElementById('ticketCount').textContent = localUserData.tickets;
+      document.getElementById('pointCount').textContent = localUserData.points;
+    }
+
+    function goBack() {
+      window.location.href = 'index.html';
+    }
+    // Для случая Game Over, OK отправляет на index.html; для noTickets просто скрывает модал
+    let modalType = "gameOver";
+    document.getElementById('endBtn').addEventListener('click', function() {
+      if (modalType === "gameOver") {
+        goToIndex();
+      } else if (modalType === "noTickets") {
+        document.getElementById('end').style.visibility = 'hidden';
+      }
+    });
+    function goToIndex() {
+      window.location.href = 'index.html';
+    }
+
+    /* ----------------------------------------
+       2. Игровой код (3D Crossy Road)
+    ---------------------------------------- */
+    let scene, camera, renderer;
+    let cameraOffset = { x: 0, y: -400, z: 600 };
+    let zoom = 2;
+    let chicken, lanes, currentLane, currentColumn;
+    let previousTimestamp, startMoving, moves, stepStartTimestamp;
+    const stepTime = 200;
+    const chickenSize = 15;
+    const positionWidth = 42;
+    const columns = 17;
+    const boardWidth = positionWidth * columns;
+    const laneTypes = ['car', 'truck', 'forest'];
+    const laneSpeeds = [2, 2.5, 3];
+    // Яркие «мультяшные» цвета для транспорта
+    const vechicleColors = [0xff5722, 0xffc107, 0x03a9f4, 0x9c27b0, 0x8bc34a, 0xf44336];
+    const threeHeights = [20, 45, 60];
+    let gameEnded = false;
+
+    // Таймер игры (5 минут = 300000 мс)
+    let gameStartTime = null;
+    const gameDuration = 300000; // 5 минут
+
+    function initGame() {
+      gameEnded = false;
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 10000);
+      camera.position.set(cameraOffset.x, cameraOffset.y, cameraOffset.z);
+      camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+      // Уменьшаем освещение от неба, чтобы тени были контрастнее
+      const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.25);
+      hemiLight.position.set(0, 0, 1000);
+      scene.add(hemiLight);
+
+      // Основной направленный свет для чётких, сильных теней
+      const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+      dirLight.position.set(
+        cameraOffset.x,
+        cameraOffset.y,
+        cameraOffset.z + 200
+      );
+      dirLight.castShadow = true;
+      // Увеличиваем размер карты теней
+      dirLight.shadow.mapSize.width = 4096;
+      dirLight.shadow.mapSize.height = 4096;
+      // Немного подбираем bias, чтобы избежать артефактов
+      dirLight.shadow.bias = -0.0003;
+      // Сужаем камеру для теней, чтобы получить ещё более детальные тени
+      dirLight.shadow.camera.left = -300;
+      dirLight.shadow.camera.right = 300;
+      dirLight.shadow.camera.top = 300;
+      dirLight.shadow.camera.bottom = -300;
+      scene.add(dirLight);
+
+      // Можно слегка ослабить или убрать этот свет, чтобы не «засвечивать» тени
+      const backLight = new THREE.DirectionalLight(0xffffff, 0.15);
+      backLight.position.set(200, 200, 300);
+      backLight.castShadow = false;
+      scene.add(backLight);
+
+      lanes = generateLanes();
+      currentLane = 0;
+      currentColumn = Math.floor(columns / 2);
+      previousTimestamp = null;
+      startMoving = false;
+      moves = [];
+      stepStartTimestamp = null;
+
+      chicken = new Chicken();
+      chicken.position.set(0, 0, 0);
+      scene.add(chicken);
+    }
+
+    function initRenderer() {
+      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+      // Включаем тени
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.setClearColor(0x000000, 1);
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.getElementById('gameWrapper').appendChild(renderer.domElement);
+    }
+
+    function Texture(width, height, rects) {
+      // Генерация «окон» для текстур
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const context = canvas.getContext("2d");
+      context.fillStyle = "#ffffff";
+      context.fillRect(0, 0, width, height);
+      context.fillStyle = "rgba(0,0,0,0.6)";
+      rects.forEach(rect => {
+        context.fillRect(rect.x, rect.y, rect.w, rect.h);
+      });
+      return new THREE.CanvasTexture(canvas);
+    }
+    const carFrontTexture = new Texture(40, 80, [{ x: 0, y: 10, w: 30, h: 60 }]);
+    const carBackTexture = new Texture(40, 80, [{ x: 10, y: 10, w: 30, h: 60 }]);
+    const carRightSideTexture = new Texture(110, 40, [{ x: 10, y: 0, w: 50, h: 30 }, { x: 70, y: 0, w: 30, h: 30 }]);
+    const carLeftSideTexture = new Texture(110, 40, [{ x: 10, y: 10, w: 50, h: 30 }, { x: 70, y: 10, w: 30, h: 30 }]);
+    const truckFrontTexture = new Texture(30, 30, [{ x: 15, y: 0, w: 10, h: 30 }]);
+    const truckRightSideTexture = new Texture(25, 30, [{ x: 0, y: 15, w: 10, h: 10 }]);
+    const truckLeftSideTexture = new Texture(25, 30, [{ x: 0, y: 5, w: 10, h: 10 }]);
+
+    function generateLanes() {
+      return [-9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(index => {
+        const lane = new Lane(index);
+        lane.mesh.position.y = index * positionWidth * zoom;
+        scene.add(lane.mesh);
+        return lane;
+      }).filter(lane => lane.index >= 0);
+    }
+    function addLane() {
+      const index = lanes.length;
+      const lane = new Lane(index);
+      lane.mesh.position.y = index * positionWidth * zoom;
+      scene.add(lane.mesh);
+      lanes.push(lane);
+    }
+    function Wheel() {
+      const wheel = new THREE.Mesh(
+        new THREE.BoxBufferGeometry(12 * zoom, 33 * zoom, 12 * zoom),
+        new THREE.MeshLambertMaterial({ color: 0x333333, flatShading: true })
+      );
+      wheel.position.z = 6 * zoom;
+      wheel.castShadow = true;
+      return wheel;
+    }
+    function Car() {
+      const car = new THREE.Group();
+      const color = vechicleColors[Math.floor(Math.random() * vechicleColors.length)];
+
+      // Основная часть машины
+      const main = new THREE.Mesh(
+        new THREE.BoxBufferGeometry(60 * zoom, 30 * zoom, 15 * zoom),
+        new THREE.MeshPhongMaterial({ color, flatShading: true, shininess: 30 })
+      );
+      main.position.z = 12 * zoom;
+      main.castShadow = true;
+      main.receiveShadow = true;
+      car.add(main);
+
+      // Кабина
+      const cabin = new THREE.Mesh(
+        new THREE.BoxBufferGeometry(33 * zoom, 24 * zoom, 12 * zoom),
+        [
+          new THREE.MeshPhongMaterial({ color: 0xffffff, flatShading: true, shininess: 10, map: carBackTexture }),
+          new THREE.MeshPhongMaterial({ color: 0xffffff, flatShading: true, shininess: 10, map: carFrontTexture }),
+          new THREE.MeshPhongMaterial({ color: 0xffffff, flatShading: true, shininess: 10, map: carRightSideTexture }),
+          new THREE.MeshPhongMaterial({ color: 0xffffff, flatShading: true, shininess: 10, map: carLeftSideTexture }),
+          new THREE.MeshPhongMaterial({ color: 0xffffff, flatShading: true, shininess: 10 }),
+          new THREE.MeshPhongMaterial({ color: 0xffffff, flatShading: true, shininess: 10 })
+        ]
+      );
+      cabin.position.x = 6 * zoom;
+      cabin.position.z = 25.5 * zoom;
+      cabin.castShadow = true;
+      cabin.receiveShadow = true;
+      car.add(cabin);
+
+      // Колёса
+      const frontWheel = new Wheel();
+      frontWheel.position.x = -18 * zoom;
+      car.add(frontWheel);
+      const backWheel = new Wheel();
+      backWheel.position.x = 18 * zoom;
+      car.add(backWheel);
+
+      car.castShadow = true;
+      return car;
+    }
+    function Truck() {
+      const truck = new THREE.Group();
+      const color = vechicleColors[Math.floor(Math.random() * vechicleColors.length)];
+
+      // Низ (платформа)
+      const base = new THREE.Mesh(
+        new THREE.BoxBufferGeometry(100 * zoom, 25 * zoom, 5 * zoom),
+        new THREE.MeshLambertMaterial({ color: 0xb4c6fc, flatShading: true })
+      );
+      base.position.z = 10 * zoom;
+      base.castShadow = true;
+      truck.add(base);
+
+      // Грузовая часть
+      const cargo = new THREE.Mesh(
+        new THREE.BoxBufferGeometry(75 * zoom, 35 * zoom, 40 * zoom),
+        new THREE.MeshLambertMaterial({ color: 0xb4c6fc, flatShading: true })
+      );
+      cargo.position.x = 15 * zoom;
+      cargo.position.z = 30 * zoom;
+      cargo.castShadow = true;
+      cargo.receiveShadow = true;
+      truck.add(cargo);
+
+      // Кабина
+      const cabin = new THREE.Mesh(
+        new THREE.BoxBufferGeometry(25 * zoom, 30 * zoom, 30 * zoom),
+        [
+          new THREE.MeshPhongMaterial({ color, flatShading: true, shininess: 10 }),
+          new THREE.MeshPhongMaterial({ color, flatShading: true, shininess: 10, map: truckFrontTexture }),
+          new THREE.MeshPhongMaterial({ color, flatShading: true, shininess: 10, map: truckRightSideTexture }),
+          new THREE.MeshPhongMaterial({ color, flatShading: true, shininess: 10, map: truckLeftSideTexture }),
+          new THREE.MeshPhongMaterial({ color, flatShading: true, shininess: 10 }),
+          new THREE.MeshPhongMaterial({ color, flatShading: true, shininess: 10 })
+        ]
+      );
+      cabin.position.x = -40 * zoom;
+      cabin.position.z = 20 * zoom;
+      cabin.castShadow = true;
+      cabin.receiveShadow = true;
+      truck.add(cabin);
+
+      // Колёса
+      const frontWheel = new Wheel();
+      frontWheel.position.x = -38 * zoom;
+      truck.add(frontWheel);
+      const middleWheel = new Wheel();
+      middleWheel.position.x = -10 * zoom;
+      truck.add(middleWheel);
+      const backWheel = new Wheel();
+      backWheel.position.x = 30 * zoom;
+      truck.add(backWheel);
+
+      return truck;
+    }
+    function ThreeTree() {
+      const tree = new THREE.Group();
+      // Ствол
+      const trunk = new THREE.Mesh(
+        new THREE.BoxBufferGeometry(15 * zoom, 15 * zoom, 20 * zoom),
+        new THREE.MeshLambertMaterial({ color: 0x4d2926, flatShading: true })
+      );
+      trunk.position.z = 10 * zoom;
+      trunk.castShadow = true;
+      trunk.receiveShadow = true;
+      tree.add(trunk);
+      // «Крона»
+      const height = threeHeights[Math.floor(Math.random() * threeHeights.length)];
+      const crown = new THREE.Mesh(
+        new THREE.BoxBufferGeometry(30 * zoom, 30 * zoom, height * zoom),
+        new THREE.MeshLambertMaterial({ color: 0x7aa21d, flatShading: true })
+      );
+      crown.position.z = (height / 2 + 20) * zoom;
+      crown.castShadow = true;
+      tree.add(crown);
+      return tree;
+    }
+    function Chicken() {
+      const chicken = new THREE.Group();
+      // Тело
+      const body = new THREE.Mesh(
+        new THREE.BoxBufferGeometry(chickenSize * zoom, chickenSize * zoom, 20 * zoom),
+        new THREE.MeshLambertMaterial({ color: 0xffffff, flatShading: true })
+      );
+      body.position.z = 10 * zoom;
+      body.castShadow = true;
+      body.receiveShadow = true;
+      chicken.add(body);
+      // Гребешок
+      const rowel = new THREE.Mesh(
+        new THREE.BoxBufferGeometry(2 * zoom, 4 * zoom, 2 * zoom),
+        new THREE.MeshLambertMaterial({ color: 0xF0619A, flatShading: true })
+      );
+      rowel.position.z = 21 * zoom;
+      rowel.castShadow = true;
+      chicken.add(rowel);
+      return chicken;
+    }
+    function Road() {
+      const road = new THREE.Group();
+      const createSection = color => new THREE.Mesh(
+        new THREE.PlaneBufferGeometry(boardWidth * zoom, positionWidth * zoom),
+        new THREE.MeshLambertMaterial({ color, flatShading: true })
+      );
+      // Тёмно-серая середина дороги
+      const middle = createSection(0x454A59);
+      middle.receiveShadow = true;
+      road.add(middle);
+      // Левый край
+      const left = createSection(0x3A3F4B);
+      left.position.x = -boardWidth * zoom;
+      road.add(left);
+      // Правый край
+      const right = createSection(0x3A3F4B);
+      right.position.x = boardWidth * zoom;
+      road.add(right);
+      return road;
+    }
+    function Grass() {
+      const grass = new THREE.Group();
+      const createSection = color => new THREE.Mesh(
+        new THREE.BoxBufferGeometry(boardWidth * zoom, positionWidth * zoom, 3 * zoom),
+        new THREE.MeshLambertMaterial({ color, flatShading: true })
+      );
+      // Ярко-зелёная трава
+      const middle = createSection(0x8bc34a);
+      middle.receiveShadow = true;
+      grass.add(middle);
+      const left = createSection(0x7fbf3c);
+      left.position.x = -boardWidth * zoom;
+      grass.add(left);
+      const right = createSection(0x7fbf3c);
+      right.position.x = boardWidth * zoom;
+      grass.add(right);
+      grass.position.z = 1.5 * zoom;
+      return grass;
+    }
+    function Lane(index) {
+      this.index = index;
+      this.type = index <= 0 ? 'field' : laneTypes[Math.floor(Math.random() * laneTypes.length)];
+      switch (this.type) {
+        case 'field': {
+          this.type = 'field';
+          this.mesh = new Grass();
+          break;
+        }
+        case 'forest': {
+          this.mesh = new Grass();
+          this.occupiedPositions = new Set();
+          this.trees = [1, 2, 3, 4].map(() => {
+            const tree = ThreeTree();
+            let position;
+            do {
+              position = Math.floor(Math.random() * columns);
+            } while (this.occupiedPositions.has(position));
+            this.occupiedPositions.add(position);
+            tree.position.x = (position * positionWidth + positionWidth / 2) * zoom - boardWidth * zoom / 2;
+            this.mesh.add(tree);
+            return tree;
+          });
+          break;
+        }
+        case 'car': {
+          this.mesh = new Road();
+          this.direction = Math.random() >= 0.5;
+          const occupiedPositions = new Set();
+          this.vechicles = [1, 2, 3].map(() => {
+            const vechicle = new Car();
+            let position;
+            do {
+              position = Math.floor(Math.random() * (columns / 2));
+            } while (occupiedPositions.has(position));
+            occupiedPositions.add(position);
+            vechicle.position.x = (position * positionWidth * 2 + positionWidth / 2) * zoom - boardWidth * zoom / 2;
+            if (!this.direction) vechicle.rotation.z = Math.PI;
+            this.mesh.add(vechicle);
+            return vechicle;
+          });
+          this.speed = laneSpeeds[Math.floor(Math.random() * laneSpeeds.length)];
+          break;
+        }
+        case 'truck': {
+          this.mesh = new Road();
+          this.direction = Math.random() >= 0.5;
+          const occupiedPositions = new Set();
+          this.vechicles = [1, 2].map(() => {
+            const vechicle = new Truck();
+            let position;
+            do {
+              position = Math.floor(Math.random() * (columns / 3));
+            } while (occupiedPositions.has(position));
+            occupiedPositions.add(position);
+            vechicle.position.x = (position * positionWidth * 3 + positionWidth / 2) * zoom - boardWidth * zoom / 2;
+            if (!this.direction) vechicle.rotation.z = Math.PI;
+            this.mesh.add(vechicle);
+            return vechicle;
+          });
+          this.speed = laneSpeeds[Math.floor(Math.random() * laneSpeeds.length)];
+          break;
+        }
+      }
+    }
+
+    // Звук движения
+    const moveSound = new Audio("move.mp3");
+
+    // Обработчики кнопок управления
+    document.getElementById('forward').addEventListener("click", () => move('forward'));
+    document.getElementById('backward').addEventListener("click", () => move('backward'));
+    document.getElementById('left').addEventListener("click", () => move('left'));
+    document.getElementById('right').addEventListener("click", () => move('right'));
+
+    function move(direction) {
+      moveSound.currentTime = 0;
+      moveSound.play().catch(err => console.log(err));
+      const finalPositions = moves.reduce((position, move) => {
+        if (move === 'forward') return { lane: position.lane + 1, column: position.column };
+        if (move === 'backward') return { lane: position.lane - 1, column: position.column };
+        if (move === 'left') return { lane: position.lane, column: position.column - 1 };
+        if (move === 'right') return { lane: position.lane, column: position.column + 1 };
+      }, { lane: currentLane, column: currentColumn });
+
+      if (direction === 'forward') {
+        if (lanes[finalPositions.lane + 1].type === 'forest' &&
+            lanes[finalPositions.lane + 1].occupiedPositions.has(finalPositions.column)) return;
+        if (!stepStartTimestamp) startMoving = true;
+        addLane();
+      } else if (direction === 'backward') {
+        if (finalPositions.lane === 0) return;
+        if (lanes[finalPositions.lane - 1].type === 'forest' &&
+            lanes[finalPositions.lane - 1].occupiedPositions.has(finalPositions.column)) return;
+        if (!stepStartTimestamp) startMoving = true;
+      } else if (direction === 'left') {
+        if (finalPositions.column === 0) return;
+        if (lanes[finalPositions.lane].type === 'forest' &&
+            lanes[finalPositions.lane].occupiedPositions.has(finalPositions.column - 1)) return;
+        if (!stepStartTimestamp) startMoving = true;
+      } else if (direction === 'right') {
+        if (finalPositions.column === columns - 1) return;
+        if (lanes[finalPositions.lane].type === 'forest' &&
+            lanes[finalPositions.lane].occupiedPositions.has(finalPositions.column + 1)) return;
+        if (!stepStartTimestamp) startMoving = true;
+      }
+      moves.push(direction);
+    }
+
+    // Эффект тряски камеры (при столкновении)
+    function cameraShake(duration = 500, intensity = 5) {
+      const startTime = performance.now();
+      const originalPosition = camera.position.clone();
+      function shake() {
+        const elapsed = performance.now() - startTime;
+        if (elapsed < duration) {
+          camera.position.x = originalPosition.x + (Math.random() - 0.5) * intensity;
+          camera.position.y = originalPosition.y + (Math.random() - 0.5) * intensity;
+          requestAnimationFrame(shake);
+        } else {
+          camera.position.copy(originalPosition);
+        }
+      }
+      shake();
+    }
+
+    // Эффект частиц при столкновении
+    function spawnCollisionParticles() {
+      const particleCount = 50;
+      const geometry = new THREE.BufferGeometry();
+      const positions = [];
+      for (let i = 0; i < particleCount; i++) {
+        positions.push(chicken.position.x, chicken.position.y, chicken.position.z);
+      }
+      geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+      const material = new THREE.PointsMaterial({ color: 0xff66cc, size: 2, transparent: true });
+      const particles = new THREE.Points(geometry, material);
+      scene.add(particles);
+      const startTime = performance.now();
+      function animateParticles() {
+        const elapsed = performance.now() - startTime;
+        if (elapsed < 1000) {
+          const positions = particles.geometry.attributes.position.array;
+          for (let i = 0; i < particleCount; i++) {
+            positions[i * 3] += (Math.random() - 0.5) * 2;
+            positions[i * 3 + 1] += (Math.random() - 0.5) * 2;
+            positions[i * 3 + 2] += (Math.random() - 0.5) * 2;
+          }
+          particles.geometry.attributes.position.needsUpdate = true;
+          requestAnimationFrame(animateParticles);
+        } else {
+          scene.remove(particles);
+          particles.geometry.dispose();
+          particles.material.dispose();
+        }
+      }
+      animateParticles();
+    }
+
+    // Завершение игры
+    function endGame() {
+      if (gameEnded) return;
+      gameEnded = true;
+      document.getElementById('deathSound').play().catch(err => console.log(err));
+      // Тряска камеры и частицы
+      cameraShake();
+      spawnCollisionParticles();
+      setTimeout(() => {
+        localUserData.points += currentLane;
+        if (userRef) userRef.update({ points: localUserData.points });
+        document.getElementById('controlls').style.display = 'none';
+        modalType = "gameOver";
+        document.getElementById('endTitle').textContent = 'Game Over!';
+        document.getElementById('endMessage').textContent = 'Your score: ' + currentLane;
+        document.getElementById('end').style.visibility = 'visible';
+      }, 600);
+    }
+
+    // Если билетов нет или данные не загружены – показываем модальное окно
+    function showNoTicketsModal() {
+      modalType = "noTickets";
+      document.getElementById('endTitle').textContent = 'Not enough tickets!';
+      document.getElementById('endMessage').textContent = 'Please come back later.';
+      document.getElementById('end').style.visibility = 'visible';
+    }
+
+    /* ----------------------------------------
+       3. Главный игровой цикл и таймер
+    ---------------------------------------- */
+    function animate(timestamp) {
+      requestAnimationFrame(animate);
+      if (!previousTimestamp) previousTimestamp = timestamp;
+      const delta = timestamp - previousTimestamp;
+      previousTimestamp = timestamp;
+
+      // Обновление таймера (если игра запущена)
+      if (gameStartTime) {
+        let elapsed = timestamp - gameStartTime;
+        let remaining = gameDuration - elapsed;
+        let timeBar = document.getElementById('timeBar');
+        if (remaining <= 0) {
+          timeBar.style.width = "0%";
+          if (!gameEnded) {
+            endGame();
+          }
+        } else {
+          timeBar.style.width = (remaining / gameDuration * 100) + "%";
+        }
+      }
+
+      // Движение машин/грузовиков
+      lanes.forEach(lane => {
+        if (lane.type === 'car' || lane.type === 'truck') {
+          const aBitBefore = -boardWidth * zoom / 2 - positionWidth * 2 * zoom;
+          const aBitAfter  = boardWidth * zoom / 2 + positionWidth * 2 * zoom;
+          lane.vechicles.forEach(vehicle => {
+            if (lane.direction) {
+              vehicle.position.x = vehicle.position.x < aBitBefore ? aBitAfter : vehicle.position.x - lane.speed / 16 * delta;
+            } else {
+              vehicle.position.x = vehicle.position.x > aBitAfter ? aBitBefore : vehicle.position.x + lane.speed / 16 * delta;
+            }
+          });
+        }
+      });
+
+      // Анимация прыжка курицы
+      if (startMoving) {
+        stepStartTimestamp = timestamp;
+        startMoving = false;
+      }
+
+      if (stepStartTimestamp) {
+        const moveDeltaTime = timestamp - stepStartTimestamp;
+        const progress = Math.min(moveDeltaTime / stepTime, 1);
+        const moveDeltaDistance = progress * positionWidth * zoom;
+        const jumpDeltaDistance = Math.sin(progress * Math.PI) * 8 * zoom;
+        switch (moves[0]) {
+          case 'forward': {
+            const targetY = currentLane * positionWidth * zoom + moveDeltaDistance;
+            chicken.position.y = targetY;
+            chicken.position.z = jumpDeltaDistance;
+            camera.position.y = chicken.position.y + cameraOffset.y;
+            camera.position.x = chicken.position.x + cameraOffset.x;
+            break;
+          }
+          case 'backward': {
+            const targetY = currentLane * positionWidth * zoom - moveDeltaDistance;
+            chicken.position.y = targetY;
+            chicken.position.z = jumpDeltaDistance;
+            camera.position.y = chicken.position.y + cameraOffset.y;
+            camera.position.x = chicken.position.x + cameraOffset.x;
+            break;
+          }
+          case 'left': {
+            const targetX = (currentColumn * positionWidth + positionWidth / 2) * zoom - boardWidth * zoom / 2 - moveDeltaDistance;
+            chicken.position.x = targetX;
+            chicken.position.z = jumpDeltaDistance;
+            camera.position.x = chicken.position.x + cameraOffset.x;
+            camera.position.y = chicken.position.y + cameraOffset.y;
+            break;
+          }
+          case 'right': {
+            const targetX = (currentColumn * positionWidth + positionWidth / 2) * zoom - boardWidth * zoom / 2 + moveDeltaDistance;
+            chicken.position.x = targetX;
+            chicken.position.z = jumpDeltaDistance;
+            camera.position.x = chicken.position.x + cameraOffset.x;
+            camera.position.y = chicken.position.y + cameraOffset.y;
+            break;
+          }
+        }
+        if (moveDeltaTime > stepTime) {
+          switch (moves[0]) {
+            case 'forward': {
+              currentLane++;
+              document.getElementById('counter').textContent = currentLane;
+              break;
+            }
+            case 'backward': {
+              currentLane--;
+              document.getElementById('counter').textContent = currentLane;
+              break;
+            }
+            case 'left': {
+              currentColumn--;
+              break;
+            }
+            case 'right': {
+              currentColumn++;
+              break;
+            }
+          }
+          moves.shift();
+          stepStartTimestamp = moves.length === 0 ? null : timestamp;
+        }
+      }
+
+      // Проверка столкновений с транспортом
+      if (lanes[currentLane].type === 'car' || lanes[currentLane].type === 'truck') {
+        const chickenMinX = chicken.position.x - chickenSize * zoom / 2;
+        const chickenMaxX = chicken.position.x + chickenSize * zoom / 2;
+        // Примерная длина автомобиля/грузовика
+        const vehicleLength = { car: 60, truck: 105 }[lanes[currentLane].type];
+        lanes[currentLane].vechicles.forEach(vehicle => {
+          const vehicleMinX = vehicle.position.x - vehicleLength * zoom / 2;
+          const vehicleMaxX = vehicle.position.x + vehicleLength * zoom / 2;
+          if (chickenMaxX > vehicleMinX && chickenMinX < vehicleMaxX) {
+            endGame();
+          }
+        });
+      }
+
+      camera.lookAt(chicken.position);
+      renderer.render(scene, camera);
+    }
+    requestAnimationFrame(animate);
+
+    /* ----------------------------------------
+       4. Функция старта игры
+    ---------------------------------------- */
+    document.body.addEventListener('click', () => {
+      const bgSound = document.getElementById('bgSound');
+      if (bgSound.paused) {
+        bgSound.play().catch(err => console.log(err));
+      }
+    }, { once: true });
+
+    function startGame() {
+      // Если данные не загружены или билетов недостаточно, показываем модальное окно
+      if (!dataLoaded || localUserData.tickets < 1) {
+        showNoTicketsModal();
+        return;
+      }
+      localUserData.tickets--;
+      if (userRef) userRef.update({ tickets: localUserData.tickets });
+      updateHeader();
+      // Скрываем меню: header, back и кнопку Start
+      document.getElementById('header').style.display = 'none';
+      document.getElementById('backContainer').style.display = 'none';
+      document.getElementById('startBtn').style.display = 'none';
+      // Показываем область игры и контролы
+      document.getElementById('gameWrapper').style.display = 'block';
+      document.getElementById('controlls').style.display = 'flex';
+      // Показываем time bar
+      document.getElementById('timeBarContainer').style.display = 'block';
+      // Устанавливаем время старта игры для таймера
+      gameStartTime = performance.now();
+
+      initGame();
+      if (!renderer) {
+        initRenderer();
+      }
+    }
+  </script>
+</body>
+</html>
