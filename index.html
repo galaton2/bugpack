@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+  <title>404</title>
+
+  <!-- Font: Press Start 2P -->
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <!-- Default theme -->
+  <link id="themeStylesheet" rel="stylesheet" href="st1.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cannon/0.6.2/cannon.min.js"></script>
+
+  <!-- Additional CSS for Loot Box block -->
+  <style>
+   .case-container {
+     flex-direction: column;
+     align-items: center;
+     justify-content: center;
+     margin-top: -60px;
+     text-align: center;
+     position: relative;
+     top: 50px;
+     display: inline-block;
+     transition: top 0.5s ease;
+   }
+   .case-container.open {
+     top: 20px;
+   }
+   .case-container img {
+     display: block;
+     margin: 0 auto;
+     width: 330px;
+     height: 330px;
+     transition: width 0.5s ease, height 0.5s ease, transform 0.5s ease;
+   }
+   .case-container.open img {
+     width: 500px;
+     height: 500px;
+     transform: translateY(-30px);
+   }
+   .explode {
+     animation: explode 0.8s ease-out forwards;
+   }
+   @keyframes explode {
+     0% {
+       transform: scale(1) rotate(0deg);
+       opacity: 1;
+       filter: brightness(1);
+     }
+     50% {
+       transform: scale(1.3) rotate(20deg);
+       opacity: 0.8;
+       filter: brightness(1.2);
+     }
+     70% {
+       transform: scale(1.1) rotate(10deg);
+       opacity: 0.9;
+       filter: brightness(1.1);
+     }
+     100% {
+       transform: scale(2.5) rotate(45deg);
+       opacity: 0;
+       filter: brightness(0.5);
+     }
+   }
+   .case-container p {
+     position: absolute;
+     bottom: 420px;
+     left: 50%;
+     transform: translateX(-50%);
+     font-weight: bold;
+     margin: 0;
+     pointer-events: none;
+     z-index: 1;
+   }
+   .lootbox-buttons {
+     position: relative;
+     z-index: 10;
+     transition: opacity 0.5s ease;
+     display: flex;
+     gap: 10px;
+     margin-top: 80px;
+   }
+   .case-container.open .lootbox-buttons {
+     opacity: 0;
+     pointer-events: none;
+   }
+  </style>
+
+  <!-- Telegram Web App API -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://unpkg.com/gifler@0.1.0/gifler.min.js"></script>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <a href="soon.html" id="walletLink" class="walletLink" style="position: absolute; top: 5px; left: 10px;">
+      <img src="https://raw.githubusercontent.com/qnexst/404token/main/wallet.png" alt="Wallet" width="45" height="45"/>
+    </a>
+    <div class="user-info">
+      <img id="userPhoto" src="" alt="Avatar"/>
+      <span id="username">@User</span>
+    </div>
+    <div class="balances">
+      <span>
+        <img src="https://raw.githubusercontent.com/qnexst/404token/main/ticket.png" alt="Tickets" width="20"/>
+        <span id="ticketCount">0</span>
+      </span>
+      <span>
+        <img src="https://raw.githubusercontent.com/qnexst/404token/main/token.png" alt="Coins" width="20"/>
+        <span id="coinCount">0</span>
+      </span>
+      <span>
+        <img src="https://raw.githubusercontent.com/qnexst/404token/main/star.png" alt="Points" width="20"/>
+        <span id="pointCount">0</span>
+      </span>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <!-- PLAY SECTION -->
+    <section id="playSection" class="section active">
+      <div class="games-section">
+        <h3>
+          <span id="mainOnlineHeaderText">Online Games</span>
+          <button id="mainOnlineInfoBtn" class="info-button" onclick="openMainOnlineInfoModal()">Info</button>
+        </h3>
+        <div class="games-gallery">
+          <div class="game-card">
+            <img src="https://raw.githubusercontent.com/qnexst/404token/main/1.jpg" alt="Special Game">
+            <p id="gameCard1Title">Snake Online</p>
+            <button id="gameCard1Button" onclick="window.location.href='specialgame.html'">Play</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="games-section">
+        <h3>
+          <span id="miniGamesHeaderText">Mini-Games</span>
+          <button id="miniGamesInfoBtn" class="info-button" onclick="openMiniGamesInfoModal()">Info</button>
+        </h3>
+        <div class="games-gallery">
+          <!-- Игра STACK (game2) – при нажатии происходит переход на stack.html без списания билетов -->
+          <div class="game-card">
+            <img src="https://i.pinimg.com/736x/ed/0d/12/ed0d1214bfce57bc73d3207f47ac1d9e.jpg" alt="Match-3">
+            <p id="gameCard2Title">PAC-MAN</p>
+            <button id="gameCard2Button" onclick="openGameInfoModal({
+              gameId: 'game2',
+              title: 'PAC-MAN',
+              img: 'https://i.pinimg.com/736x/ed/0d/12/ed0d1214bfce57bc73d3207f47ac1d9e.jpg',
+              desc: 'Pac-Man is a classic arcade game in which each dot gives you one star.',
+              cost: 1
+            })">Play</button>
+          </div>
+          <!-- Игра TETRIS (game3) – списываются билеты и запускается игра -->
+          <div class="game-card">
+            <img src="https://raw.githubusercontent.com/qnexst/404token/main/tetris.jpg" alt="Game 3">
+            <p id="gameCard3Title">TETRIS</p>
+            <button id="gameCard3Button" onclick="openGameInfoModal({
+              gameId: 'game3',
+              title: 'TETRIS',
+              img: 'https://raw.githubusercontent.com/qnexst/404token/main/tetris.jpg',
+              desc: 'Tetris is a classic tile-matching puzzle game. Each cleared row awards you 30 stars.',
+              cost: 1
+            })">Play</button>
+          </div>
+          <div class="game-card">
+            <img src="https://i.pinimg.com/736x/ea/b7/75/eab775a90814f5df05466cc7ea4c590c.jpg" alt="Space Explorer">
+            <p id="gameCard4Title">Crossy Road</p>
+            <button id="gameCard4Button" onclick="openGameInfoModal({
+              gameId: 'game4',
+              title: 'Crossy Road',
+              img: 'https://i.pinimg.com/736x/ea/b7/75/eab775a90814f5df05466cc7ea4c590c.jpg',
+              desc: 'Crossy Road is a fast-paced arcade game where every step earns you 1 star.',
+              cost: 1
+            })">Play</button>
+          </div>
+          <!-- Новая карточка для Breakout -->
+          <div class="game-card">
+            <img src="https://raw.githubusercontent.com/qnexst/404token/main/breakout.jpg" alt="Breakout">
+            <p id="gameCard7Title">Breakout</p>
+            <button id="gameCard7Button" onclick="openGameInfoModal({
+              gameId: 'breakout',
+              title: 'Breakout',
+              img: 'https://raw.githubusercontent.com/qnexst/404token/main/breakout.jpg',
+              desc: 'Breakout is a classic arcade game where each broken brick awards you 5 stars.',
+              cost: 1
+            })">Play</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="games-section">
+        <h3>
+          <span id="partnerGamesHeaderText">Partner Games</span>
+          <button id="partnerInfoBtn" class="info-button" onclick="openPartnerInfoModal()">Info</button>
+        </h3>
+        <div class="games-gallery">
+         <div class="game-card">
+  <img src="https://img.icons8.com/ios-filled/50/00000/handshake.png" alt="Partner Game">
+  <p id="gameCard5Title">Partner Game</p>
+  <!-- Скрываем кнопку Play до момента, когда она станет доступной -->
+  <button id="gameCard5Button" style="display: none;" onclick="openGameInfoModal({ 
+              gameId: 'partnergame1',
+              title: 'soon',
+              img: 'https://img.icons8.com/ios-filled/50/00000/handshake.png',
+              desc: 'Game from our partner.',
+              cost: 1
+            })">Play</button>
+</div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- TICKETS SECTION -->
+    <section id="ticketsSection" class="section">
+      <h2 id="ticketsHeader">Tickets</h2>
+      <div class="wheel-container">
+        <div class="wheel" id="wheel">
+          <div class="slice slice1">
+            <img width="24" height="32" src="https://raw.githubusercontent.com/qnexst/404token/main/ticket.png" alt="ticket"/>
+            <span>2</span>
+          </div>
+          <div class="slice slice2">
+            <img width="24" height="32" src="https://raw.githubusercontent.com/qnexst/404token/main/ticket.png" alt="ticket"/>
+            <span>5</span>
+          </div>
+          <div class="slice slice3">
+            <img width="24" height="32" src="https://raw.githubusercontent.com/qnexst/404token/main/ticket.png" alt="ticket"/>
+            <span>8</span>
+          </div>
+          <div class="slice slice4">
+            <img width="24" height="32" src="https://raw.githubusercontent.com/qnexst/404token/main/ticket.png" alt="ticket"/>
+            <span>10</span>
+          </div>
+          <div class="slice slice5">
+            <img width="24" height="32" src="https://raw.githubusercontent.com/qnexst/404token/main/ticket.png" alt="ticket"/>
+            <span>13</span>
+          </div>
+          <div class="slice slice6">
+            <img width="24" height="32" src="https://raw.githubusercontent.com/qnexst/404token/main/ticket.png" alt="ticket"/>
+            <span>15</span>
+          </div>
+        </div>
+        <div class="wheel-pointer"></div>
+        <div class="tickets-actions">
+          <button id="spinButton" onclick="spinWheel()">Free Spin</button>
+          <button id="buyTicketsBtn" onclick="buyTickets()">Buy Tickets</button>
+        </div>
+        <div class="spin-result" id="spinResult"></div>
+      </div>
+    </section>
+
+    <!-- LEADERBOARD SECTION -->
+    <section id="leaderboardSection" class="section">
+      <h2 id="leaderboardHeader">Leaderboard</h2>
+       <h2 id="leaderboardHeader">Season 1</h2>
+      <button class="info-button" onclick="openSeasonInfoModal()">Info</button>
+      <div class="leaderboard-container">
+        <table id="leaderboardTable">
+          <thead>
+            <tr>
+              <th>№</th>
+              <th>Username</th>
+              <th>Points</th>
+              <th>Prize</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboardTop10">
+            <!-- Top-10 players with prizes -->
+          </tbody>
+          <tbody id="leaderboardRest">
+            <!-- Other players -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- LOOT BOX SECTION -->
+    <section id="referralSection" class="section">
+      <h2 id="referralHeader">ㅤㅤ</h2>
+      <h2 id="referralHeader">Bug Packs</h2>
+      <button class="info-button" onclick="openLootBoxInfoModal()">Info</button>
+      <div class="case-container">
+        <img id="caseImage" src="https://raw.githubusercontent.com/qnexst/404token/main/case.png" alt="Cyber Case">
+      </div>
+      <div class="lootbox-container" id="lootboxContainer" style="display: none;">
+        <div class="lootbox-indicator"></div>
+        <div class="lootbox-roulette" id="lootboxRoulette">
+          <!-- Prizes will be added dynamically -->
+        </div>
+      </div>
+      <div class="lootbox-buttons">
+        <button id="openBtn" onclick="openLootBox()">open (0)</button>
+        <button id="openForTokenBtn" onclick="spinLootBoxForTokens()">
+          <span>Open for 5m tokens</span><br>
+          <span></span>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav id="mainNav">
+    <button onclick="showSection('playSection')">
+      <img src="https://img.icons8.com/ios-filled/50/ffffff/playing.png" alt="Play" id="navPlayAlt"/>
+    </button>
+    <button onclick="showSection('ticketsSection')">
+      <img src="https://img.icons8.com/ios-filled/50/ffffff/ticket.png" alt="Tickets" id="navTicketsAlt"/>
+    </button>
+    <button onclick="showSection('leaderboardSection')">
+      <img src="https://img.icons8.com/ios-filled/50/ffffff/trophy.png" alt="Leaderboard" id="navLeaderboardAlt"/>
+    </button>
+    <button onclick="showSection('referralSection')">
+      <img src="https://img.icons8.com/ios-filled/50/question-mark.png" alt="Cyber Case" id="navReferralAlt"/>
+    </button>
+  </nav>
+
+  <!-- Global Modal -->
+  <div class="modal-backdrop" id="globalModalBackdrop">
+    <div class="modal">
+      <h2 id="globalModalTitle">Message</h2>
+      <p id="globalModalMessage"></p>
+      <button class="close-modal" onclick="closeGlobalModal()">OK</button>
+    </div>
+  </div>
+
+  <!-- Season Info Modal -->
+  <div class="modal-backdrop" id="seasonModalBackdrop">
+    <div class="modal modal-season">
+      <h2 id="seasonModalTitle">Season Information</h2>
+      <p id="seasonModalDesc">Season 1: The season lasts for 1 week, and at the end of it, each of the top 10 players will automatically receive BUG PACKs.</p>
+      <button class="close-modal" onclick="closeSeasonModal()">Close</button>
+    </div>
+  </div>
+
+  <!-- Modal for Loot Box Info -->
+  <div class="modal-backdrop" id="lootBoxInfoModal">
+    <div class="modal">
+    
+      <h2 id="lootBoxInfoTitle">Bug Pack Info</h2>
+      <p id="lootBoxInfoDesc">
+  Prizes and Chances:<br>
+  - 3 tickets (10%)<br>
+  - 5 tickets (5%)<br>
+  - 10 tickets (8%)<br>
+  - 8 tickets (4%)<br>
+  - One case (5%)<br>
+  - 100 points (10%)<br>
+  - 500 points (5%)<br>
+  - 1M tokens (3%)<br>
+  - 3M tokens (2%)<br>
+  - 5M tokens (1%)<br>
+  - NFT Red (1%) – Special<br>
+  - NFT Yellow (2%) – Legendary<br>
+  - NFT Green (3%) – Rare<br>
+ 
+  - 1000 points (2%)
+</p>
+
+      <button class="close-modal" onclick="closeLootBoxInfoModal()">Close</button>
+    </div>
+  </div>
+
+  <!-- Modal for Game Info -->
+  <div class="modal-backdrop" id="gameInfoModal">
+    <div class="modal">
+      <img id="gameInfoImg" src="" alt="Game Image" style="max-width:100px; display:block; margin:0 auto 10px;" />
+      <h2 id="gameInfoTitle" style="text-align:center;"></h2>
+      <p id="gameInfoDesc"></p>
+      <button id="gameInfoPlayBtn">Play</button>
+      <button class="close-modal" onclick="closeGameInfoModal()">Close</button>
+    </div>
+  </div>
+
+  <!-- Spin Result Modal -->
+  <div class="modal-backdrop" id="spinModalBackdrop">
+    <div class="modal">
+      <h2 id="spinModalTitle">You won <span id="wheelTicketCount"></span> tickets!</h2>
+      <button class="close-modal" onclick="closeSpinModal()">OK</button>
+    </div>
+  </div>
+
+  <!-- Fullscreen Game Modal -->
+  <div class="game-modal-backdrop" id="gameModalBackdrop">
+    <div class="game-modal-content">
+      <div class="game-canvas">
+         <!-- Оставлен только canvas для TETRIS (game3) -->
+         <canvas id="game3Canvas" width="400" height="740" style="display: none; position: relative; top: -0px;"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Endgame Modal -->
+  <div class="endgame-backdrop" id="endgameBackdrop">
+    <div class="endgame-modal">
+      <h2 id="endgameTitle">Result</h2>
+      <p id="endgameMessage"></p>
+      <button class="close-modal" onclick="finishGame()">Close</button>
+    </div>
+  </div>
+
+  <!-- Modal for Main Online Games Info -->
+  <div class="modal-backdrop" id="mainOnlineInfoModal">
+    <div class="modal">
+      <h2 id="mainOnlineInfoTitle">Online Games</h2>
+      <p id="mainOnlineInfoDesc">The online games section features a collection of arcade challenges where players can place token bets for bigger rewards or play for free without tickets and tokens, offering flexible mechanics that cater to both competitive and casual gamers in a fast-paced, engaging environment.</p>
+      <button class="close-modal" onclick="closeMainOnlineInfoModal()">Close</button>
+    </div>
+  </div>
+
+  <!-- Modal for Mini Games Info -->
+  <div class="modal-backdrop" id="miniGamesInfoModal">
+    <div class="modal">
+      <h2 id="miniGamesInfoTitle">Mini Games Info</h2>
+      <p id="miniGamesInfoDesc">Players participate in mini games for tickets, earning points for their activity. Every 7 days, top 10 players receive BUG PACKS.</p>
+      <button class="close-modal" onclick="closeMiniGamesInfoModal()">Close</button>
+    </div>
+  </div>
+
+  <!-- Modal for Partner Games Info -->
+  <div class="modal-backdrop" id="partnerInfoModal">
+    <div class="modal">
+      <h2 id="partnerInfoTitle">Partner Games</h2>
+      <p id="partnerInfoDesc">Game from our partner.</p>
+      <button class="close-modal" onclick="closePartnerInfoModal()">Close</button>
+    </div>
+  </div>
+
+  <!-- Modal for Deposit -->
+  <div class="modal-backdrop" id="depositModal">
+    <div class="modal">
+      <h2 id="depositModalTitle">Not enough Tokens</h2>
+      <p id="depositModalDesc">You do not have enough coins to play. Please top up your balance.</p>
+      <button class="close-modal" onclick="closeDepositModal()">Close</button>
+    </div>
+  </div>
+
+  <!-- Include game scripts and main script -->
+  <script src="game1.js"></script>
+  <script src="game2.js"></script>
+  <script src="partnergame1.js"></script>
+  <script src="game3.js"></script>
+  <script src="game4.js"></script>
+  <script src="game5.js"></script>
+  <script src="game6.js"></script>
+  <script src="case.js"></script>
+  <!-- Подключение нового файла breakout.js -->
+  <script src="breakout.js"></script>
+  <script>
+    /* ----------------------------------------------
+       1. Firebase Initialization
+    ---------------------------------------------- */
+    const firebaseConfig = {
+      apiKey: "AIzaSyB90ev3fJRDKmn64hLTJaWjVjpHQtMjhLg",
+      authDomain: "test-with-likes.firebaseapp.com",
+      databaseURL: "https://test-with-likes-default-rtdb.firebaseio.com",
+      projectId: "test-with-likes",
+      storageBucket: "test-with-likes.appspot.com",
+      messagingSenderId: "764738820142",
+      appId: "1:764738820142:web:b22c6608a30e46cdcea7bf",
+      measurementId: "G-WJNF0HSN9P"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    /* ----------------------------------------------
+       2. Telegram Web App
+    ---------------------------------------------- */
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    /* ----------------------------------------------
+       3. Global Variables & User Data
+    ---------------------------------------------- */
+    let currentUser = null;
+    let userRef = null;
+    let localUserData = {
+      photo: '',
+      tickets: 0,
+      coins: 0,
+      points: 0,
+      lastSpinTime: 0,
+      dataChip: false,
+      cyberCase: 0,
+      nfts: [] // добавлено поле для NFT
+    };
+    let gameInProgress = false;
+    let isSpinning = false;
+
+    if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+      currentUser = tg.initDataUnsafe.user;
+      document.getElementById('username').textContent = '@' + currentUser.username;
+      if (currentUser.photo_url) {
+        document.getElementById('userPhoto').src = currentUser.photo_url;
+      }
+      userRef = db.ref('users/' + currentUser.username);
+      userRef.once('value', snapshot => {
+        if (!snapshot.exists()) {
+          userRef.set({
+            photo: currentUser.photo_url || '',
+            tickets: 0,
+            coins: 0,
+            points: 0,
+            lastSpinTime: 0,
+            dataChip: false,
+            cyberCase: 0,
+            nfts: []  // инициализация поля NFT
+          }).then(() => {
+            // Перенаправляем новых пользователей на info.html
+            window.location.href = 'info.html';
+          });
+        }
+      });
+      userRef.on('value', snapshot => {
+        const data = snapshot.val() || {};
+        localUserData = {
+          photo: data.photo || '',
+          tickets: data.tickets || 0,
+          coins: data.coins || 0,
+          points: data.points || 0,
+          lastSpinTime: data.lastSpinTime || 0,
+          dataChip: data.dataChip || false,
+          cyberCase: data.cyberCase || 0,
+          nfts: data.nfts || []
+        };
+        updateTopBar();
+        updateSpinButton();
+        updateCaseCount();
+      });
+    }
+
+    /* ----------------------------------------------
+       4. Update Top Bar & Case Count
+    ---------------------------------------------- */
+    function updateTopBar() {
+      document.getElementById('ticketCount').textContent = localUserData.tickets || 0;
+      document.getElementById('coinCount').textContent   = localUserData.coins || 0;
+      document.getElementById('pointCount').textContent  = localUserData.points || 0;
+    }
+
+    function updateCaseCount() {
+      document.getElementById('openBtn').textContent = `open (${localUserData.cyberCase})`;
+    }
+
+    /* ----------------------------------------------
+       5. Section Switching
+    ---------------------------------------------- */
+    function showSection(sectionId) {
+      document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+      document.querySelectorAll('.modal-backdrop').forEach(modal => modal.classList.remove('active'));
+      document.getElementById('gameModalBackdrop').classList.remove('active');
+      document.getElementById('endgameBackdrop').classList.remove('active');
+      document.getElementById(sectionId).classList.add('active');
+    }
+
+    /* ----------------------------------------------
+       6. Global Modal
+    ---------------------------------------------- */
+    function showGlobalModal(title, message) {
+      document.getElementById('globalModalTitle').textContent = title;
+      document.getElementById('globalModalMessage').textContent = message;
+      document.getElementById('globalModalBackdrop').classList.add('active');
+    }
+    function closeGlobalModal() {
+      document.getElementById('globalModalBackdrop').classList.remove('active');
+    }
+
+    /* ----------------------------------------------
+       7. Game Info Modal
+    ---------------------------------------------- */
+    function openGameInfoModal(gameData) {
+      document.getElementById('gameInfoImg').src = gameData.img;
+      document.getElementById('gameInfoTitle').textContent = gameData.title;
+      document.getElementById('gameInfoDesc').textContent = gameData.desc;
+      const playBtn = document.getElementById('gameInfoPlayBtn');
+      playBtn.textContent = "Play (" + gameData.cost + " ticket)";
+      playBtn.onclick = function() {
+        closeGameInfoModal();
+        handleStartGame(gameData.gameId, gameData.cost);
+      };
+      document.getElementById('gameInfoModal').classList.add('active');
+    }
+    function closeGameInfoModal() {
+      document.getElementById('gameInfoModal').classList.remove('active');
+    }
+
+    /* ----------------------------------------------
+       8. Start Game
+    ---------------------------------------------- */
+    let currentGame = null;
+    function handleStartGame(gameName, ticketCost) {
+      document.querySelector('.user-info').style.display = 'none';
+      if (!currentUser || !userRef) {
+        showGlobalModal("Error", "No user data available!");
+        return;
+      }
+      
+      if (gameName === 'game2') {
+        window.location.href = 'stack.html';
+        return;
+      }
+      if (gameName === 'partnergame1') {
+        window.location.href = 'partnergame.html';
+        return;
+      } else if (gameName === 'breakout') {
+        window.location.href = 'breakout.html';
+        return;
+      } else if (gameName === 'game4') {
+        window.location.href = 'space.html';
+        return;
+      }
+      
+      if (gameName === 'game3') {
+        if ((localUserData.tickets || 0) < ticketCost) {
+          showGlobalModal("Not enough tickets", "You do not have enough tickets to play!");
+          return;
+        }
+        localUserData.tickets -= ticketCost;
+        updateTopBar();
+        userRef.update({ tickets: localUserData.tickets });
+        
+        currentGame = gameName;
+        gameInProgress = true;
+        document.getElementById('mainNav').classList.add('hidden');
+        
+        document.getElementById('gameModalBackdrop').classList.add('active');
+        document.getElementById('game3Canvas').style.display = 'block';
+        initGame3();
+      }
+    }
+
+    /* ----------------------------------------------
+       9. End Game Modal
+    ---------------------------------------------- */
+    function showEndGameModal(title, message) {
+      document.getElementById('endgameTitle').textContent = "Result";
+      document.getElementById('endgameMessage').textContent = message;
+      document.getElementById('endgameBackdrop').classList.add('active');
+    }
+    function finishGame() {
+      document.querySelector('.user-info').style.display = '';
+      document.getElementById('endgameBackdrop').classList.remove('active');
+      closeGameModal();
+    }
+    function closeGameModal() {
+      document.getElementById('gameModalBackdrop').classList.remove('active');
+      document.getElementById('mainNav').classList.remove('hidden');
+      if (userRef && currentGame) {
+        userRef.update({ points: localUserData.points });
+      }
+      if (currentGame === 'game3') {
+        resetGame3();
+      }
+      currentGame = null;
+      gameInProgress = false;
+    }
+
+    /* ----------------------------------------------
+       10. Wheel of Fortune / Tickets
+    ---------------------------------------------- */
+    let spinDuration = 4000;
+    function spinWheel() {
+      if (!currentUser) return;
+      const now = Date.now();
+      if (now - (localUserData.lastSpinTime || 0) < 24 * 60 * 60 * 1000) {
+        showGlobalModal("Wheel of Fortune", "Free spin available once every 24 hours!");
+        return;
+      }
+      localUserData.lastSpinTime = now;
+      userRef.update({ lastSpinTime: now });
+      updateSpinButton();
+      let randomRotation = 1080 + Math.floor(Math.random() * 360);
+      const wheelEl = document.getElementById('wheel');
+      wheelEl.style.transform = `rotate(${randomRotation}deg)`;
+      setTimeout(() => {
+        let finalDeg = randomRotation % 360;
+        let wonTickets = 0;
+        if (finalDeg < 60) {
+          wonTickets = 2;
+        } else if (finalDeg < 120) {
+          wonTickets = 5;
+        } else if (finalDeg < 180) {
+          wonTickets = 8;
+        } else if (finalDeg < 240) {
+          wonTickets = 10;
+        } else if (finalDeg < 300) {
+          wonTickets = 13;
+        } else {
+          wonTickets = 15;
+        }
+        localUserData.tickets += wonTickets;
+        updateTopBar();
+        userRef.update({ tickets: localUserData.tickets });
+        showSpinModal(wonTickets);
+      }, spinDuration);
+    }
+    function showSpinModal(amount) {
+      document.getElementById("wheelTicketCount").textContent = amount;
+      document.getElementById("spinModalTitle").innerHTML = "You won <span id='wheelTicketCount'>" + amount + "</span> tickets!";
+      document.getElementById("spinModalBackdrop").classList.add("active");
+    }
+    function closeSpinModal() {
+      document.getElementById("spinModalBackdrop").classList.remove("active");
+    }
+    function updateSpinButton() {
+      const btn = document.getElementById('spinButton');
+      const now = Date.now();
+      const last = localUserData.lastSpinTime || 0;
+      const diff = now - last;
+      const wait = 24 * 60 * 60 * 1000 - diff;
+      if(wait <= 0) {
+         btn.textContent = "Spin";
+         btn.disabled = false;
+      } else {
+         const seconds = Math.floor(wait / 1000) % 60;
+         const minutes = Math.floor(wait / (1000 * 60)) % 60;
+         const hours = Math.floor(wait / (1000 * 60 * 60));
+         btn.textContent = "Spin (" + hours.toString().padStart(2,'0') + ":" + minutes.toString().padStart(2,'0') + ":" + seconds.toString().padStart(2,'0') + ")";
+         btn.disabled = true;
+      }
+    }
+    setInterval(updateSpinButton, 1000);
+
+    /* ----------------------------------------------
+       11. Leaderboard
+    ---------------------------------------------- */
+    let leaderboardRef = db.ref('users');
+    leaderboardRef.on('value', snapshot => {
+      const usersData = snapshot.val() || {};
+      const usersArray = Object.entries(usersData).map(([uname, obj]) => ({
+        username: uname,
+        points: obj.points || 0
+      }));
+      usersArray.sort((a, b) => b.points - a.points);
+      const top10Body = document.getElementById('leaderboardTop10');
+      const restBody = document.getElementById('leaderboardRest');
+      top10Body.innerHTML = '';
+      restBody.innerHTML = '';
+      
+      usersArray.forEach((user, i) => {
+        const tr = document.createElement('tr');
+        if (currentUser && user.username === currentUser.username) {
+          tr.classList.add('current-user');
+        }
+        if (i < 10) {
+          let multiplier;
+          if (i === 0) {
+            multiplier = "5x";
+          } else if (i === 1) {
+            multiplier = "3x";
+          } else if (i === 2) {
+            multiplier = "2x";
+          } else {
+            multiplier = "1x";
+          }
+          tr.innerHTML = `<td>${i + 1}</td>
+                          <td>@${user.username}</td>
+                          <td>${user.points}</td>
+                          <td>
+                            <img src="https://raw.githubusercontent.com/qnexst/404token/main/case.png" alt="Prize Icon" width="40" height="40">
+                            ${multiplier}
+                          </td>`;
+          top10Body.appendChild(tr);
+        } else {
+          tr.innerHTML = `<td>${i + 1}</td>
+                          <td>@${user.username}</td>
+                          <td>${user.points}</td>
+                          <td></td>`;
+          restBody.appendChild(tr);
+        }
+      });
+    });
+
+    function openSeasonInfoModal() {
+      document.getElementById('seasonModalBackdrop').classList.add('active');
+    }
+    function closeSeasonModal() {
+      document.getElementById('seasonModalBackdrop').classList.remove('active');
+    }
+
+    /* ----------------------------------------------
+       12. Buy Tickets
+    ---------------------------------------------- */
+    function buyTickets() {
+      window.location.href = 'buyticket.html';
+    }
+
+    /* ----------------------------------------------
+       13. Lootbox in Cyber Case Section
+    ---------------------------------------------- */
+    // Обновлённый массив призов (итого 10 предметов)
+    const lootboxPrizes = [
+       { name: '3 tickets', image: 'https://raw.githubusercontent.com/qnexst/404token/main/ticket.png', chance: 10 },
+      { name: '5 tickets', image: 'https://raw.githubusercontent.com/qnexst/404token/main/ticket.png', chance: 5 },
+      { name: 'One case', image: 'https://raw.githubusercontent.com/qnexst/404token/main/case.png', chance: 5 },
+      { name: '100 points', image: 'https://raw.githubusercontent.com/qnexst/404token/main/star.png', chance: 10 },
+      { name: '500 points', image: 'https://raw.githubusercontent.com/qnexst/404token/main/star.png', chance: 5 },
+      { name: '1M tokens', image: 'https://raw.githubusercontent.com/qnexst/404token/main/token.png', chance: 1 },
+       { name: '3M tokens', image: 'https://raw.githubusercontent.com/qnexst/404token/main/token.png', chance: 0.5 },
+      { name: '5M tokens', image: 'https://raw.githubusercontent.com/qnexst/404token/main/token.png', chance: 0.2 },
+      { name: 'NFT Special', image: 'https://img.icons8.com/color/48/nft.png', chance: 0.5 },
+      { name: 'NFT Legendary', image: 'https://img.icons8.com/color/48/nft.png', chance: 1 },
+      { name: 'NFT Rare', image: 'https://img.icons8.com/color/48/nft.png', chance: 2 },
+      { name: '10 tickets', image: 'https://raw.githubusercontent.com/qnexst/404token/main/ticket.png', chance: 8 },
+      { name: '8 tickets', image: 'https://raw.githubusercontent.com/qnexst/404token/main/ticket.png', chance: 4 },
+      { name: '1000 points', image: 'https://raw.githubusercontent.com/qnexst/404token/main/star.png', chance: 2 },
+    ];
+
+    // Helper function для перемешивания массива
+    function shuffleArray(array) {
+      let arr = array.slice();
+      for (let i = arr.length - 1; i > 0; i--) {
+         const j = Math.floor(Math.random() * (i + 1));
+         [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function getWeightedRandomIndex(prizes) {
+      let total = 0;
+      prizes.forEach(prize => total += prize.chance);
+      let randomNum = Math.random() * total;
+      for (let i = 0; i < prizes.length; i++) {
+        if (randomNum < prizes[i].chance) {
+          return i;
+        }
+        randomNum -= prizes[i].chance;
+      }
+      return prizes.length - 1;
+    }
+
+    function parsePrizeAmount(prizeName) {
+      if (prizeName.includes("M")) {
+        let num = parseFloat(prizeName);
+        return num * 1000000;
+      } else {
+        return parseInt(prizeName);
+      }
+    }
+
+    // Обработка приза с учетом NFT
+    function addPrizeToUser(prize) {
+      if (prize.name.toLowerCase().includes("token")) {
+         let amount = parsePrizeAmount(prize.name);
+         localUserData.coins += amount;
+         userRef.update({ coins: localUserData.coins });
+         updateTopBar();
+      } else if (prize.name.toLowerCase().includes("case")) {
+         localUserData.cyberCase += 1;
+         userRef.update({ cyberCase: localUserData.cyberCase });
+         updateCaseCount();
+      } else if (prize.name.toLowerCase().includes("point")) {
+         let amount = parsePrizeAmount(prize.name);
+         localUserData.points += amount;
+         userRef.update({ points: localUserData.points });
+         updateTopBar();
+      } else if (prize.name.toLowerCase().includes("nft")) {
+         let nftRarity = "";
+         if(prize.name.includes("Green")) {
+             nftRarity = "Редкий";
+         } else if(prize.name.includes("Yellow")) {
+             nftRarity = "Легендарный";
+         } else if(prize.name.includes("Red")) {
+             nftRarity = "Эксклюзивный";
+         }
+         let nftData = { name: prize.name, rarity: nftRarity };
+         if (!localUserData.nfts) {
+           localUserData.nfts = [];
+         }
+         localUserData.nfts.push(nftData);
+         userRef.update({ nfts: localUserData.nfts });
+      } else {
+         let amount = parsePrizeAmount(prize.name);
+         localUserData.tickets += amount;
+         userRef.update({ tickets: localUserData.tickets });
+         updateTopBar();
+      }
+    }
+
+    // Функция анимации рулетки с рандомным расположением призов
+    function spinRoulette() {
+      const roulette = document.getElementById('lootboxRoulette');
+      roulette.innerHTML = '';
+      const prizeWidth = 136;
+      const count = lootboxPrizes.length;
+      const visibleCenter = roulette.parentElement.offsetWidth / 2;
+
+      // Определяем выигрышный приз по весовой выборке
+      const winningIndex = getWeightedRandomIndex(lootboxPrizes);
+      const winningPrize = lootboxPrizes[winningIndex];
+
+      const fullCycles = 5;
+      let rouletteItems = [];
+
+      // Генерируем 5 полных циклов с перемешанными призами
+      for (let cycle = 0; cycle < fullCycles; cycle++) {
+        let shuffled = shuffleArray(lootboxPrizes);
+        rouletteItems = rouletteItems.concat(shuffled);
+      }
+
+      // В 6‑м цикле перемешиваем и гарантируем появление выигрышного приза
+      let lastCycle = shuffleArray(lootboxPrizes);
+      const targetIndex = Math.floor(Math.random() * count);
+      lastCycle[targetIndex] = winningPrize;
+      rouletteItems = rouletteItems.concat(lastCycle);
+
+      // Заполняем контейнер рулетки
+      rouletteItems.forEach(item => {
+        const prizeEl = document.createElement('div');
+        prizeEl.className = 'lootbox-prize';
+        if (item.name === 'NFT Special') {
+          prizeEl.style.background = 'linear-gradient(45deg, #8B0000, #FF6347)';
+        } else if (item.name === 'NFT Legendary') {
+          prizeEl.style.background = 'linear-gradient(45deg, #FFD700, #FFFFE0)';
+        } else if (item.name === 'NFT Rare') {
+          prizeEl.style.background = 'linear-gradient(45deg, #006400, #32CD32)';
+        }
+        prizeEl.innerHTML = `<img src="${item.image}" alt="${item.name}"><span>${item.name}</span>`;
+        roulette.appendChild(prizeEl);
+      });
+
+      const finalIndex = fullCycles * count + targetIndex;
+      const finalOffset = -(finalIndex * prizeWidth) + visibleCenter - (prizeWidth / 2);
+
+      roulette.style.transition = 'transform 10s cubic-bezier(0.25, 0.1, 0.25, 1)';
+      roulette.style.transform = `translateX(${finalOffset}px)`;
+
+      setTimeout(() => {
+        const remainder = finalIndex % count;
+        const newOffset = -(remainder * prizeWidth) + visibleCenter - (prizeWidth / 2);
+        roulette.style.transition = 'none';
+        roulette.style.transform = `translateX(${newOffset}px)`;
+        isSpinning = false;
+        addPrizeToUser(winningPrize);
+        showGlobalModal('Congratulations!', `Your prize: ${winningPrize.name}`);
+        document.getElementById('lootboxContainer').style.display = 'none';
+        const caseContainer = document.querySelector('.case-container');
+        caseContainer.style.display = 'block';
+        const caseImage = document.getElementById('caseImage');
+        caseImage.classList.remove('explode');
+        caseImage.style.opacity = 1;
+      }, 10200);
+    }
+
+    function spinLootBoxForTokens() {
+      if (!currentUser) return;
+      if (isSpinning) return;
+      if (localUserData.coins < 5000000) {
+        showGlobalModal("Not enough coins", "You do not have enough coins to play. Please top up your balance.");
+        return;
+      }
+      isSpinning = true;
+      localUserData.coins -= 5000000;
+      updateTopBar();
+      userRef.update({ coins: localUserData.coins });
+
+      const caseImage = document.getElementById('caseImage');
+      caseImage.classList.add('explode');
+
+      caseImage.addEventListener('animationend', () => {
+        document.querySelector('.case-container').style.display = 'none';
+        document.getElementById('lootboxContainer').style.display = 'block';
+        spinRoulette();
+      }, { once: true });
+    }
+
+    function openLootBox() {
+      if (!currentUser) return;
+      if (isSpinning) return;
+      if (localUserData.cyberCase <= 0) {
+        showGlobalModal('Error', 'You have no Bug Packs to open!');
+        return;
+      }
+      isSpinning = true;
+      localUserData.cyberCase -= 1;
+      updateCaseCount();
+      userRef.update({ cyberCase: localUserData.cyberCase });
+
+      const caseImage = document.getElementById('caseImage');
+      caseImage.classList.add('explode');
+
+      caseImage.addEventListener('animationend', () => {
+        document.querySelector('.case-container').style.display = 'none';
+        document.getElementById('lootboxContainer').style.display = 'block';
+        spinRoulette();
+      }, { once: true });
+    }
+
+    /* ----------------------------------------------
+       Modal windows for Loot Box
+    ---------------------------------------------- */
+    function openLootBoxInfoModal() {
+      document.getElementById('lootBoxInfoModal').classList.add('active');
+    }
+    function closeLootBoxInfoModal() {
+      document.getElementById('lootBoxInfoModal').classList.remove('active');
+    }
+
+    function openMainOnlineInfoModal() {
+      document.getElementById('mainOnlineInfoModal').classList.add('active');
+    }
+    function closeMainOnlineInfoModal() {
+      document.getElementById('mainOnlineInfoModal').classList.remove('active');
+    }
+    function openMiniGamesInfoModal() {
+      document.getElementById('miniGamesInfoModal').classList.add('active');
+    }
+    function closeMiniGamesInfoModal() {
+      document.getElementById('miniGamesInfoModal').classList.remove('active');
+    }
+    function openPartnerInfoModal() {
+      document.getElementById('partnerInfoModal').classList.add('active');
+    }
+    function closePartnerInfoModal() {
+      document.getElementById('partnerInfoModal').classList.remove('active');
+    }
+    function closeDepositModal() {
+      document.getElementById('depositModal').classList.remove('active');
+    }
+
+
+
+    // Добавьте эту функцию в ваш скрипт (например, сразу перед updateTopBar)
+function formatCoins(coins) {
+  if (coins >= 1000000000) {
+    return (coins / 1000000000).toFixed(1).replace(/\.0$/, '') + 'b';
+  } else if (coins >= 1000000) {
+    return (coins / 1000000).toFixed(1).replace(/\.0$/, '') + 'm';
+  } else if (coins >= 1000) {
+    return (coins / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+  }
+  return coins;
+}
+
+// Измените функцию updateTopBar так, чтобы для coins использовалась функция форматирования:
+function updateTopBar() {
+  document.getElementById('ticketCount').textContent = localUserData.tickets || 0;
+  document.getElementById('coinCount').textContent   = formatCoins(localUserData.coins || 0);
+  document.getElementById('pointCount').textContent  = localUserData.points || 0;
+}
+
+  </script>
+
+</body>
+</html>
