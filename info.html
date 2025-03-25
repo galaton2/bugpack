@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meta GL!TCH GameFi-Zone Info</title>
+  <style>
+    :root {
+      --primary-color: limegreen;
+      --accent-color: #FF1493; /* Кислотно розовый */
+    }
+    /* Базовые стили и отключение прокрутки */
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #000;
+      color: #fff;
+      font-family: 'Press Start 2P', monospace;
+      height: 100vh;
+      width: 100vw;
+    }
+    *, *:before, *:after {
+      box-sizing: border-box;
+    }
+    /* Загрузочный экран */
+    .loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      z-index: 100;
+    }
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(50,205,50,0.3);
+      border-top-color: var(--primary-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .loader-text {
+      font-size: 18px;
+      letter-spacing: 2px;
+      animation: pulse 1.5s ease-in-out infinite;
+      margin-bottom: 20px;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.1); }
+    }
+    /* Элемент для отображения процента загрузки видео */
+    #videoProgress {
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+    /* Кнопка, появляющаяся после загрузки видео */
+    .start-button {
+      padding: 10px 20px;
+      font-size: 14px;
+      border: 2px solid var(--primary-color);
+      background: transparent;
+      color: var(--primary-color);
+      cursor: pointer;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 1s forwards;
+      animation-delay: 0.3s;
+    }
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    /* Контейнер для видео */
+    .video-container {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 90;
+    }
+    .video-container video {
+      playsinline: true;
+      width: 720px;
+      height: 720px;
+      max-width: 90%;
+      max-height: 90%;
+      display: block;
+    }
+    /* Экран описания и слайдов */
+    .app-description {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      min-height: 100vh;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 80;
+      padding: 0 20px;
+      text-align: center;
+    }
+    /* Кнопка переключения языка */
+    #langToggle {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      border: 2px solid var(--accent-color);
+      background: transparent;
+      color: var(--accent-color);
+      padding: 8px 16px;
+      cursor: pointer;
+      font-size: 12px;
+      z-index: 110;
+    }
+    /* Прогресс-бар для слайдов */
+    .progress-bar-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: #222;
+      z-index: 50;
+    }
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+      transition: width 0.3s ease;
+    }
+    /* Контейнер слайдов */
+    .slides-container {
+      width: 100%;
+      max-width: 600px;
+      margin: 20px auto;
+      text-align: center;
+    }
+    .slide {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .slide.active {
+      display: flex;
+    }
+    .slide h1 {
+      margin-bottom: 10px;
+      font-size: 24px;
+      color: var(--accent-color);
+    }
+    .slide p {
+      margin-bottom: 20px;
+      font-size: 14px;
+      line-height: 1.6;
+      text-align: justify;
+    }
+    .slide img {
+      max-width: 80px;
+      margin: 10px;
+    }
+    /* Кнопки навигации */
+    .nav-button {
+      border: 2px solid var(--accent-color);
+      background: transparent;
+      color: var(--accent-color);
+      padding: 10px 20px;
+      font-size: 12px;
+      cursor: pointer;
+      margin: 5px;
+      transition: background 0.2s;
+    }
+    .nav-button:hover {
+      background: rgba(255,20,147,0.2);
+    }
+    /* Адаптивные стили для мобильных устройств */
+    @media (max-width: 600px) {
+      .loader-text { font-size: 16px; }
+      .start-button { font-size: 12px; padding: 8px 16px; }
+      .slide h1 { font-size: 20px; }
+      .slide p { font-size: 12px; }
+      .nav-button { font-size: 10px; padding: 8px 16px; }
+      .slide img { max-width: 60px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Загрузочный экран с индикатором загрузки -->
+  <div id="loadingScreen" class="loading-screen">
+    <div class="spinner"></div>
+    <div class="loader-text">Loading... [C:\>_]</div>
+    <div id="videoProgress">0%</div>
+    <button id="playButton" class="start-button" style="display: none;">Start</button>
+  </div>
+
+  <!-- Контейнер для видео -->
+  <div id="videoContainer" class="video-container">
+    <video id="introVideo" playsinline preload="auto">
+      <source src="https://res.cloudinary.com/do8tg9gfg/video/upload/v1742838664/lzz8jyntfq2nui7eaiqt.mp4" type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+  </div>
+
+  <!-- Экран описания и слайдов -->
+  <div id="appDescription" class="app-description">
+    <!-- Кнопка переключения языка -->
+    <button id="langToggle">Русский</button>
+    <!-- Прогресс-бар для слайдов -->
+    <div class="progress-bar-container">
+      <div id="progressBar" class="progress-bar"></div>
+    </div>
+    <!-- Контейнер слайдов -->
+    <div id="slidesContainer" class="slides-container">
+      <!-- Slide 1: Вступление -->
+      <div id="slide1" class="slide active">
+        <h1 id="slide1Title">Welcome to Meta GL!TCH GameFi-Zone!</h1>
+        <p id="slide1Text">
+          Dive into an epic arena of battles and challenges. <br><br>
+          Experience fast-paced PvP duels, fun mini-games, and unique partner events.
+        </p>
+        <button id="nextBtn1" class="nav-button">Next</button>
+      </div>
+      <!-- Slide 2: PvP Duels -->
+      <div id="slide2" class="slide">
+        <h1 id="slide2Title">PvP Duels</h1>
+        <p id="slide2Text">
+          Engage in 1-on-1 battles and stake your tokens. <br><br>
+          Win the entire pot – with a smart commission that burns a fraction to boost token value.
+        </p>
+        <img src="https://raw.githubusercontent.com/qnexst/404token/main/token.png" alt="Token" />
+        <button id="backBtn2" class="nav-button">Back</button>
+        <button id="nextBtn2" class="nav-button">Next</button>
+      </div>
+      <!-- Slide 3: Mini-Games & Leaderboard -->
+      <div id="slide3" class="slide">
+        <h1 id="slide3Title">Mini-Games & Leaderboard</h1>
+        <p id="slide3Text">
+          Quick games to earn tickets and points. <br><br>
+          Every week, the top 10 players win exclusive cases packed with rewards.
+        </p>
+        <img src="https://raw.githubusercontent.com/qnexst/404token/main/ticket.png" alt="Ticket" />
+        <img src="https://raw.githubusercontent.com/qnexst/404token/main/case.png" alt="Bug Pack" />
+        <button id="backBtn3" class="nav-button">Back</button>
+        <button id="nextBtn3" class="nav-button">Next</button>
+      </div>
+      <!-- Slide 4: Partner Games & Tickets -->
+      <div id="slide4" class="slide">
+        <h1 id="slide4Title">Partner Games & Tickets</h1>
+        <p id="slide4Text">
+          Explore partner games with exclusive challenges. <br><br>
+          Use tickets – earned daily or purchased – to join the action and unlock bonus rewards.
+        </p>
+        <img src="https://raw.githubusercontent.com/qnexst/404token/main/ticket.png" alt="Ticket" />
+        <button id="backBtn4" class="nav-button">Back</button>
+        <button id="nextBtn4" class="nav-button">Next</button>
+      </div>
+      <!-- Slide 5: Join the Revolution -->
+      <div id="slide5" class="slide">
+        <h1 id="slide5Title">Join the Revolution</h1>
+        <p id="slide5Text">
+          Endless thrills await in Meta GL!TCH GameFi-Zone. <br><br>
+          Compete, win, and become part of a vibrant, ever-growing community.
+        </p>
+        <button id="backBtn5" class="nav-button">Back</button>
+        <button id="continueBtn" class="nav-button">Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const totalSlides = 5;
+      let currentLanguage = "en"; // начальный язык - английский
+
+      const englishContent = {
+        slide1Title: "Welcome to Meta GL!TCH GameFi-Zone!",
+        slide1Text: "Dive into an epic arena of battles and challenges. <br><br>Experience fast-paced PvP duels, fun mini-games, and unique partner events.",
+        slide2Title: "PvP Duels",
+        slide2Text: "Engage in 1-on-1 battles and stake your tokens. <br><br>Win the entire pot – with a smart commission that burns a fraction to boost token value.",
+        slide3Title: "Mini-Games & Leaderboard",
+        slide3Text: "Quick games to earn tickets and points. <br><br>Every week, the top 10 players win exclusive cases packed with rewards.",
+        slide4Title: "Partner Games & Tickets",
+        slide4Text: "Explore partner games with exclusive challenges. <br><br>Use tickets – earned daily or purchased – to join the action and unlock bonus rewards.",
+        slide5Title: "Join the Revolution",
+        slide5Text: "Endless thrills await in Meta GL!TCH GameFi-Zone. <br><br>Compete, win, and become part of a vibrant, ever-growing community.",
+        nextButton: "Next",
+        backButton: "Back",
+        continueButton: "Continue",
+        toggleText: "Русский"
+      };
+
+      const russianContent = {
+        slide1Title: "Добро пожаловать в Meta GL!TCH GameFi-Zone!",
+        slide1Text: "Погрузитесь в эпическую арену битв и испытаний. <br><br>Ощутите адреналин PvP дуэлей, веселых мини-игр и уникальных партнерских событий.",
+        slide2Title: "PvP Дуэли",
+        slide2Text: "Сражайтесь 1 на 1 и делайте ставку в токенах. <br><br>Победитель получает весь банк – с умной комиссией, сжигающей часть для роста стоимости токена.",
+        slide3Title: "Мини-игры и лидерборд",
+        slide3Text: "Быстрые игры для заработка очков. <br><br>Каждую неделю топ-10 игроков получает эксклюзивные кейсы с наградами.",
+        slide4Title: "Партнерские игры и билеты",
+        slide4Text: "Исследуйте партнерские игры с уникальными вызовами. <br><br>Используйте билеты – получаемые ежедневно или купленные – чтобы участвовать в мини-играх и получать бонусы.",
+        slide5Title: "Присоединяйтесь к революции",
+        slide5Text: "Бесконечные эмоции ждут вас в Meta GL!TCH GameFi-Zone. <br><br>Соревнуйтесь, побеждайте и станьте частью яркого, постоянно растущего сообщества.",
+        nextButton: "Далее",
+        backButton: "Назад",
+        continueButton: "Продолжить",
+        toggleText: "English"
+      };
+
+      // Функция обновления текста слайдов
+      function updateLanguage() {
+        const content = currentLanguage === "en" ? englishContent : russianContent;
+        document.getElementById('slide1Title').innerHTML = content.slide1Title;
+        document.getElementById('slide1Text').innerHTML = content.slide1Text;
+        document.getElementById('slide2Title').innerHTML = content.slide2Title;
+        document.getElementById('slide2Text').innerHTML = content.slide2Text;
+        document.getElementById('slide3Title').innerHTML = content.slide3Title;
+        document.getElementById('slide3Text').innerHTML = content.slide3Text;
+        document.getElementById('slide4Title').innerHTML = content.slide4Title;
+        document.getElementById('slide4Text').innerHTML = content.slide4Text;
+        document.getElementById('slide5Title').innerHTML = content.slide5Title;
+        document.getElementById('slide5Text').innerHTML = content.slide5Text;
+        // Обновляем текст кнопок навигации
+        document.getElementById('nextBtn1').innerHTML = content.nextButton;
+        document.getElementById('backBtn2').innerHTML = content.backButton;
+        document.getElementById('nextBtn2').innerHTML = content.nextButton;
+        document.getElementById('backBtn3').innerHTML = content.backButton;
+        document.getElementById('nextBtn3').innerHTML = content.nextButton;
+        document.getElementById('backBtn4').innerHTML = content.backButton;
+        document.getElementById('nextBtn4').innerHTML = content.nextButton;
+        document.getElementById('backBtn5').innerHTML = content.backButton;
+        document.getElementById('continueBtn').innerHTML = content.continueButton;
+        document.getElementById('langToggle').innerHTML = content.toggleText;
+      }
+
+      // Переключатель языка
+      document.getElementById('langToggle').addEventListener('click', function() {
+        currentLanguage = (currentLanguage === "en") ? "ru" : "en";
+        updateLanguage();
+      });
+
+      // Изначально обновляем язык (английский)
+      updateLanguage();
+
+      // Элементы загрузочного экрана и видео
+      const loadingScreen = document.getElementById('loadingScreen');
+      const playButton = document.getElementById('playButton');
+      const videoContainer = document.getElementById('videoContainer');
+      const introVideo = document.getElementById('introVideo');
+      const videoProgress = document.getElementById('videoProgress');
+      const progressBar = document.getElementById('progressBar');
+
+      // После загрузки метаданных начинаем отслеживать прогресс буферизации
+      introVideo.addEventListener('loadedmetadata', function() {
+        updateVideoProgress();
+      });
+
+      // Функция обновления индикатора загрузки видео
+      function updateVideoProgress() {
+        if (introVideo.buffered.length > 0 && introVideo.duration) {
+          const bufferedEnd = introVideo.buffered.end(0);
+          let percent = Math.floor((bufferedEnd / introVideo.duration) * 100);
+          // Если процент меньше 0 или NaN, принудительно выставляем 0
+          if (isNaN(percent) || percent < 0) { percent = 0; }
+          videoProgress.innerText = percent + '%';
+          // Если достигли 90% или событие canplaythrough сработало, считаем видео загруженным
+          if (percent >= 90) {
+            videoProgress.innerText = 'Loaded';
+            setTimeout(function(){
+              // Скрываем индикаторы загрузки и показываем кнопку воспроизведения
+              loadingScreen.querySelector('.spinner').style.display = 'none';
+              videoProgress.style.display = 'none';
+              playButton.style.display = 'inline-block';
+            }, 300);
+          } else {
+            // Продолжаем обновлять прогресс через 200 мс
+            setTimeout(updateVideoProgress, 200);
+          }
+        }
+      }
+
+      // Событие canplaythrough в качестве запасного варианта
+      introVideo.addEventListener('canplaythrough', function() {
+        videoProgress.innerText = 'Loaded';
+        setTimeout(function(){
+          loadingScreen.querySelector('.spinner').style.display = 'none';
+          videoProgress.style.display = 'none';
+          playButton.style.display = 'inline-block';
+        }, 300);
+      });
+
+      // По клику на кнопку Play скрываем загрузочный экран и показываем видео
+      playButton.addEventListener('click', function() {
+        loadingScreen.style.display = 'none';
+        videoContainer.style.display = 'flex';
+        introVideo.play().catch(function(error) {
+          console.log("Video play error:", error);
+        });
+      });
+
+      // По окончании видео показываем экран описания и слайдов
+      introVideo.addEventListener('ended', function() {
+        videoContainer.style.display = 'none';
+        document.getElementById('appDescription').style.display = 'flex';
+        updateProgress(1);
+      });
+
+      // Функция обновления прогресс-бара для слайдов (каждый слайд = 20%)
+      function updateProgress(slideNumber) {
+        const percent = (slideNumber / totalSlides) * 100;
+        progressBar.style.width = percent + '%';
+      }
+
+      // Функция переключения слайдов
+      function goToSlide(slideNumber) {
+        const slides = document.querySelectorAll('.slide');
+        slides.forEach(slide => {
+          slide.classList.remove('active');
+          if (slide.id === 'slide' + slideNumber) {
+            slide.classList.add('active');
+          }
+        });
+        updateProgress(slideNumber);
+      }
+
+      // Обработчики кнопок навигации по слайдам
+      document.getElementById('nextBtn1').addEventListener('click', function() {
+        goToSlide(2);
+      });
+      document.getElementById('backBtn2').addEventListener('click', function() {
+        goToSlide(1);
+      });
+      document.getElementById('nextBtn2').addEventListener('click', function() {
+        goToSlide(3);
+      });
+      document.getElementById('backBtn3').addEventListener('click', function() {
+        goToSlide(2);
+      });
+      document.getElementById('nextBtn3').addEventListener('click', function() {
+        goToSlide(4);
+      });
+      document.getElementById('backBtn4').addEventListener('click', function() {
+        goToSlide(3);
+      });
+      document.getElementById('nextBtn4').addEventListener('click', function() {
+        goToSlide(5);
+      });
+      document.getElementById('backBtn5').addEventListener('click', function() {
+        goToSlide(4);
+      });
+      document.getElementById('continueBtn').addEventListener('click', function() {
+        window.location.href = 'index.html';
+      });
+    });
+  </script>
+</body>
+</html>
