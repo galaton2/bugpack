@@ -23,7 +23,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-functions-compat.js"></script>
   
   <style>
-    /* Пример дополнительных стилей для Bug Pack (Loot Box) */
+    /* Стили для Bug Pack (Loot Box) */
     .case-container {
       flex-direction: column;
       align-items: center;
@@ -293,7 +293,7 @@
     </button>
   </nav>
 
-  <!-- Глобальные модальные окна -->
+  <!-- Модальные окна -->
   <div class="modal-backdrop" id="globalModalBackdrop">
     <div class="modal">
       <h2 id="globalModalTitle">Message</h2>
@@ -404,13 +404,13 @@
   <script>
     // === Firebase Initialization ===
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_AUTH_DOMAIN",
-      databaseURL: "YOUR_DATABASE_URL",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_STORAGE_BUCKET",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
+      apiKey: "AIzaSyApxp0dHh0TK4nZVfOqloJ92dekjvjey3I",
+      authDomain: "meta-glitch.firebaseapp.com",
+      projectId: "meta-glitch",
+      storageBucket: "meta-glitch.firebasestorage.app",
+      messagingSenderId: "186162879710",
+      appId: "1:186162879710:web:87975bd09681505be7364f",
+      measurementId: "G-1TXVH8MESD"
     };
     firebase.initializeApp(firebaseConfig);
   
@@ -570,7 +570,6 @@
     let currentGame = null;
     let gameInProgress = false;
     function handleStartGame(gameName, ticketCost) {
-      // Для других игр – просто редирект
       if (gameName === 'game2') {
         window.location.href = 'stack.html';
         return;
@@ -681,11 +680,10 @@
   
     // === Инициализация игр (например, TETRIS) ===
     function initGame3() {
-      // Здесь инициализация игры Tetris – оставьте существующую логику
       console.log("Инициализация TETRIS");
+      // Здесь разместите вашу логику инициализации Tetris
     }
     function resetGame3() {
-      // Сброс состояния игры
       document.getElementById('game3Canvas').style.display = 'none';
       console.log("Сброс TETRIS");
     }
