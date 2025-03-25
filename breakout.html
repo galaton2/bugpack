@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <!-- Для мобильных устройств -->
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+  <title>Breakout 8-bit Retro</title>
+
+  <!-- Font: Press Start 2P -->
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+  <!-- Telegram Web App API (если требуется) -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <style>
+    /* Базовые стили, фон в стиле "8-bit" */
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000 url('https://raw.githubusercontent.com/qnexst/404token/main/8bit_bg.png') repeat;
+      font-family: 'Press Start 2P', monospace;
+      color: #fff;
+    }
+
+    /* Общие вспомогательные классы */
+    .pixel-border {
+      border: 4px solid #0ff; /* Ярко-голубая «неоновая» рамка */
+      box-sizing: border-box;
+    }
+    .pixel-button {
+      font-size: 12px;
+      padding: 10px 20px;
+      background: #0ff;
+      color: #000;
+      cursor: pointer;
+      border: none;
+      outline: none;
+      font-family: 'Press Start 2P', monospace;
+    }
+    .pixel-button:active {
+      filter: brightness(0.8);
+    }
+
+    /* Шапка (header) — немного в «неоновом» стиле */
+    #header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 50px;
+      background: #6600cc; /* тёмно-фиолетовый фон */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      border-bottom: 4px solid #0ff; /* пиксельная рамка снизу */
+    }
+    #info {
+      display: flex;
+      gap: 20px;
+      font-size: 12px;
+      color: #fff;
+      align-items: center;
+    }
+    #info span {
+      white-space: nowrap;
+    }
+    .balance {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .balance img {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Кнопка Back */
+    #backContainer {
+      position: absolute;
+      top: 60px; /* чуть ниже шапки */
+      left: 10px;
+      z-index: 1000;
+    }
+    #backBtn {
+      font-size: 10px;
+      padding: 6px 12px;
+      background: #f0f;
+      color: #000;
+      cursor: pointer;
+      font-family: 'Press Start 2P', monospace;
+      border: 4px solid #ff0;
+    }
+    #backBtn:active {
+      filter: brightness(0.8);
+    }
+
+    /* Обёртка для всей игры */
+    #gameWrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Кнопка Start (видна до начала игры) */
+    #startBtn {
+      position: absolute;
+      z-index: 10;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    /* Canvas будет занимать весь экран, но скрыт до начала игры */
+    #breakoutCanvas {
+      display: none;
+      background: #000;
+    }
+
+    /* Модальное окно окончания игры (и для ошибок) */
+    .modal-backdrop {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999; /* Выше всего */
+    }
+    .modal-backdrop.active {
+      display: flex;
+    }
+    .modal {
+      background: #222;
+      padding: 20px;
+      width: 80%;
+      max-width: 400px;
+      text-align: center;
+      color: #fff;
+      font-size: 14px;
+      position: relative;
+      box-shadow: 0 0 10px #0ff;
+    }
+    .modal h2 {
+      color: #0ff;
+      margin-bottom: 10px;
+    }
+    .modal p {
+      margin: 10px 0;
+    }
+    .modal button {
+      margin-top: 10px;
+      font-size: 12px;
+      padding: 6px 12px;
+      background: #0ff;
+      color: #000;
+      border: none;
+      cursor: pointer;
+      font-family: 'Press Start 2P', monospace;
+    }
+    .modal button:active {
+      filter: brightness(0.8);
+    }
+  </style>
+</head>
+<body>
+  <!-- Header с информацией (показывается до начала игры) -->
+  <div id="header" class="pixel-border">
+    <div id="info">
+      <span id="username">@User</span>
+      <div class="balance">
+        <img src="https://raw.githubusercontent.com/qnexst/404token/main/ticket.png" alt="Ticket">
+        <span id="ticketCount">0</span>
+      </div>
+      <div class="balance">
+        <img src="https://raw.githubusercontent.com/qnexst/404token/main/star.png" alt="Points">
+        <span id="pointCount">0</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Кнопка Back (видна до старта игры) -->
+  <div id="backContainer">
+    <button id="backBtn" onclick="goBack()">Back</button>
+  </div>
+
+  <!-- Обёртка для игры -->
+  <div id="gameWrapper">
+    <!-- Кнопка Start (видна до начала игры) -->
+    <button id="startBtn" class="pixel-button" onclick="startBreakout()">
+      START (1 Ticket)
+    </button>
+
+    <!-- Canvas для игры, автоматически растягивается на весь экран -->
+    <canvas id="breakoutCanvas"></canvas>
+
+    <!-- Модальное окно окончания игры -->
+    <div id="endModal" class="modal-backdrop">
+      <div class="modal pixel-border">
+        <h2 id="endTitle">Game Over!</h2>
+        <p id="endMessage"></p>
+        <!-- При нажатии кнопки OK переходим на index.html -->
+        <button onclick="window.location.href='index.html'">OK</button>
+      </div>
+    </div>
+
+    <!-- Модальное окно для ошибок (404, 402 и т.п.) -->
+    <div id="errorModal" class="modal-backdrop">
+      <div class="modal pixel-border">
+        <h2 id="errorCodeTitle">Error</h2>
+        <p id="errorMessage"></p>
+        <button onclick="closeErrorModal()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ------------------------------------------------
+       1. Firebase и Telegram инициализация
+    ------------------------------------------------ */
+    const firebaseConfig = {
+      apiKey: "AIzaSyB90ev-ex",
+      authDomain: "test-with-likes.firebaseapp.com",
+      databaseURL: "https://test-with-likes-default-rtdb.firebaseio.com",
+      projectId: "test-with-likes",
+      storageBucket: "test-with-likes.appspot.com",
+      messagingSenderId: "764738820142",
+      appId: "1:764738820142:web:b22c6608a30e46cdcea7bf"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    let tg = null;
+    if (window.Telegram && window.Telegram.WebApp) {
+      tg = window.Telegram.WebApp;
+      tg.expand();
+    }
+
+    let currentUser = null;
+    let userRef = null;
+    let localUserData = {
+      tickets: 0,
+      points: 0
+    };
+
+    // Определяем пользователя (Telegram или тестового)
+    if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+      currentUser = tg.initDataUnsafe.user;
+      document.getElementById('username').textContent = '@' + currentUser.username;
+      userRef = db.ref('users/' + currentUser.username);
+    } else {
+      currentUser = { username: 'TestUser' };
+      document.getElementById('username').textContent = '@TestUser';
+      userRef = db.ref('users/TestUser');
+    }
+
+    // Инициализация в Firebase
+    userRef.once('value').then(snapshot => {
+      if (!snapshot.exists()) {
+        // Если пользователя нет, создаём
+        userRef.set({
+          tickets: 5,
+          points: 0
+        });
+      }
+    }).catch(err => {
+      // Если ошибка (например, недоступен Firebase)
+      showErrorModal(404, "Firebase недоступен: " + err.message);
+    });
+
+    // Подписка на изменения
+    userRef.on('value', snapshot => {
+      const data = snapshot.val() || {};
+      localUserData.tickets = data.tickets || 0;
+      localUserData.points  = data.points  || 0;
+      updateHeader();
+    }, (error) => {
+      showErrorModal(404, "Ошибка чтения из БД: " + error.message);
+    });
+
+    function updateHeader() {
+      document.getElementById('ticketCount').textContent = localUserData.tickets;
+      document.getElementById('pointCount').textContent = localUserData.points;
+    }
+
+    function goBack() {
+      window.location.href = 'index.html';
+    }
+
+    /* ------------------------------------------------
+       2. Подготовка Canvas к размеру окна
+    ------------------------------------------------ */
+    const canvas = document.getElementById('breakoutCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let GAME_WIDTH  = 0;
+    let GAME_HEIGHT = 0;
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      GAME_WIDTH = canvas.width;
+      GAME_HEIGHT = canvas.height;
+    }
+    window.addEventListener('resize', () => {
+      resizeCanvas();
+      // При желании можно переинициализировать игру
+    });
+    resizeCanvas();
+
+    /* ------------------------------------------------
+       3. Модальное окно для ошибок
+    ------------------------------------------------ */
+    function showErrorModal(code, message) {
+      document.getElementById('errorCodeTitle').textContent = "Error " + code;
+      document.getElementById('errorMessage').textContent = message;
+      document.getElementById('errorModal').classList.add('active');
+    }
+    function closeErrorModal() {
+      document.getElementById('errorModal').classList.remove('active');
+    }
+
+    /* ------------------------------------------------
+       4. Параметры игры Breakout
+    ------------------------------------------------ */
+    // Мяч
+    let ballRadius = 8;
+    let ballX, ballY;
+    let ballDX = 0;
+    let ballDY = 0;
+
+    // Ракетка: чуть выше низа
+    const paddleOffsetFromBottom = 60;
+    let paddleWidth = 60;
+    let paddleHeight = 10;
+    let paddleX;
+    let paddleY;
+    let paddleSpeed = 7;
+
+    // Управление
+    let rightPressed = false;
+    let leftPressed = false;
+    let isGameRunning = false;
+
+    // Кирпичи
+    let brickRowCount = 5;
+    let brickColumnCount = 8;
+    let brickWidth = 40;
+    let brickHeight = 15;
+    let brickPadding = 5;
+    let brickOffsetTop = 70;
+
+    // Для центрирования стены кирпичей
+    let totalBrickWidth = 0;
+    let centerOffsetX = 0;
+
+    let bricks = [];
+
+    // Очки
+    let score = 0;
+
+    // Игровой цикл
+    let gameLoop = null;
+
+    /* ------------------------------------------------
+       5. Инициализация игры
+    ------------------------------------------------ */
+    function initGameParams() {
+      score = 0;
+      isGameRunning = false;
+      // Мяч по центру
+      ballX = GAME_WIDTH / 2;
+      ballY = GAME_HEIGHT - 100;
+      ballDX = 0;
+      ballDY = 0;
+
+      // Ракетка
+      paddleY = GAME_HEIGHT - paddleHeight - paddleOffsetFromBottom;
+      paddleX = (GAME_WIDTH - paddleWidth) / 2;
+      rightPressed = false;
+      leftPressed = false;
+
+      // Кирпичи
+      bricks = [];
+      // Вычисляем общую ширину строки кирпичей
+      totalBrickWidth = brickColumnCount * brickWidth + (brickColumnCount - 1) * brickPadding;
+      // Сдвиг по центру
+      centerOffsetX = (GAME_WIDTH - totalBrickWidth) / 2;
+
+      for (let c = 0; c < brickColumnCount; c++) {
+        bricks[c] = [];
+        for (let r = 0; r < brickRowCount; r++) {
+          bricks[c][r] = { hits: 0 };
+        }
+      }
+    }
+
+    /* ------------------------------------------------
+       6. Управление (клавиатура и сенсор)
+    ------------------------------------------------ */
+    document.addEventListener('keydown', keyDownHandler, false);
+    document.addEventListener('keyup',   keyUpHandler,   false);
+
+    function keyDownHandler(e) {
+      if (e.key === 'ArrowRight') rightPressed = true;
+      if (e.key === 'ArrowLeft')  leftPressed = true;
+      if (!isGameRunning && (rightPressed || leftPressed)) {
+        ballDX = 5;
+        ballDY = -5;
+        isGameRunning = true;
+      }
+    }
+    function keyUpHandler(e) {
+      if (e.key === 'ArrowRight') rightPressed = false;
+      if (e.key === 'ArrowLeft')  leftPressed = false;
+    }
+
+    canvas.addEventListener('touchstart', handleTouch, {passive: false});
+    canvas.addEventListener('touchmove',  handleTouch, {passive: false});
+    function handleTouch(e) {
+      e.preventDefault();
+      let touch = e.touches[0];
+      const rect = canvas.getBoundingClientRect();
+      let touchX = touch.clientX - rect.left;
+      // Двигаем ракетку
+      paddleX = touchX - paddleWidth / 2;
+      // Запуск мяча
+      if (!isGameRunning) {
+        ballDX = 5;
+        ballDY = -5;
+        isGameRunning = true;
+      }
+    }
+
+    /* ------------------------------------------------
+       7. Отрисовка
+    ------------------------------------------------ */
+    function drawBricks() {
+      for (let c = 0; c < brickColumnCount; c++) {
+        for (let r = 0; r < brickRowCount; r++) {
+          let b = bricks[c][r];
+          if (b.hits < 2) {
+            // Координаты кирпича с учётом центрирования
+            let brickX = centerOffsetX + c * (brickWidth + brickPadding);
+            let brickY = brickOffsetTop + r * (brickHeight + brickPadding);
+
+            ctx.beginPath();
+            ctx.rect(brickX, brickY, brickWidth, brickHeight);
+            ctx.fillStyle = (b.hits === 0) ? '#0ff' : 'red';
+            ctx.fill();
+            ctx.closePath();
+          }
+        }
+      }
+    }
+
+    function drawBall() {
+      ctx.beginPath();
+      ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
+      ctx.fillStyle = "#ff0";
+      ctx.fill();
+      ctx.closePath();
+    }
+
+    function drawPaddle() {
+      ctx.beginPath();
+      ctx.rect(paddleX, paddleY, paddleWidth, paddleHeight);
+      ctx.fillStyle = "#f0f";
+      ctx.fill();
+      ctx.closePath();
+    }
+
+    function drawScore() {
+      ctx.font = "14px 'Press Start 2P', monospace";
+      ctx.fillStyle = "#fff";
+      ctx.fillText("Score: " + score, 10, 30);
+    }
+
+    /* ------------------------------------------------
+       8. Логика столкновений
+    ------------------------------------------------ */
+    function collisionDetection() {
+      for (let c = 0; c < brickColumnCount; c++) {
+        for (let r = 0; r < brickRowCount; r++) {
+          let b = bricks[c][r];
+          if (b.hits < 2) {
+            // Координаты кирпича (снова вычисляем в точке столкновения)
+            let brickX = centerOffsetX + c * (brickWidth + brickPadding);
+            let brickY = brickOffsetTop + r * (brickHeight + brickPadding);
+
+            if (
+              ballX > brickX &&
+              ballX < brickX + brickWidth &&
+              ballY > brickY &&
+              ballY < brickY + brickHeight
+            ) {
+              ballDY = -ballDY;
+              b.hits++;
+              if (b.hits === 2) {
+                score += 5;
+                if (userRef) {
+                  localUserData.points += 5;
+                  userRef.update({ points: localUserData.points });
+                }
+                if (checkWin()) {
+                  endGame("Congratulations! You won!");
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    function checkWin() {
+      for (let c = 0; c < brickColumnCount; c++){
+        for (let r = 0; r < brickRowCount; r++){
+          if (bricks[c][r].hits < 2) return false;
+        }
+      }
+      return true;
+    }
+
+    /* ------------------------------------------------
+       9. Главный игровой цикл
+    ------------------------------------------------ */
+    function draw() {
+      ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
+      drawBricks();
+      drawBall();
+      drawPaddle();
+      drawScore();
+      collisionDetection();
+
+      // Столкновения со стенами
+      if (ballX + ballDX > GAME_WIDTH - ballRadius || ballX + ballDX < ballRadius) {
+        ballDX = -ballDX;
+      }
+      if (ballY + ballDY < ballRadius) {
+        ballDY = -ballDY;
+      }
+
+      // Столкновение с ракеткой
+      if (ballDY > 0 && ballY + ballDY >= paddleY - ballRadius && ballY < paddleY) {
+        if (ballX > paddleX && ballX < paddleX + paddleWidth) {
+          ballDY = -ballDY;
+          ballY = paddleY - ballRadius;
+        }
+      }
+
+      // Проверка выхода за нижнюю границу
+      if (ballY - ballRadius > GAME_HEIGHT) {
+        endGame("Game Over! You lost.");
+        return;
+      }
+
+      // Обновляем координаты мяча
+      ballX += ballDX;
+      ballY += ballDY;
+
+      // Движение ракетки
+      if (rightPressed && paddleX < GAME_WIDTH - paddleWidth) {
+        paddleX += paddleSpeed;
+      } else if (leftPressed && paddleX > 0) {
+        paddleX -= paddleSpeed;
+      }
+    }
+
+    /* ------------------------------------------------
+       10. Запуск и завершение игры
+    ------------------------------------------------ */
+    function startBreakout() {
+      // Проверяем билеты. Если мало — ошибка 402
+      if (localUserData.tickets < 1) {
+        showErrorModal(402, "Недостаточно билетов!");
+        return;
+      }
+      // Списываем билет
+      localUserData.tickets--;
+      if (userRef) {
+        userRef.update({ tickets: localUserData.tickets });
+      }
+      updateHeader();
+
+      // Скрываем интерфейс
+      document.getElementById('header').style.display = 'none';
+      document.getElementById('backContainer').style.display = 'none';
+      document.getElementById('startBtn').style.display = 'none';
+      canvas.style.display = 'block';
+
+      initGameParams();
+      if (gameLoop) clearInterval(gameLoop);
+
+      // Для плавности можно использовать requestAnimationFrame, но setInterval тоже работает:
+      gameLoop = setInterval(draw, 16);
+    }
+
+    function endGame(message) {
+      clearInterval(gameLoop);
+      document.getElementById('endMessage').textContent = message + " Score: " + score;
+      document.getElementById('endModal').classList.add('active');
+    }
+  </script>
+</body>
+</html>
