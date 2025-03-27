@@ -95,7 +95,10 @@
   <!-- Telegram Web App API -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://unpkg.com/gifler@0.1.0/gifler.min.js"></script>
-  <!-- Firebase Client SDK не подключается, т.к. теперь работа с базой данных происходит через сервер -->
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 </head>
 <body>
   <!-- Header -->
@@ -147,7 +150,7 @@
           <button id="miniGamesInfoBtn" class="info-button" onclick="openMiniGamesInfoModal()">Info</button>
         </h3>
         <div class="games-gallery">
-          <!-- Игра STACK (game2) – переход на stack.html -->
+          <!-- Игра STACK (game2) – при нажатии происходит переход на stack.html без списания билетов -->
           <div class="game-card">
             <img src="https://i.pinimg.com/736x/ed/0d/12/ed0d1214bfce57bc73d3207f47ac1d9e.jpg" alt="Match-3">
             <p id="gameCard2Title">PAC-MAN</p>
@@ -159,7 +162,7 @@
               cost: 1
             })">Play</button>
           </div>
-          <!-- Игра TETRIS (game3) – списывание билетов -->
+          <!-- Игра TETRIS (game3) – списываются билеты и запускается игра -->
           <div class="game-card">
             <img src="https://raw.githubusercontent.com/qnexst/404token/main/tetris.jpg" alt="Game 3">
             <p id="gameCard3Title">TETRIS</p>
@@ -204,17 +207,18 @@
         </h3>
         <div class="games-gallery">
          <div class="game-card">
-           <img src="https://img.icons8.com/ios-filled/50/00000/handshake.png" alt="Partner Game">
-           <p id="gameCard5Title">Partner Game</p>
-           <!-- Кнопка Play скрыта до активации -->
-           <button id="gameCard5Button" style="display: none;" onclick="openGameInfoModal({ 
+  <img src="https://img.icons8.com/ios-filled/50/00000/handshake.png" alt="Partner Game">
+  <p id="gameCard5Title">Partner Game</p>
+  <!-- Скрываем кнопку Play до момента, когда она станет доступной -->
+  <button id="gameCard5Button" style="display: none;" onclick="openGameInfoModal({ 
               gameId: 'partnergame1',
               title: 'soon',
               img: 'https://img.icons8.com/ios-filled/50/00000/handshake.png',
               desc: 'Game from our partner.',
               cost: 1
             })">Play</button>
-         </div>
+</div>
+
         </div>
       </div>
     </section>
@@ -261,7 +265,7 @@
     <!-- LEADERBOARD SECTION -->
     <section id="leaderboardSection" class="section">
       <h2 id="leaderboardHeader">Leaderboard</h2>
-      <h2 id="leaderboardHeader">Season 1</h2>
+       <h2 id="leaderboardHeader">Season 1</h2>
       <button class="info-button" onclick="openSeasonInfoModal()">Info</button>
       <div class="leaderboard-container">
         <table id="leaderboardTable">
@@ -274,10 +278,10 @@
             </tr>
           </thead>
           <tbody id="leaderboardTop10">
-            <!-- Top-10 игроков -->
+            <!-- Top-10 players with prizes -->
           </tbody>
           <tbody id="leaderboardRest">
-            <!-- Остальные игроки -->
+            <!-- Other players -->
           </tbody>
         </table>
       </div>
@@ -294,7 +298,7 @@
       <div class="lootbox-container" id="lootboxContainer" style="display: none;">
         <div class="lootbox-indicator"></div>
         <div class="lootbox-roulette" id="lootboxRoulette">
-          <!-- Призы добавляются динамически -->
+          <!-- Prizes will be added dynamically -->
         </div>
       </div>
       <div class="lootbox-buttons">
@@ -344,24 +348,27 @@
   <!-- Modal for Loot Box Info -->
   <div class="modal-backdrop" id="lootBoxInfoModal">
     <div class="modal">
+    
       <h2 id="lootBoxInfoTitle">Bug Pack Info</h2>
       <p id="lootBoxInfoDesc">
-        Prizes and Chances:<br>
-        - 3 tickets (10%)<br>
-        - 5 tickets (5%)<br>
-        - 10 tickets (8%)<br>
-        - 8 tickets (4%)<br>
-        - One case (5%)<br>
-        - 100 points (10%)<br>
-        - 500 points (5%)<br>
-        - 1M tokens (3%)<br>
-        - 3M tokens (2%)<br>
-        - 5M tokens (1%)<br>
-        - NFT Red (1%) – Special<br>
-        - NFT Yellow (2%) – Legendary<br>
-        - NFT Green (3%) – Rare<br>
-        - 1000 points (2%)
-      </p>
+  Prizes and Chances:<br>
+  - 3 tickets (10%)<br>
+  - 5 tickets (5%)<br>
+  - 10 tickets (8%)<br>
+  - 8 tickets (4%)<br>
+  - One case (5%)<br>
+  - 100 points (10%)<br>
+  - 500 points (5%)<br>
+  - 1M tokens (3%)<br>
+  - 3M tokens (2%)<br>
+  - 5M tokens (1%)<br>
+  - NFT Red (1%) – Special<br>
+  - NFT Yellow (2%) – Legendary<br>
+  - NFT Green (3%) – Rare<br>
+ 
+  - 1000 points (2%)
+</p>
+
       <button class="close-modal" onclick="closeLootBoxInfoModal()">Close</button>
     </div>
   </div>
@@ -389,6 +396,7 @@
   <div class="game-modal-backdrop" id="gameModalBackdrop">
     <div class="game-modal-content">
       <div class="game-canvas">
+         <!-- Оставлен только canvas для TETRIS (game3) -->
          <canvas id="game3Canvas" width="400" height="740" style="display: none; position: relative; top: -0px;"></canvas>
       </div>
     </div>
@@ -403,7 +411,43 @@
     </div>
   </div>
 
-  <!-- Подключаем игровые скрипты -->
+  <!-- Modal for Main Online Games Info -->
+  <div class="modal-backdrop" id="mainOnlineInfoModal">
+    <div class="modal">
+      <h2 id="mainOnlineInfoTitle">Online Games</h2>
+      <p id="mainOnlineInfoDesc">The online games section features a collection of arcade challenges where players can place token bets for bigger rewards or play for free without tickets and tokens, offering flexible mechanics that cater to both competitive and casual gamers in a fast-paced, engaging environment.</p>
+      <button class="close-modal" onclick="closeMainOnlineInfoModal()">Close</button>
+    </div>
+  </div>
+
+  <!-- Modal for Mini Games Info -->
+  <div class="modal-backdrop" id="miniGamesInfoModal">
+    <div class="modal">
+      <h2 id="miniGamesInfoTitle">Mini Games Info</h2>
+      <p id="miniGamesInfoDesc">Players participate in mini games for tickets, earning points for their activity. Every 7 days, top 10 players receive BUG PACKS.</p>
+      <button class="close-modal" onclick="closeMiniGamesInfoModal()">Close</button>
+    </div>
+  </div>
+
+  <!-- Modal for Partner Games Info -->
+  <div class="modal-backdrop" id="partnerInfoModal">
+    <div class="modal">
+      <h2 id="partnerInfoTitle">Partner Games</h2>
+      <p id="partnerInfoDesc">Game from our partner.</p>
+      <button class="close-modal" onclick="closePartnerInfoModal()">Close</button>
+    </div>
+  </div>
+
+  <!-- Modal for Deposit -->
+  <div class="modal-backdrop" id="depositModal">
+    <div class="modal">
+      <h2 id="depositModalTitle">Not enough Tokens</h2>
+      <p id="depositModalDesc">You do not have enough coins to play. Please top up your balance.</p>
+      <button class="close-modal" onclick="closeDepositModal()">Close</button>
+    </div>
+  </div>
+
+  <!-- Include game scripts and main script -->
   <script src="game1.js"></script>
   <script src="game2.js"></script>
   <script src="partnergame1.js"></script>
@@ -412,17 +456,35 @@
   <script src="game5.js"></script>
   <script src="game6.js"></script>
   <script src="case.js"></script>
+  <!-- Подключение нового файла breakout.js -->
   <script src="breakout.js"></script>
-  
-  <!-- Основной скрипт с интеграцией API-сервера -->
   <script>
-    /* -------------------------------
-       1. Инициализация пользователя
-    ------------------------------- */
+    /* ----------------------------------------------
+       1. Firebase Initialization
+    ---------------------------------------------- */
+    const firebaseConfig = {
+  apiKey: "AIzaSyApxp0dHh0TK4nZVfOqloJ92dekjvjey3I",
+  authDomain: "meta-glitch.firebaseapp.com",
+  projectId: "meta-glitch",
+  storageBucket: "meta-glitch.firebasestorage.app",
+  messagingSenderId: "186162879710",
+  appId: "1:186162879710:web:87975bd09681505be7364f",
+  measurementId: "G-1TXVH8MESD"
+};
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    /* ----------------------------------------------
+       2. Telegram Web App
+    ---------------------------------------------- */
     const tg = window.Telegram.WebApp;
     tg.expand();
-    
+
+    /* ----------------------------------------------
+       3. Global Variables & User Data
+    ---------------------------------------------- */
     let currentUser = null;
+    let userRef = null;
     let localUserData = {
       photo: '',
       tickets: 0,
@@ -431,108 +493,69 @@
       lastSpinTime: 0,
       dataChip: false,
       cyberCase: 0,
-      nfts: []
+      nfts: [] // добавлено поле для NFT
     };
     let gameInProgress = false;
     let isSpinning = false;
 
-    // Инициализация через данные Telegram
     if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
       currentUser = tg.initDataUnsafe.user;
       document.getElementById('username').textContent = '@' + currentUser.username;
       if (currentUser.photo_url) {
         document.getElementById('userPhoto').src = currentUser.photo_url;
       }
-      // Получение данных пользователя с сервера
-      fetchUserData();
+      userRef = db.ref('users/' + currentUser.username);
+      userRef.once('value', snapshot => {
+        if (!snapshot.exists()) {
+          userRef.set({
+            photo: currentUser.photo_url || '',
+            tickets: 0,
+            coins: 0,
+            points: 0,
+            lastSpinTime: 0,
+            dataChip: false,
+            cyberCase: 0,
+            nfts: []  // инициализация поля NFT
+          }).then(() => {
+            // Перенаправляем новых пользователей на info.html
+            window.location.href = 'info.html';
+          });
+        }
+      });
+      userRef.on('value', snapshot => {
+        const data = snapshot.val() || {};
+        localUserData = {
+          photo: data.photo || '',
+          tickets: data.tickets || 0,
+          coins: data.coins || 0,
+          points: data.points || 0,
+          lastSpinTime: data.lastSpinTime || 0,
+          dataChip: data.dataChip || false,
+          cyberCase: data.cyberCase || 0,
+          nfts: data.nfts || []
+        };
+        updateTopBar();
+        updateSpinButton();
+        updateCaseCount();
+      });
     }
 
-    /* -------------------------------
-       2. Функции для работы с API-сервером
-       Используем адрес http://localhost:5000
-    ------------------------------- */
-    function fetchUserData() {
-      fetch('http://localhost:5000/api/getUserData?username=' + currentUser.username)
-        .then(response => response.json())
-        .then(data => {
-          if (!data.exists) {
-            createUserOnServer();
-          } else {
-            localUserData = data.userData;
-            updateTopBar();
-            updateSpinButton();
-            updateCaseCount();
-            updateLeaderboard();
-          }
-        })
-        .catch(err => console.error('Ошибка получения данных пользователя:', err));
-    }
-
-    function createUserOnServer() {
-      const payload = {
-        username: currentUser.username,
-        photo: currentUser.photo_url || '',
-        tickets: 0,
-        coins: 0,
-        points: 0,
-        lastSpinTime: 0,
-        dataChip: false,
-        cyberCase: 0,
-        nfts: []
-      };
-      fetch('http://localhost:5000/api/createUser', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-      .then(response => response.json())
-      .then(() => {
-        window.location.href = 'info.html';
-      })
-      .catch(err => console.error('Ошибка создания пользователя:', err));
-    }
-
-    function updateUserOnServer(updates) {
-      Object.assign(localUserData, updates);
-      const payload = {
-        username: currentUser.username,
-        updates: updates
-      };
-      fetch('http://localhost:5000/api/updateUserData', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-      .catch(err => console.error('Ошибка обновления данных пользователя:', err));
-    }
-
-    /* -------------------------------
-       3. Обновление верхней панели
-    ------------------------------- */
-    function formatCoins(coins) {
-      if (coins >= 1e9) {
-        return (coins / 1e9).toFixed(1).replace(/\.0$/, '') + 'b';
-      } else if (coins >= 1e6) {
-        return (coins / 1e6).toFixed(1).replace(/\.0$/, '') + 'm';
-      } else if (coins >= 1e3) {
-        return (coins / 1e3).toFixed(1).replace(/\.0$/, '') + 'k';
-      }
-      return coins;
-    }
-
+    /* ----------------------------------------------
+       4. Update Top Bar & Case Count
+    ---------------------------------------------- */
     function updateTopBar() {
-      document.getElementById('ticketCount').textContent = localUserData.tickets;
-      document.getElementById('coinCount').textContent   = formatCoins(localUserData.coins);
-      document.getElementById('pointCount').textContent  = localUserData.points;
+      document.getElementById('ticketCount').textContent = localUserData.tickets || 0;
+      document.getElementById('coinCount').textContent   = localUserData.coins || 0;
+      document.getElementById('pointCount').textContent  = localUserData.points || 0;
     }
 
     function updateCaseCount() {
       document.getElementById('openBtn').textContent = `open (${localUserData.cyberCase})`;
     }
 
-    /* -------------------------------
-       4. Переключение разделов и модальных окон
-    ------------------------------- */
+    /* ----------------------------------------------
+       5. Section Switching
+    ---------------------------------------------- */
     function showSection(sectionId) {
       document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
       document.querySelectorAll('.modal-backdrop').forEach(modal => modal.classList.remove('active'));
@@ -541,6 +564,9 @@
       document.getElementById(sectionId).classList.add('active');
     }
 
+    /* ----------------------------------------------
+       6. Global Modal
+    ---------------------------------------------- */
     function showGlobalModal(title, message) {
       document.getElementById('globalModalTitle').textContent = title;
       document.getElementById('globalModalMessage').textContent = message;
@@ -550,9 +576,9 @@
       document.getElementById('globalModalBackdrop').classList.remove('active');
     }
 
-    /* -------------------------------
-       5. Модальное окно с информацией об игре
-    ------------------------------- */
+    /* ----------------------------------------------
+       7. Game Info Modal
+    ---------------------------------------------- */
     function openGameInfoModal(gameData) {
       document.getElementById('gameInfoImg').src = gameData.img;
       document.getElementById('gameInfoTitle').textContent = gameData.title;
@@ -569,13 +595,13 @@
       document.getElementById('gameInfoModal').classList.remove('active');
     }
 
-    /* -------------------------------
-       6. Запуск игры
-    ------------------------------- */
+    /* ----------------------------------------------
+       8. Start Game
+    ---------------------------------------------- */
     let currentGame = null;
     function handleStartGame(gameName, ticketCost) {
       document.querySelector('.user-info').style.display = 'none';
-      if (!currentUser) {
+      if (!currentUser || !userRef) {
         showGlobalModal("Error", "No user data available!");
         return;
       }
@@ -596,36 +622,27 @@
       }
       
       if (gameName === 'game3') {
-        fetch('http://localhost:5000/api/startGame', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username: currentUser.username, game: gameName, cost: ticketCost })
-        })
-        .then(response => response.json())
-        .then(result => {
-          if (result.error) {
-            showGlobalModal("Not enough tickets", result.error);
-          } else {
-            localUserData.tickets = result.updatedData.tickets;
-            updateTopBar();
-            currentGame = gameName;
-            gameInProgress = true;
-            document.getElementById('mainNav').classList.add('hidden');
-            document.getElementById('gameModalBackdrop').classList.add('active');
-            document.getElementById('game3Canvas').style.display = 'block';
-            initGame3();
-          }
-        })
-        .catch(err => {
-          console.error(err);
-          showGlobalModal("Error", "Unable to start game");
-        });
+        if ((localUserData.tickets || 0) < ticketCost) {
+          showGlobalModal("Not enough tickets", "You do not have enough tickets to play!");
+          return;
+        }
+        localUserData.tickets -= ticketCost;
+        updateTopBar();
+        userRef.update({ tickets: localUserData.tickets });
+        
+        currentGame = gameName;
+        gameInProgress = true;
+        document.getElementById('mainNav').classList.add('hidden');
+        
+        document.getElementById('gameModalBackdrop').classList.add('active');
+        document.getElementById('game3Canvas').style.display = 'block';
+        initGame3();
       }
     }
 
-    /* -------------------------------
-       7. Завершение игры
-    ------------------------------- */
+    /* ----------------------------------------------
+       9. End Game Modal
+    ---------------------------------------------- */
     function showEndGameModal(title, message) {
       document.getElementById('endgameTitle').textContent = "Result";
       document.getElementById('endgameMessage').textContent = message;
@@ -639,8 +656,8 @@
     function closeGameModal() {
       document.getElementById('gameModalBackdrop').classList.remove('active');
       document.getElementById('mainNav').classList.remove('hidden');
-      if (currentGame) {
-        updateUserOnServer({ points: localUserData.points });
+      if (userRef && currentGame) {
+        userRef.update({ points: localUserData.points });
       }
       if (currentGame === 'game3') {
         resetGame3();
@@ -649,32 +666,44 @@
       gameInProgress = false;
     }
 
-    /* -------------------------------
-       8. Колесо фортуны
-    ------------------------------- */
+    /* ----------------------------------------------
+       10. Wheel of Fortune / Tickets
+    ---------------------------------------------- */
+    let spinDuration = 4000;
     function spinWheel() {
       if (!currentUser) return;
-      fetch('http://localhost:5000/api/spinWheel', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: currentUser.username })
-      })
-      .then(response => response.json())
-      .then(result => {
-        if (result.error) {
-          showGlobalModal("Wheel of Fortune", result.error);
-          return;
+      const now = Date.now();
+      if (now - (localUserData.lastSpinTime || 0) < 24 * 60 * 60 * 1000) {
+        showGlobalModal("Wheel of Fortune", "Free spin available once every 24 hours!");
+        return;
+      }
+      localUserData.lastSpinTime = now;
+      userRef.update({ lastSpinTime: now });
+      updateSpinButton();
+      let randomRotation = 1080 + Math.floor(Math.random() * 360);
+      const wheelEl = document.getElementById('wheel');
+      wheelEl.style.transform = `rotate(${randomRotation}deg)`;
+      setTimeout(() => {
+        let finalDeg = randomRotation % 360;
+        let wonTickets = 0;
+        if (finalDeg < 60) {
+          wonTickets = 2;
+        } else if (finalDeg < 120) {
+          wonTickets = 5;
+        } else if (finalDeg < 180) {
+          wonTickets = 8;
+        } else if (finalDeg < 240) {
+          wonTickets = 10;
+        } else if (finalDeg < 300) {
+          wonTickets = 13;
+        } else {
+          wonTickets = 15;
         }
-        let randomRotation = 1080 + Math.floor(Math.random() * 360);
-        const wheelEl = document.getElementById('wheel');
-        wheelEl.style.transform = `rotate(${randomRotation}deg)`;
-        setTimeout(() => {
-          localUserData.tickets = result.updatedData.tickets;
-          updateTopBar();
-          showSpinModal(result.wonTickets);
-        }, 4000);
-      })
-      .catch(err => console.error(err));
+        localUserData.tickets += wonTickets;
+        updateTopBar();
+        userRef.update({ tickets: localUserData.tickets });
+        showSpinModal(wonTickets);
+      }, spinDuration);
     }
     function showSpinModal(amount) {
       document.getElementById("wheelTicketCount").textContent = amount;
@@ -690,7 +719,7 @@
       const last = localUserData.lastSpinTime || 0;
       const diff = now - last;
       const wait = 24 * 60 * 60 * 1000 - diff;
-      if (wait <= 0) {
+      if(wait <= 0) {
          btn.textContent = "Spin";
          btn.disabled = false;
       } else {
@@ -703,54 +732,55 @@
     }
     setInterval(updateSpinButton, 1000);
 
-    /* -------------------------------
-       9. Leaderboard
-    ------------------------------- */
-    function updateLeaderboard() {
-      fetch('http://localhost:5000/api/leaderboard')
-      .then(response => response.json())
-      .then(result => {
-         const usersArray = result.users;
-         usersArray.sort((a, b) => b.points - a.points);
-         const top10Body = document.getElementById('leaderboardTop10');
-         const restBody = document.getElementById('leaderboardRest');
-         top10Body.innerHTML = '';
-         restBody.innerHTML = '';
-         usersArray.forEach((user, i) => {
-           const tr = document.createElement('tr');
-           if (currentUser && user.username === currentUser.username) {
-             tr.classList.add('current-user');
-           }
-           if (i < 10) {
-             let multiplier;
-             if (i === 0) {
-               multiplier = "5x";
-             } else if (i === 1) {
-               multiplier = "3x";
-             } else if (i === 2) {
-               multiplier = "2x";
-             } else {
-               multiplier = "1x";
-             }
-             tr.innerHTML = `<td>${i + 1}</td>
-                             <td>@${user.username}</td>
-                             <td>${user.points}</td>
-                             <td>
-                               <img src="https://raw.githubusercontent.com/qnexst/404token/main/case.png" alt="Prize Icon" width="40" height="40">
-                               ${multiplier}
-                             </td>`;
-             top10Body.appendChild(tr);
-           } else {
-             tr.innerHTML = `<td>${i + 1}</td>
-                             <td>@${user.username}</td>
-                             <td>${user.points}</td>
-                             <td></td>`;
-             restBody.appendChild(tr);
-           }
-         });
-      })
-      .catch(err => console.error(err));
-    }
+    /* ----------------------------------------------
+       11. Leaderboard
+    ---------------------------------------------- */
+    let leaderboardRef = db.ref('users');
+    leaderboardRef.on('value', snapshot => {
+      const usersData = snapshot.val() || {};
+      const usersArray = Object.entries(usersData).map(([uname, obj]) => ({
+        username: uname,
+        points: obj.points || 0
+      }));
+      usersArray.sort((a, b) => b.points - a.points);
+      const top10Body = document.getElementById('leaderboardTop10');
+      const restBody = document.getElementById('leaderboardRest');
+      top10Body.innerHTML = '';
+      restBody.innerHTML = '';
+      
+      usersArray.forEach((user, i) => {
+        const tr = document.createElement('tr');
+        if (currentUser && user.username === currentUser.username) {
+          tr.classList.add('current-user');
+        }
+        if (i < 10) {
+          let multiplier;
+          if (i === 0) {
+            multiplier = "5x";
+          } else if (i === 1) {
+            multiplier = "3x";
+          } else if (i === 2) {
+            multiplier = "2x";
+          } else {
+            multiplier = "1x";
+          }
+          tr.innerHTML = `<td>${i + 1}</td>
+                          <td>@${user.username}</td>
+                          <td>${user.points}</td>
+                          <td>
+                            <img src="https://raw.githubusercontent.com/qnexst/404token/main/case.png" alt="Prize Icon" width="40" height="40">
+                            ${multiplier}
+                          </td>`;
+          top10Body.appendChild(tr);
+        } else {
+          tr.innerHTML = `<td>${i + 1}</td>
+                          <td>@${user.username}</td>
+                          <td>${user.points}</td>
+                          <td></td>`;
+          restBody.appendChild(tr);
+        }
+      });
+    });
 
     function openSeasonInfoModal() {
       document.getElementById('seasonModalBackdrop').classList.add('active');
@@ -759,33 +789,35 @@
       document.getElementById('seasonModalBackdrop').classList.remove('active');
     }
 
-    /* -------------------------------
-       10. Покупка билетов
-    ------------------------------- */
+    /* ----------------------------------------------
+       12. Buy Tickets
+    ---------------------------------------------- */
     function buyTickets() {
       window.location.href = 'buyticket.html';
     }
 
-    /* -------------------------------
-       11. Lootbox – открытие кейса через сервер
-    ------------------------------- */
+    /* ----------------------------------------------
+       13. Lootbox in Cyber Case Section
+    ---------------------------------------------- */
+    // Обновлённый массив призов (итого 10 предметов)
     const lootboxPrizes = [
        { name: '3 tickets', image: 'https://raw.githubusercontent.com/qnexst/404token/main/ticket.png', chance: 10 },
-       { name: '5 tickets', image: 'https://raw.githubusercontent.com/qnexst/404token/main/ticket.png', chance: 5 },
-       { name: 'One case', image: 'https://raw.githubusercontent.com/qnexst/404token/main/case.png', chance: 5 },
-       { name: '100 points', image: 'https://raw.githubusercontent.com/qnexst/404token/main/star.png', chance: 10 },
-       { name: '500 points', image: 'https://raw.githubusercontent.com/qnexst/404token/main/star.png', chance: 5 },
-       { name: '1M tokens', image: 'https://raw.githubusercontent.com/qnexst/404token/main/token.png', chance: 1 },
+      { name: '5 tickets', image: 'https://raw.githubusercontent.com/qnexst/404token/main/ticket.png', chance: 5 },
+      { name: 'One case', image: 'https://raw.githubusercontent.com/qnexst/404token/main/case.png', chance: 5 },
+      { name: '100 points', image: 'https://raw.githubusercontent.com/qnexst/404token/main/star.png', chance: 10 },
+      { name: '500 points', image: 'https://raw.githubusercontent.com/qnexst/404token/main/star.png', chance: 5 },
+      { name: '1M tokens', image: 'https://raw.githubusercontent.com/qnexst/404token/main/token.png', chance: 1 },
        { name: '3M tokens', image: 'https://raw.githubusercontent.com/qnexst/404token/main/token.png', chance: 0.5 },
-       { name: '5M tokens', image: 'https://raw.githubusercontent.com/qnexst/404token/main/token.png', chance: 0.2 },
-       { name: 'NFT Special', image: 'https://img.icons8.com/color/48/nft.png', chance: 0.5 },
-       { name: 'NFT Legendary', image: 'https://img.icons8.com/color/48/nft.png', chance: 1 },
-       { name: 'NFT Rare', image: 'https://img.icons8.com/color/48/nft.png', chance: 2 },
-       { name: '10 tickets', image: 'https://raw.githubusercontent.com/qnexst/404token/main/ticket.png', chance: 8 },
-       { name: '8 tickets', image: 'https://raw.githubusercontent.com/qnexst/404token/main/ticket.png', chance: 4 },
-       { name: '1000 points', image: 'https://raw.githubusercontent.com/qnexst/404token/main/star.png', chance: 2 },
+      { name: '5M tokens', image: 'https://raw.githubusercontent.com/qnexst/404token/main/token.png', chance: 0.2 },
+      { name: 'NFT Special', image: 'https://img.icons8.com/color/48/nft.png', chance: 0.5 },
+      { name: 'NFT Legendary', image: 'https://img.icons8.com/color/48/nft.png', chance: 1 },
+      { name: 'NFT Rare', image: 'https://img.icons8.com/color/48/nft.png', chance: 2 },
+      { name: '10 tickets', image: 'https://raw.githubusercontent.com/qnexst/404token/main/ticket.png', chance: 8 },
+      { name: '8 tickets', image: 'https://raw.githubusercontent.com/qnexst/404token/main/ticket.png', chance: 4 },
+      { name: '1000 points', image: 'https://raw.githubusercontent.com/qnexst/404token/main/star.png', chance: 2 },
     ];
 
+    // Helper function для перемешивания массива
     function shuffleArray(array) {
       let arr = array.slice();
       for (let i = arr.length - 1; i > 0; i--) {
@@ -817,20 +849,21 @@
       }
     }
 
+    // Обработка приза с учетом NFT
     function addPrizeToUser(prize) {
       if (prize.name.toLowerCase().includes("token")) {
          let amount = parsePrizeAmount(prize.name);
          localUserData.coins += amount;
-         updateUserOnServer({ coins: localUserData.coins });
+         userRef.update({ coins: localUserData.coins });
          updateTopBar();
       } else if (prize.name.toLowerCase().includes("case")) {
          localUserData.cyberCase += 1;
-         updateUserOnServer({ cyberCase: localUserData.cyberCase });
+         userRef.update({ cyberCase: localUserData.cyberCase });
          updateCaseCount();
       } else if (prize.name.toLowerCase().includes("point")) {
          let amount = parsePrizeAmount(prize.name);
          localUserData.points += amount;
-         updateUserOnServer({ points: localUserData.points });
+         userRef.update({ points: localUserData.points });
          updateTopBar();
       } else if (prize.name.toLowerCase().includes("nft")) {
          let nftRarity = "";
@@ -846,15 +879,16 @@
            localUserData.nfts = [];
          }
          localUserData.nfts.push(nftData);
-         updateUserOnServer({ nfts: localUserData.nfts });
+         userRef.update({ nfts: localUserData.nfts });
       } else {
          let amount = parsePrizeAmount(prize.name);
          localUserData.tickets += amount;
-         updateUserOnServer({ tickets: localUserData.tickets });
+         userRef.update({ tickets: localUserData.tickets });
          updateTopBar();
       }
     }
 
+    // Функция анимации рулетки с рандомным расположением призов
     function spinRoulette() {
       const roulette = document.getElementById('lootboxRoulette');
       roulette.innerHTML = '';
@@ -862,20 +896,26 @@
       const count = lootboxPrizes.length;
       const visibleCenter = roulette.parentElement.offsetWidth / 2;
 
+      // Определяем выигрышный приз по весовой выборке
       const winningIndex = getWeightedRandomIndex(lootboxPrizes);
       const winningPrize = lootboxPrizes[winningIndex];
 
       const fullCycles = 5;
       let rouletteItems = [];
+
+      // Генерируем 5 полных циклов с перемешанными призами
       for (let cycle = 0; cycle < fullCycles; cycle++) {
         let shuffled = shuffleArray(lootboxPrizes);
         rouletteItems = rouletteItems.concat(shuffled);
       }
+
+      // В 6‑м цикле перемешиваем и гарантируем появление выигрышного приза
       let lastCycle = shuffleArray(lootboxPrizes);
       const targetIndex = Math.floor(Math.random() * count);
       lastCycle[targetIndex] = winningPrize;
       rouletteItems = rouletteItems.concat(lastCycle);
 
+      // Заполняем контейнер рулетки
       rouletteItems.forEach(item => {
         const prizeEl = document.createElement('div');
         prizeEl.className = 'lootbox-prize';
@@ -914,84 +954,59 @@
     }
 
     function spinLootBoxForTokens() {
-      if (!currentUser || isSpinning) return;
+      if (!currentUser) return;
+      if (isSpinning) return;
       if (localUserData.coins < 5000000) {
         showGlobalModal("Not enough coins", "You do not have enough coins to play. Please top up your balance.");
         return;
       }
       isSpinning = true;
-      fetch('http://localhost:5000/api/spinLootBoxForTokens', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: currentUser.username, cost: 5000000 })
-      })
-      .then(response => response.json())
-      .then(result => {
-         if (result.error) {
-           showGlobalModal("Error", result.error);
-           isSpinning = false;
-         } else {
-           localUserData.coins = result.updatedData.coins;
-           updateTopBar();
-           const caseImage = document.getElementById('caseImage');
-           caseImage.classList.add('explode');
-           caseImage.addEventListener('animationend', () => {
-             document.querySelector('.case-container').style.display = 'none';
-             document.getElementById('lootboxContainer').style.display = 'block';
-             spinRoulette();
-           }, { once: true });
-         }
-      })
-      .catch(err => {
-         console.error(err);
-         isSpinning = false;
-      });
+      localUserData.coins -= 5000000;
+      updateTopBar();
+      userRef.update({ coins: localUserData.coins });
+
+      const caseImage = document.getElementById('caseImage');
+      caseImage.classList.add('explode');
+
+      caseImage.addEventListener('animationend', () => {
+        document.querySelector('.case-container').style.display = 'none';
+        document.getElementById('lootboxContainer').style.display = 'block';
+        spinRoulette();
+      }, { once: true });
     }
 
     function openLootBox() {
-      if (!currentUser || isSpinning) return;
+      if (!currentUser) return;
+      if (isSpinning) return;
       if (localUserData.cyberCase <= 0) {
         showGlobalModal('Error', 'You have no Bug Packs to open!');
         return;
       }
       isSpinning = true;
-      fetch('http://localhost:5000/api/openLootBox', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: currentUser.username })
-      })
-      .then(response => response.json())
-      .then(result => {
-         if (result.error) {
-           showGlobalModal("Error", result.error);
-           isSpinning = false;
-         } else {
-           localUserData.cyberCase = result.updatedData.cyberCase;
-           updateCaseCount();
-           const caseImage = document.getElementById('caseImage');
-           caseImage.classList.add('explode');
-           caseImage.addEventListener('animationend', () => {
-             document.querySelector('.case-container').style.display = 'none';
-             document.getElementById('lootboxContainer').style.display = 'block';
-             spinRoulette();
-           }, { once: true });
-         }
-      })
-      .catch(err => {
-         console.error(err);
-         isSpinning = false;
-      });
+      localUserData.cyberCase -= 1;
+      updateCaseCount();
+      userRef.update({ cyberCase: localUserData.cyberCase });
+
+      const caseImage = document.getElementById('caseImage');
+      caseImage.classList.add('explode');
+
+      caseImage.addEventListener('animationend', () => {
+        document.querySelector('.case-container').style.display = 'none';
+        document.getElementById('lootboxContainer').style.display = 'block';
+        spinRoulette();
+      }, { once: true });
     }
 
-    /* -------------------------------
-       12. Модальные окна для Loot Box и дополнительной информации
-    ------------------------------- */
+    /* ----------------------------------------------
+       Modal windows for Loot Box
+    ---------------------------------------------- */
     function openLootBoxInfoModal() {
       document.getElementById('lootBoxInfoModal').classList.add('active');
     }
     function closeLootBoxInfoModal() {
       document.getElementById('lootBoxInfoModal').classList.remove('active');
     }
+
     function openMainOnlineInfoModal() {
       document.getElementById('mainOnlineInfoModal').classList.add('active');
     }
@@ -1013,6 +1028,29 @@
     function closeDepositModal() {
       document.getElementById('depositModal').classList.remove('active');
     }
+
+
+
+    // Добавьте эту функцию в ваш скрипт (например, сразу перед updateTopBar)
+function formatCoins(coins) {
+  if (coins >= 1000000000) {
+    return (coins / 1000000000).toFixed(1).replace(/\.0$/, '') + 'b';
+  } else if (coins >= 1000000) {
+    return (coins / 1000000).toFixed(1).replace(/\.0$/, '') + 'm';
+  } else if (coins >= 1000) {
+    return (coins / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+  }
+  return coins;
+}
+
+// Измените функцию updateTopBar так, чтобы для coins использовалась функция форматирования:
+function updateTopBar() {
+  document.getElementById('ticketCount').textContent = localUserData.tickets || 0;
+  document.getElementById('coinCount').textContent   = formatCoins(localUserData.coins || 0);
+  document.getElementById('pointCount').textContent  = localUserData.points || 0;
+}
+
   </script>
+
 </body>
 </html>
