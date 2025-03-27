@@ -704,5 +704,5 @@ table tr.current-user {
   transition: opacity 2s ease;
   display: flex;
   gap: 10px;
-  margin-top: 80px;
+  margin-top: 70px;
 }
