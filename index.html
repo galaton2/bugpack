@@ -150,7 +150,7 @@
           <button id="miniGamesInfoBtn" class="info-button" onclick="openMiniGamesInfoModal()">Info</button>
         </h3>
         <div class="games-gallery">
-          <!-- Игра STACK (game2) – при нажатии происходит переход на stack.html без списания билетов -->
+          <!-- Игра STACK (game2) – переход на stack.html без списания билетов -->
           <div class="game-card">
             <img src="https://i.pinimg.com/736x/ed/0d/12/ed0d1214bfce57bc73d3207f47ac1d9e.jpg" alt="Match-3">
             <p id="gameCard2Title">PAC-MAN</p>
@@ -206,19 +206,18 @@
           <button id="partnerInfoBtn" class="info-button" onclick="openPartnerInfoModal()">Info</button>
         </h3>
         <div class="games-gallery">
-         <div class="game-card">
-  <img src="https://img.icons8.com/ios-filled/50/00000/handshake.png" alt="Partner Game">
-  <p id="gameCard5Title">Partner Game</p>
-  <!-- Скрываем кнопку Play до момента, когда она станет доступной -->
-  <button id="gameCard5Button" style="display: none;" onclick="openGameInfoModal({ 
+          <div class="game-card">
+            <img src="https://img.icons8.com/ios-filled/50/00000/handshake.png" alt="Partner Game">
+            <p id="gameCard5Title">Partner Game</p>
+            <!-- Кнопка Play скрыта до активации -->
+            <button id="gameCard5Button" style="display: none;" onclick="openGameInfoModal({ 
               gameId: 'partnergame1',
               title: 'soon',
               img: 'https://img.icons8.com/ios-filled/50/00000/handshake.png',
               desc: 'Game from our partner.',
               cost: 1
             })">Play</button>
-</div>
-
+          </div>
         </div>
       </div>
     </section>
@@ -265,7 +264,7 @@
     <!-- LEADERBOARD SECTION -->
     <section id="leaderboardSection" class="section">
       <h2 id="leaderboardHeader">Leaderboard</h2>
-       <h2 id="leaderboardHeader">Season 1</h2>
+      <h2 id="leaderboardHeader">Season 1</h2>
       <button class="info-button" onclick="openSeasonInfoModal()">Info</button>
       <div class="leaderboard-container">
         <table id="leaderboardTable">
@@ -298,7 +297,7 @@
       <div class="lootbox-container" id="lootboxContainer" style="display: none;">
         <div class="lootbox-indicator"></div>
         <div class="lootbox-roulette" id="lootboxRoulette">
-          <!-- Prizes will be added dynamically -->
+          <!-- Призы добавляются динамически -->
         </div>
       </div>
       <div class="lootbox-buttons">
@@ -348,27 +347,24 @@
   <!-- Modal for Loot Box Info -->
   <div class="modal-backdrop" id="lootBoxInfoModal">
     <div class="modal">
-    
       <h2 id="lootBoxInfoTitle">Bug Pack Info</h2>
       <p id="lootBoxInfoDesc">
-  Prizes and Chances:<br>
-  - 3 tickets (10%)<br>
-  - 5 tickets (5%)<br>
-  - 10 tickets (8%)<br>
-  - 8 tickets (4%)<br>
-  - One case (5%)<br>
-  - 100 points (10%)<br>
-  - 500 points (5%)<br>
-  - 1M tokens (3%)<br>
-  - 3M tokens (2%)<br>
-  - 5M tokens (1%)<br>
-  - NFT Red (1%) – Special<br>
-  - NFT Yellow (2%) – Legendary<br>
-  - NFT Green (3%) – Rare<br>
- 
-  - 1000 points (2%)
-</p>
-
+        Prizes and Chances:<br>
+        - 3 tickets (10%)<br>
+        - 5 tickets (5%)<br>
+        - 10 tickets (8%)<br>
+        - 8 tickets (4%)<br>
+        - One case (5%)<br>
+        - 100 points (10%)<br>
+        - 500 points (5%)<br>
+        - 1M tokens (3%)<br>
+        - 3M tokens (2%)<br>
+        - 5M tokens (1%)<br>
+        - NFT Red (1%) – Special<br>
+        - NFT Yellow (2%) – Legendary<br>
+        - NFT Green (3%) – Rare<br>
+        - 1000 points (2%)
+      </p>
       <button class="close-modal" onclick="closeLootBoxInfoModal()">Close</button>
     </div>
   </div>
@@ -396,7 +392,7 @@
   <div class="game-modal-backdrop" id="gameModalBackdrop">
     <div class="game-modal-content">
       <div class="game-canvas">
-         <!-- Оставлен только canvas для TETRIS (game3) -->
+         <!-- Для TETRIS (game3) используется canvas -->
          <canvas id="game3Canvas" width="400" height="740" style="display: none; position: relative; top: -0px;"></canvas>
       </div>
     </div>
@@ -458,13 +454,557 @@
   <script src="case.js"></script>
   <!-- Подключение нового файла breakout.js -->
   <script src="breakout.js"></script>
-  <!-- Обфусцированный inline JS -->
   <script>
-  (function(){
-    var _0xencoded = "PHNjcmlwdD4KLyogLS0tLS0tLS0tLS0tLS0tLS0tLS0tIFN0YXJ0IG9mIHRoZSBJbnNpZGUgSlMgQ29kZSBzZWN0aW9uIC0tLS0tLS0tLS0tLS0tLS0tLwoKY29uc3QgZmlyZWJhc2VDb25maWcgPSB7CiAgYXBpS2V5OiAiQUl6YVN5QXB4cDBkSEE0blpWZnBPcWxvSjkyZGVrajVleTNGIiwKICBhdXRoRG9tYWluOiAibWV0YS1nbGl0Y2gucmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsCiAgcHJvamVjdElkOiAibWV0YS1nbGl0Y2giLAogIHN0b3JhZ2VCdWNrZXQ6ICJtZXRhLWdsaXRjaC5maXJlYmFzZXN0b3JhZ2UuYXBwIiwKICBtZXNzYWdpbmdTZW5kZXJJZDogIjE4NjE2Mjg3OTcwIiwKICBhcHBJZDogIjE6MTg2MTYyODc5NzA6d2VsYzpodWJAdjgxL2JlNzkyNWI5NjA4MTM1MDA2YmU3MzY0ZiIsCiAgbWVhc3VyZW1lbnRJZDogIkctMVRYVkg4TUVTRCIKfTsKCmZpcmViYXNlLmluaXRpYWxpemVBcHkoZmlyZWJhc2VDb25maWcpOwoKY29uc3QgZGIgPSBmaXJlYmFzZS5kYXRhYmFzZSgpOwoKLyogLS0tLS0tLS0tLS0tLS0tLS0tLS0tIFRlbGVncmFtIFdlYiBBcHAgU2V0dXAgLS0tLS0tLS0tLS0tLS0tLS0tLS0KY29uc3QgdGcgPSB3aW5kb3cuVGVsZWdyYW0uV2ViQXBwOwoKdGcuZXhwYW5kKCk7CgovLyogLS0tLS0tLS0tLS0tLS0tLS0tLS0tIEdsb2JhbCBWYXJpYWJsZXMgJiBVc2VyIERhdGEgU2VjdGlvbiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0KY29uc3QgY3VycmVudFVzZXIgPSBudWxsOwoKY29uc3QgdXNlclJlZiA9IGRiLnJlZih1c2Vycy8rY3VycmVudFVzZXIudXNlcm5hbWUpOwoKbGV0IGxvY2FsVXNlckRhdGEgPSB7CiAgcGhvdG86ICcnLAogIHRpY2tldHM6IDAsCiAgY29pbnM6IDAsCiAgcG9pbnRzOiAwLAogIGxhc3RTcGluVGltZTogMCwKICBkYXRhQ2hpcDogZmFsc2UsCiAgY3liZXJDYXNlOiAwLAogIG5mdHM6IFtdCiB9OwoKbGV0IGdhbWVJblByb2dyZXNzID0gZmFsc2U7Cgp2YXQgX3RvVXBkYXRlVG9wQXIoKSA9IGZ1bmN0aW9uKCkgewogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdpY2NvbnRUb3VudCcpLnRleHRDb250ZW50ID0gbG9jYWxVc2VyRGF0YS50aWNrZXRzOwp9OwoKZnVuY3Rpb24gdXBkYXRlU3BpblRCdXR0b24oKSB7CiAgY29uc3QgYnQgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnc3BpbkJ1dHRvbicpOwogIGNvbnN0IG5vdyA9IERhdGUubm93KCk7CiAgY29uc3QgbGFzdCA9IGxvY2FsVXNlckRhdGEubGFzdFNwaW5UaW1lIHx8IDA7CiAgY29uc3QgZGlmZiA9IG5vdyAtIGxhc3QgOwpjb25zdCB3YWl0ID0gMjQgKiA2MDAgKiA2MCAtIGRpZmY7CiAgaWYod2FpdCA8PSAwKSB7CiAgICBidC50ZXh0Q29udGVudCA9ICJTaXAiOwogICAgYnQuZGlzYWJsZWQgPSBmYWxzZTsKICB9IGVsc2UgewogICAgY29uc3Qgc2Vjb25kcyA9IE1hdGguZmxvb3Iod2FpdC8xMDApICU2MDsKICAgIGNvbnN0IG1pbnV0ZXMgPSBNYXRoLmZsb29yKHdhaXQgKCAqIDEwMC8oMTAwICogNjApKSAlNjA7CiAgICBjb25zdCBob3VycyA9IE1hdGguZmxvb3Iod2FpdCAqIDEwMC8oMTAwICogNjApKTsKICAgIGJ0LnRleHRDb250ZW50ID0gIlNwaW4gKCIgKyBob3Vycy50b1N0cmluZygwKSArICI6IiArIG1pbnV0ZXMudG9TaW5nKDApICsgIjoiICsgc2Vjb25kcy50b1N0cmluZygwKSArICI6IiArIGJ0c1RleHQoKSI7CiAgICBidC5kaXNhYmxlZCA9IHRydWU7CiAgfQp9CgpzZXRUaW1lcih1cGRhdGVTcGludEJ1dHRvbik7CgovLyAqIE9iZnVzY2F0ZWQgSW5saW5lIEpTIGNvZGUgLS0tLS0tLS0tLS0tLS0tLS0tLS0tCi8qIEFuZCB0aGlzIGlzIHRoZSBzdHJhdGVneSBwYXNzd29yZCwgaXQgaXMgYW4gZXhhbXBsZSBvZiBvYmZ1c2NhdGlvbi4gSXRzIGJhc2UgNjQgZW5jb2RlZCBzdHJpbmcgaXMgcmVtYWluZWQgYWxzby4gKi8KZnVuY3Rpb24gdXBkYXRlVG9wQXIoKSB7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3RpY2tDb3VudCcpLnRleHRDb250ZW50ID0gbG9jYWxVc2VyRGF0YS50aWNrZXRzIHx8IDA7Cn0KCmZ1bmN0aW9uIHNob3dHbG9iYWxNb2RhbCh0aXRsZSwgbWVzc2FnZSkgewogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdnbG9iYWxNb2RhbFRpdGxlJykudGV4dENvbnRlbnQgPSB0aXRsZTsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnZ2xvYmFsTW9kYWxNb2RhbU1lc3NhZ2UnKSB0ZXh0Q29udGVudCA9IG1lc3NhZzsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnZ2xvYmFsTW9kYWxNb2RhbUJhY2tkJykgY2xhc3MgPSAnYWN0aXZlJzsKfQoKLy8gQWRkaXRpb24gb2YgZnVuY3Rpb24gZm9ybWF0Q29pbnMoY29pbnMpIHdoaWNoIGZvcm1hdHMgbnVtYmVycywgc2FmZSBmb3IgZGlzcGxheWluZyB0aGUgY29pbnMgKQoKZnVuY3Rpb24gZm9ybWF0Q29pbnMoY29pbnMpIHsKICBpZiAoY29pbnMgPCAxMDAwMDAwMDApIHJldHVybiAoY29pbnMgLyAxMDAwMDAwMDApLml0b0ZpeGVkKDApLnJlcGxhY2UoLy5wYXN0ZXI6JywgJyRicicpICsgJ2InOwogIGVsc2UgaWYgKGNvaW5zID49IDEwMDAwMDAwMCkgewogICAgcmV0dXJuIChjb2lucyAvIDEwMDAwMDAwMCkuZml4ZWQoMCkucmVwbGFjZSgvLnBhc3RlcjonLCAnJHNtJykgKyAnbWEnOwogIH0gZWxzZSBpZiAoY29pbnMgPCAxMDAwKSB7CiAgICByZXR1cm4gKGNvaW5zIC8gMTAwMCkuZml4ZWQoMCkucmVwbGFjZSgvLnBhc3RlcjonLCAnJHNtJykgKyAnaycpOwogIH0KICByZXR1cm4gY29pbnM7Cn0KCnVuY3Rpb24gdXBkYXRlVG9wQXIoKSB7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3RpY2tDb3VudCcpLnRleHRDb250ZW50ID0gbG9jYWxVc2VyRGF0YS50aWNrZXRzIHx8IDA7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2NvaW5Db3VudCcpLnRleHRDb250ZW50ID0gZm9ybWF0Q29pbnMobG9jYWxVc2VyRGF0YS5jb2lucyB8fCAwKTsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgncG9pbnRDb3VudCcpLnRleHRDb250ZW50ID0gbG9jYWxVc2VyRGF0YS5wb2ludHMgfHwgMDsKfQoKLy8gVXBkYXRlIHRoZSB0b3AgYmFyIGFuZCB0aGUgY2FzZSBjb3VudApmdW5jdGlvbiB1cGRhdGVDYXNlQ291bnQoKSB7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ29wZW4oKSApLnRleHRDb250ZW50ID0gYGlwZW4gKCR7bG9jYWxVc2VyRGF0YS5jeWJlckNhc2V9YDsKYWRkKCgidXRpbCcpKTsKfQoKLy8gU2V0IGludGVydmFsIHRvIHVwZGF0ZSB0aGUgc3BpbkJ1dHRvbi4Kc2V0SW50ZXJ2YWwodXBkYXRlU3BpbkJ1dHRvbicsIDEwMDApOwoKLy8gLS0tLS0tLS0tLS0tLS0tLS0tLS0tIE9yaWdpbmFsIG9mIHRoZSBpbmxpbmUgSlMgQ29kZSBzZWN0aW9uIGVuZHMgLS0tLS0tLS0tLS0tLS0tLS0tLS0tCi8vIEVuZCBvZiBvYmZ1c2NhdGVkIGV4ZWN1dGlvbi4KLy8gUGxlYXNlIG1ha2Ugb3VyIGRlY29kaW5nIG1lYW5zIHRoYXQgYWxsIGZ1bmN0aW9ucyB3aWxsIGZ1bmN0aW9uIGFzIGJldG9sIGFzIGJlZm9yZSBhYm9ydC4KLy8gRm9yIGV4YW1wbGUsIGlmIHRoZSBjb2RlIGlzIG1vZGlmaWVkLCBhbGVydChcIlRhbXBlcmluZyBkZXRlY3RlZCBcIik7Cml2YXIgbm90ZSA9IERhdGUubm93KCk7CmlmKGV2YWwoImxvY2FsVXNlckRhdGEiKSAmJiB1c2VyUmVmKSB7CiAgLy8gTW9yZSB0ZXN0cy4uLgoJdXNlclJlZi5vblxuKCdkYXRhJywgZnVuY3Rpb24oc25hcHNob3QpIHsKCSAgY29uc3QgZGF0YSA9IHNuYXBzaG90LmF2YWwgfHwgeyB9OwoJICBsb2NhbFVzZXJEYXRhID0gewogICAgcGhvdG86IGRhdGEucGhvdG8gfHwgJycsCiAgICB0aWNrZXRzOiBkYXRhLnRpY2tldHMsCiAgICBjb2luczogZGF0YS5jb2lucywKICAgIHBvaW50czogZGF0YS5wb2ludHMsCiAgICBsYXN0U3BpbnRUaW1lOiBkYXRhLmxhc3RTcGluVGltZSwKICAgIGRhdGFDaGlwOiBkYXRhLmRhdGFDaGlwLAogICAgY3liZXJDYXNlOiBkYXRhLmN5YmVyQ2FzZSwKICAgIG5mdHM6IGRhdGEubnRzCiAgfTsKCSAgdXBkYXRlVG9wQXIoKTsKICB1cGRhdGVTcGluQnV0dG9uKCk7CiAgdXBkYXRlQ2FzZUNvdW50KCk7CiAgfSk7CgoKLy8gLS0tLS0tLS0tLS0tLS0tLS0tLS0tIEVuZCBvZiBvYmZ1c2NhdGVkIEpTIGNvZGUgLS0tLS0tLS0tLS0tLS0tLS0tLS0tCi8vIEVuZCBvZiB0aGUgb2JmdXNjYXRlZCBzY3JpcHQKPC9zY3JpcHQ+";
-    var _0xdecoded = atob(_0xencoded);
-    eval(_0xdecoded);
-  })();
+    /* ----------------------------------------------
+       1. Firebase Initialization
+    ---------------------------------------------- */
+    const firebaseConfig = {
+      apiKey: "AIzaSyApxp0dHh0TK4nZVfOqloJ92dekjvjey3I",
+      authDomain: "meta-glitch.firebaseapp.com",
+      projectId: "meta-glitch",
+      storageBucket: "meta-glitch.firebasestorage.app",
+      messagingSenderId: "186162879710",
+      appId: "1:186162879710:web:87975bd09681505be7364f",
+      measurementId: "G-1TXVH8MESD"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    /* ----------------------------------------------
+       2. Telegram Web App
+    ---------------------------------------------- */
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    /* ----------------------------------------------
+       3. Global Variables & User Data
+    ---------------------------------------------- */
+    let currentUser = null;
+    let userRef = null;
+    let localUserData = {
+      photo: '',
+      tickets: 0,
+      coins: 0,
+      points: 0,
+      lastSpinTime: 0,
+      dataChip: false,
+      cyberCase: 0,
+      nfts: [] // поле для NFT
+    };
+    let gameInProgress = false;
+    let isSpinning = false;
+
+    if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+      currentUser = tg.initDataUnsafe.user;
+      document.getElementById('username').textContent = '@' + currentUser.username;
+      if (currentUser.photo_url) {
+        document.getElementById('userPhoto').src = currentUser.photo_url;
+      }
+      userRef = db.ref('users/' + currentUser.username);
+      userRef.once('value', snapshot => {
+        if (!snapshot.exists()) {
+          userRef.set({
+            photo: currentUser.photo_url || '',
+            tickets: 0,
+            coins: 0,
+            points: 0,
+            lastSpinTime: 0,
+            dataChip: false,
+            cyberCase: 0,
+            nfts: []  // инициализация поля NFT
+          }).then(() => {
+            // Перенаправление новых пользователей на info.html
+            window.location.href = 'info.html';
+          });
+        }
+      });
+      userRef.on('value', snapshot => {
+        const data = snapshot.val() || {};
+        localUserData = {
+          photo: data.photo || '',
+          tickets: data.tickets || 0,
+          coins: data.coins || 0,
+          points: data.points || 0,
+          lastSpinTime: data.lastSpinTime || 0,
+          dataChip: data.dataChip || false,
+          cyberCase: data.cyberCase || 0,
+          nfts: data.nfts || []
+        };
+        updateTopBar();
+        updateSpinButton();
+        updateCaseCount();
+      });
+    }
+
+    /* ----------------------------------------------
+       4. Update Top Bar & Case Count
+    ---------------------------------------------- */
+    // Обфусцированная версия updateTopBar (обфускация строковых литералов производится вручную)
+    function updateTopBar(){
+      document.getElementById("ticketCount").textContent = localUserData.tickets || 0;
+      document.getElementById("coinCount").textContent = formatCoins(localUserData.coins || 0);
+      document.getElementById("pointCount").textContent = localUserData.points || 0;
+    }
+    function updateCaseCount(){
+      document.getElementById("openBtn").textContent = `open (${localUserData.cyberCase})`;
+    }
+
+    /* ----------------------------------------------
+       5. Section Switching
+    ---------------------------------------------- */
+    function showSection(sectionId) {
+      document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+      document.querySelectorAll('.modal-backdrop').forEach(modal => modal.classList.remove('active'));
+      document.getElementById('gameModalBackdrop').classList.remove('active');
+      document.getElementById('endgameBackdrop').classList.remove('active');
+      document.getElementById(sectionId).classList.add('active');
+    }
+
+    /* ----------------------------------------------
+       6. Global Modal
+    ---------------------------------------------- */
+    function showGlobalModal(title, message) {
+      document.getElementById('globalModalTitle').textContent = title;
+      document.getElementById('globalModalMessage').textContent = message;
+      document.getElementById('globalModalBackdrop').classList.add('active');
+    }
+    function closeGlobalModal() {
+      document.getElementById('globalModalBackdrop').classList.remove('active');
+    }
+
+    /* ----------------------------------------------
+       7. Game Info Modal
+    ---------------------------------------------- */
+    function openGameInfoModal(gameData) {
+      document.getElementById('gameInfoImg').src = gameData.img;
+      document.getElementById('gameInfoTitle').textContent = gameData.title;
+      document.getElementById('gameInfoDesc').textContent = gameData.desc;
+      const playBtn = document.getElementById('gameInfoPlayBtn');
+      playBtn.textContent = "Play (" + gameData.cost + " ticket)";
+      playBtn.onclick = function() {
+        closeGameInfoModal();
+        handleStartGame(gameData.gameId, gameData.cost);
+      };
+      document.getElementById('gameInfoModal').classList.add('active');
+    }
+    function closeGameInfoModal() {
+      document.getElementById('gameInfoModal').classList.remove('active');
+    }
+
+    /* ----------------------------------------------
+       8. Start Game (Обфусцированная версия)
+    ---------------------------------------------- */
+    var _0x1a2b=["\x74\x69\x63\x6B\x65\x74\x73","\x6D\x61\x69\x6E\x4E\x61\x76","\x68\x69\x64\x64\x65\x6E","\x67\x61\x6D\x65\x33\x43\x61\x6E\x76\x61\x73","\x61\x63\x74\x69\x76\x65"];
+    (function(_0x32d1,_0x1b50){var _0x3ef8=function(_0x5b57){while(--_0x5b57){_0x32d1.push(_0x32d1.shift());}};_0x3ef8(++_0x1b50);}(_0x1a2b,0x1a));
+    let currentGame = null;
+    function handleStartGame(_0x25a1, _0x1123) {
+      document.querySelector('.user-info').style.display = 'none';
+      if (!currentUser || !userRef) {
+        showGlobalModal("Error", "No user data available!");
+        return;
+      }
+      if (_0x25a1 === 'game2') {
+        window.location.href = 'stack.html';
+        return;
+      }
+      if (_0x25a1 === 'partnergame1') {
+        window.location.href = 'partnergame.html';
+        return;
+      } else if (_0x25a1 === 'breakout') {
+        window.location.href = 'breakout.html';
+        return;
+      } else if (_0x25a1 === 'game4') {
+        window.location.href = 'space.html';
+        return;
+      }
+      if (_0x25a1 === 'game3') {
+        if ((localUserData[_0x1a2b[0]] || 0) < _0x1123) {
+          showGlobalModal("Not enough tickets", "You do not have enough tickets to play!");
+          return;
+        }
+        localUserData[_0x1a2b[0]] -= _0x1123;
+        updateTopBar();
+        userRef.update({ tickets: localUserData[_0x1a2b[0]] });
+        currentGame = _0x25a1;
+        gameInProgress = true;
+        document.getElementById(_0x1a2b[1]).classList.add(_0x1a2b[2]);
+        document.getElementById('gameModalBackdrop').classList.add(_0x1a2b[4]);
+        document.getElementById(_0x1a2b[3]).style.display = 'block';
+        initGame3();
+      }
+    }
+
+    /* ----------------------------------------------
+       9. End Game Modal
+    ---------------------------------------------- */
+    function showEndGameModal(title, message) {
+      document.getElementById('endgameTitle').textContent = "Result";
+      document.getElementById('endgameMessage').textContent = message;
+      document.getElementById('endgameBackdrop').classList.add('active');
+    }
+    function finishGame() {
+      document.querySelector('.user-info').style.display = '';
+      document.getElementById('endgameBackdrop').classList.remove('active');
+      closeGameModal();
+    }
+    function closeGameModal() {
+      document.getElementById('gameModalBackdrop').classList.remove('active');
+      document.getElementById('mainNav').classList.remove('hidden');
+      if (userRef && currentGame) {
+        userRef.update({ points: localUserData.points });
+      }
+      if (currentGame === 'game3') {
+        resetGame3();
+      }
+      currentGame = null;
+      gameInProgress = false;
+    }
+
+    /* ----------------------------------------------
+       10. Wheel of Fortune / Tickets
+    ---------------------------------------------- */
+    let spinDuration = 4000;
+    function spinWheel() {
+      if (!currentUser) return;
+      const now = Date.now();
+      if (now - (localUserData.lastSpinTime || 0) < 24 * 60 * 60 * 1000) {
+        showGlobalModal("Wheel of Fortune", "Free spin available once every 24 hours!");
+        return;
+      }
+      localUserData.lastSpinTime = now;
+      userRef.update({ lastSpinTime: now });
+      updateSpinButton();
+      let randomRotation = 1080 + Math.floor(Math.random() * 360);
+      const wheelEl = document.getElementById('wheel');
+      wheelEl.style.transform = `rotate(${randomRotation}deg)`;
+      setTimeout(() => {
+        let finalDeg = randomRotation % 360;
+        let wonTickets = 0;
+        if (finalDeg < 60) {
+          wonTickets = 2;
+        } else if (finalDeg < 120) {
+          wonTickets = 5;
+        } else if (finalDeg < 180) {
+          wonTickets = 8;
+        } else if (finalDeg < 240) {
+          wonTickets = 10;
+        } else if (finalDeg < 300) {
+          wonTickets = 13;
+        } else {
+          wonTickets = 15;
+        }
+        localUserData.tickets += wonTickets;
+        updateTopBar();
+        userRef.update({ tickets: localUserData.tickets });
+        showSpinModal(wonTickets);
+      }, spinDuration);
+    }
+    function showSpinModal(amount) {
+      document.getElementById("wheelTicketCount").textContent = amount;
+      document.getElementById("spinModalTitle").innerHTML = "You won <span id='wheelTicketCount'>" + amount + "</span> tickets!";
+      document.getElementById("spinModalBackdrop").classList.add("active");
+    }
+    function closeSpinModal() {
+      document.getElementById("spinModalBackdrop").classList.remove("active");
+    }
+    function updateSpinButton() {
+      const btn = document.getElementById('spinButton');
+      const now = Date.now();
+      const last = localUserData.lastSpinTime || 0;
+      const diff = now - last;
+      const wait = 24 * 60 * 60 * 1000 - diff;
+      if (wait <= 0) {
+         btn.textContent = "Spin";
+         btn.disabled = false;
+      } else {
+         const seconds = Math.floor(wait / 1000) % 60;
+         const minutes = Math.floor(wait / (1000 * 60)) % 60;
+         const hours = Math.floor(wait / (1000 * 60 * 60));
+         btn.textContent = "Spin (" + hours.toString().padStart(2,'0') + ":" + minutes.toString().padStart(2,'0') + ":" + seconds.toString().padStart(2,'0') + ")";
+         btn.disabled = true;
+      }
+    }
+    setInterval(updateSpinButton, 1000);
+
+    /* ----------------------------------------------
+       11. Leaderboard
+    ---------------------------------------------- */
+    let leaderboardRef = db.ref('users');
+    leaderboardRef.on('value', snapshot => {
+      const usersData = snapshot.val() || {};
+      const usersArray = Object.entries(usersData).map(([uname, obj]) => ({
+        username: uname,
+        points: obj.points || 0
+      }));
+      usersArray.sort((a, b) => b.points - a.points);
+      const top10Body = document.getElementById('leaderboardTop10');
+      const restBody = document.getElementById('leaderboardRest');
+      top10Body.innerHTML = '';
+      restBody.innerHTML = '';
+      
+      usersArray.forEach((user, i) => {
+        const tr = document.createElement('tr');
+        if (currentUser && user.username === currentUser.username) {
+          tr.classList.add('current-user');
+        }
+        if (i < 10) {
+          let multiplier;
+          if (i === 0) {
+            multiplier = "5x";
+          } else if (i === 1) {
+            multiplier = "3x";
+          } else if (i === 2) {
+            multiplier = "2x";
+          } else {
+            multiplier = "1x";
+          }
+          tr.innerHTML = `<td>${i + 1}</td>
+                          <td>@${user.username}</td>
+                          <td>${user.points}</td>
+                          <td>
+                            <img src="https://raw.githubusercontent.com/qnexst/404token/main/case.png" alt="Prize Icon" width="40" height="40">
+                            ${multiplier}
+                          </td>`;
+          top10Body.appendChild(tr);
+        } else {
+          tr.innerHTML = `<td>${i + 1}</td>
+                          <td>@${user.username}</td>
+                          <td>${user.points}</td>
+                          <td></td>`;
+          restBody.appendChild(tr);
+        }
+      });
+    });
+    function openSeasonInfoModal() {
+      document.getElementById('seasonModalBackdrop').classList.add('active');
+    }
+    function closeSeasonModal() {
+      document.getElementById('seasonModalBackdrop').classList.remove('active');
+    }
+
+    /* ----------------------------------------------
+       12. Buy Tickets
+    ---------------------------------------------- */
+    function buyTickets() {
+      window.location.href = 'buyticket.html';
+    }
+
+    /* ----------------------------------------------
+       13. Lootbox in Cyber Case Section
+    ---------------------------------------------- */
+    const lootboxPrizes = [
+       { name: '3 tickets', image: 'https://raw.githubusercontent.com/qnexst/404token/main/ticket.png', chance: 10 },
+      { name: '5 tickets', image: 'https://raw.githubusercontent.com/qnexst/404token/main/ticket.png', chance: 5 },
+      { name: 'One case', image: 'https://raw.githubusercontent.com/qnexst/404token/main/case.png', chance: 5 },
+      { name: '100 points', image: 'https://raw.githubusercontent.com/qnexst/404token/main/star.png', chance: 10 },
+      { name: '500 points', image: 'https://raw.githubusercontent.com/qnexst/404token/main/star.png', chance: 5 },
+      { name: '1M tokens', image: 'https://raw.githubusercontent.com/qnexst/404token/main/token.png', chance: 1 },
+       { name: '3M tokens', image: 'https://raw.githubusercontent.com/qnexst/404token/main/token.png', chance: 0.5 },
+      { name: '5M tokens', image: 'https://raw.githubusercontent.com/qnexst/404token/main/token.png', chance: 0.2 },
+      { name: 'NFT Special', image: 'https://img.icons8.com/color/48/nft.png', chance: 0.5 },
+      { name: 'NFT Legendary', image: 'https://img.icons8.com/color/48/nft.png', chance: 1 },
+      { name: 'NFT Rare', image: 'https://img.icons8.com/color/48/nft.png', chance: 2 },
+      { name: '10 tickets', image: 'https://raw.githubusercontent.com/qnexst/404token/main/ticket.png', chance: 8 },
+      { name: '8 tickets', image: 'https://raw.githubusercontent.com/qnexst/404token/main/ticket.png', chance: 4 },
+      { name: '1000 points', image: 'https://raw.githubusercontent.com/qnexst/404token/main/star.png', chance: 2 },
+    ];
+    function shuffleArray(array) {
+      let arr = array.slice();
+      for (let i = arr.length - 1; i > 0; i--) {
+         const j = Math.floor(Math.random() * (i + 1));
+         [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+    function getWeightedRandomIndex(prizes) {
+      let total = 0;
+      prizes.forEach(prize => total += prize.chance);
+      let randomNum = Math.random() * total;
+      for (let i = 0; i < prizes.length; i++) {
+        if (randomNum < prizes[i].chance) {
+          return i;
+        }
+        randomNum -= prizes[i].chance;
+      }
+      return prizes.length - 1;
+    }
+    function parsePrizeAmount(prizeName) {
+      if (prizeName.includes("M")) {
+        let num = parseFloat(prizeName);
+        return num * 1000000;
+      } else {
+        return parseInt(prizeName);
+      }
+    }
+    function addPrizeToUser(prize) {
+      if (prize.name.toLowerCase().includes("token")) {
+         let amount = parsePrizeAmount(prize.name);
+         localUserData.coins += amount;
+         userRef.update({ coins: localUserData.coins });
+         updateTopBar();
+      } else if (prize.name.toLowerCase().includes("case")) {
+         localUserData.cyberCase += 1;
+         userRef.update({ cyberCase: localUserData.cyberCase });
+         updateCaseCount();
+      } else if (prize.name.toLowerCase().includes("point")) {
+         let amount = parsePrizeAmount(prize.name);
+         localUserData.points += amount;
+         userRef.update({ points: localUserData.points });
+         updateTopBar();
+      } else if (prize.name.toLowerCase().includes("nft")) {
+         let nftRarity = "";
+         if(prize.name.includes("Green")) {
+             nftRarity = "Редкий";
+         } else if(prize.name.includes("Yellow")) {
+             nftRarity = "Легендарный";
+         } else if(prize.name.includes("Red")) {
+             nftRarity = "Эксклюзивный";
+         }
+         let nftData = { name: prize.name, rarity: nftRarity };
+         if (!localUserData.nfts) {
+           localUserData.nfts = [];
+         }
+         localUserData.nfts.push(nftData);
+         userRef.update({ nfts: localUserData.nfts });
+      } else {
+         let amount = parsePrizeAmount(prize.name);
+         localUserData.tickets += amount;
+         userRef.update({ tickets: localUserData.tickets });
+         updateTopBar();
+      }
+    }
+    function spinRoulette() {
+      const roulette = document.getElementById('lootboxRoulette');
+      roulette.innerHTML = '';
+      const prizeWidth = 136;
+      const count = lootboxPrizes.length;
+      const visibleCenter = roulette.parentElement.offsetWidth / 2;
+      const winningIndex = getWeightedRandomIndex(lootboxPrizes);
+      const winningPrize = lootboxPrizes[winningIndex];
+      const fullCycles = 5;
+      let rouletteItems = [];
+      for (let cycle = 0; cycle < fullCycles; cycle++) {
+        let shuffled = shuffleArray(lootboxPrizes);
+        rouletteItems = rouletteItems.concat(shuffled);
+      }
+      let lastCycle = shuffleArray(lootboxPrizes);
+      const targetIndex = Math.floor(Math.random() * count);
+      lastCycle[targetIndex] = winningPrize;
+      rouletteItems = rouletteItems.concat(lastCycle);
+      rouletteItems.forEach(item => {
+        const prizeEl = document.createElement('div');
+        prizeEl.className = 'lootbox-prize';
+        if (item.name === 'NFT Special') {
+          prizeEl.style.background = 'linear-gradient(45deg, #8B0000, #FF6347)';
+        } else if (item.name === 'NFT Legendary') {
+          prizeEl.style.background = 'linear-gradient(45deg, #FFD700, #FFFFE0)';
+        } else if (item.name === 'NFT Rare') {
+          prizeEl.style.background = 'linear-gradient(45deg, #006400, #32CD32)';
+        }
+        prizeEl.innerHTML = `<img src="${item.image}" alt="${item.name}"><span>${item.name}</span>`;
+        roulette.appendChild(prizeEl);
+      });
+      const finalIndex = fullCycles * count + targetIndex;
+      const finalOffset = -(finalIndex * prizeWidth) + visibleCenter - (prizeWidth / 2);
+      roulette.style.transition = 'transform 10s cubic-bezier(0.25, 0.1, 0.25, 1)';
+      roulette.style.transform = `translateX(${finalOffset}px)`;
+      setTimeout(() => {
+        const remainder = finalIndex % count;
+        const newOffset = -(remainder * prizeWidth) + visibleCenter - (prizeWidth / 2);
+        roulette.style.transition = 'none';
+        roulette.style.transform = `translateX(${newOffset}px)`;
+        isSpinning = false;
+        addPrizeToUser(winningPrize);
+        showGlobalModal('Congratulations!', `Your prize: ${winningPrize.name}`);
+        document.getElementById('lootboxContainer').style.display = 'none';
+        const caseContainer = document.querySelector('.case-container');
+        caseContainer.style.display = 'block';
+        const caseImage = document.getElementById('caseImage');
+        caseImage.classList.remove('explode');
+        caseImage.style.opacity = 1;
+      }, 10200);
+    }
+    function spinLootBoxForTokens() {
+      if (!currentUser) return;
+      if (isSpinning) return;
+      if (localUserData.coins < 5000000) {
+        showGlobalModal("Not enough coins", "You do not have enough coins to play. Please top up your balance.");
+        return;
+      }
+      isSpinning = true;
+      localUserData.coins -= 5000000;
+      updateTopBar();
+      userRef.update({ coins: localUserData.coins });
+      const caseImage = document.getElementById('caseImage');
+      caseImage.classList.add('explode');
+      caseImage.addEventListener('animationend', () => {
+        document.querySelector('.case-container').style.display = 'none';
+        document.getElementById('lootboxContainer').style.display = 'block';
+        spinRoulette();
+      }, { once: true });
+    }
+    function openLootBox() {
+      if (!currentUser) return;
+      if (isSpinning) return;
+      if (localUserData.cyberCase <= 0) {
+        showGlobalModal('Error', 'You have no Bug Packs to open!');
+        return;
+      }
+      isSpinning = true;
+      localUserData.cyberCase -= 1;
+      updateCaseCount();
+      userRef.update({ cyberCase: localUserData.cyberCase });
+      const caseImage = document.getElementById('caseImage');
+      caseImage.classList.add('explode');
+      caseImage.addEventListener('animationend', () => {
+        document.querySelector('.case-container').style.display = 'none';
+        document.getElementById('lootboxContainer').style.display = 'block';
+        spinRoulette();
+      }, { once: true });
+    }
+
+    /* ----------------------------------------------
+       Modal windows for Loot Box and others
+    ---------------------------------------------- */
+    function openLootBoxInfoModal() {
+      document.getElementById('lootBoxInfoModal').classList.add('active');
+    }
+    function closeLootBoxInfoModal() {
+      document.getElementById('lootBoxInfoModal').classList.remove('active');
+    }
+    function openMainOnlineInfoModal() {
+      document.getElementById('mainOnlineInfoModal').classList.add('active');
+    }
+    function closeMainOnlineInfoModal() {
+      document.getElementById('mainOnlineInfoModal').classList.remove('active');
+    }
+    function openMiniGamesInfoModal() {
+      document.getElementById('miniGamesInfoModal').classList.add('active');
+    }
+    function closeMiniGamesInfoModal() {
+      document.getElementById('miniGamesInfoModal').classList.remove('active');
+    }
+    function openPartnerInfoModal() {
+      document.getElementById('partnerInfoModal').classList.add('active');
+    }
+    function closePartnerInfoModal() {
+      document.getElementById('partnerInfoModal').classList.remove('active');
+    }
+    function closeDepositModal() {
+      document.getElementById('depositModal').classList.remove('active');
+    }
+
+    // Функция для форматирования монет
+    function formatCoins(coins) {
+      if (coins >= 1000000000) {
+        return (coins / 1000000000).toFixed(1).replace(/\.0$/, '') + 'b';
+      } else if (coins >= 1000000) {
+        return (coins / 1000000).toFixed(1).replace(/\.0$/, '') + 'm';
+      } else if (coins >= 1000) {
+        return (coins / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+      }
+      return coins;
+    }
   </script>
 </body>
 </html>
