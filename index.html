@@ -539,7 +539,6 @@
     /* ----------------------------------------------
        4. Update Top Bar & Case Count
     ---------------------------------------------- */
-    // Обфусцированная версия updateTopBar (обфускация строковых литералов производится вручную)
     function updateTopBar(){
       document.getElementById("ticketCount").textContent = localUserData.tickets || 0;
       document.getElementById("coinCount").textContent = formatCoins(localUserData.coins || 0);
@@ -618,11 +617,14 @@
         return;
       }
       if (_0x25a1 === 'game3') {
-        if ((localUserData[_0x1a2b[0]] || 0) < _0x1123) {
+        // Приводим билеты к числу для корректного сравнения и арифметики
+        const currentTickets = Number(localUserData[_0x1a2b[0]]);
+        const cost = Number(_0x1123);
+        if (currentTickets < cost) {
           showGlobalModal("Not enough tickets", "You do not have enough tickets to play!");
           return;
         }
-        localUserData[_0x1a2b[0]] -= _0x1123;
+        localUserData[_0x1a2b[0]] = currentTickets - cost;
         updateTopBar();
         userRef.update({ tickets: localUserData[_0x1a2b[0]] });
         currentGame = _0x25a1;
