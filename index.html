@@ -150,7 +150,7 @@
           <button id="miniGamesInfoBtn" class="info-button" onclick="openMiniGamesInfoModal()">Info</button>
         </h3>
         <div class="games-gallery">
-          <!-- Игра STACK (game2) – переход на stack.html без списания билетов -->
+          <!-- Игра STACK (game2) – при нажатии происходит переход на stack.html без списания билетов -->
           <div class="game-card">
             <img src="https://i.pinimg.com/736x/ed/0d/12/ed0d1214bfce57bc73d3207f47ac1d9e.jpg" alt="Match-3">
             <p id="gameCard2Title">PAC-MAN</p>
@@ -206,18 +206,19 @@
           <button id="partnerInfoBtn" class="info-button" onclick="openPartnerInfoModal()">Info</button>
         </h3>
         <div class="games-gallery">
-          <div class="game-card">
-            <img src="https://img.icons8.com/ios-filled/50/00000/handshake.png" alt="Partner Game">
-            <p id="gameCard5Title">Partner Game</p>
-            <!-- Кнопка Play скрыта до активации -->
-            <button id="gameCard5Button" style="display: none;" onclick="openGameInfoModal({ 
+         <div class="game-card">
+  <img src="https://img.icons8.com/ios-filled/50/00000/handshake.png" alt="Partner Game">
+  <p id="gameCard5Title">Partner Game</p>
+  <!-- Скрываем кнопку Play до момента, когда она станет доступной -->
+  <button id="gameCard5Button" style="display: none;" onclick="openGameInfoModal({ 
               gameId: 'partnergame1',
               title: 'soon',
               img: 'https://img.icons8.com/ios-filled/50/00000/handshake.png',
               desc: 'Game from our partner.',
               cost: 1
             })">Play</button>
-          </div>
+</div>
+
         </div>
       </div>
     </section>
@@ -264,7 +265,7 @@
     <!-- LEADERBOARD SECTION -->
     <section id="leaderboardSection" class="section">
       <h2 id="leaderboardHeader">Leaderboard</h2>
-      <h2 id="leaderboardHeader">Season 1</h2>
+       <h2 id="leaderboardHeader">Season 1</h2>
       <button class="info-button" onclick="openSeasonInfoModal()">Info</button>
       <div class="leaderboard-container">
         <table id="leaderboardTable">
@@ -297,7 +298,7 @@
       <div class="lootbox-container" id="lootboxContainer" style="display: none;">
         <div class="lootbox-indicator"></div>
         <div class="lootbox-roulette" id="lootboxRoulette">
-          <!-- Призы добавляются динамически -->
+          <!-- Prizes will be added dynamically -->
         </div>
       </div>
       <div class="lootbox-buttons">
@@ -347,24 +348,27 @@
   <!-- Modal for Loot Box Info -->
   <div class="modal-backdrop" id="lootBoxInfoModal">
     <div class="modal">
+    
       <h2 id="lootBoxInfoTitle">Bug Pack Info</h2>
       <p id="lootBoxInfoDesc">
-        Prizes and Chances:<br>
-        - 3 tickets (10%)<br>
-        - 5 tickets (5%)<br>
-        - 10 tickets (8%)<br>
-        - 8 tickets (4%)<br>
-        - One case (5%)<br>
-        - 100 points (10%)<br>
-        - 500 points (5%)<br>
-        - 1M tokens (3%)<br>
-        - 3M tokens (2%)<br>
-        - 5M tokens (1%)<br>
-        - NFT Red (1%) – Special<br>
-        - NFT Yellow (2%) – Legendary<br>
-        - NFT Green (3%) – Rare<br>
-        - 1000 points (2%)
-      </p>
+  Prizes and Chances:<br>
+  - 3 tickets (10%)<br>
+  - 5 tickets (5%)<br>
+  - 10 tickets (8%)<br>
+  - 8 tickets (4%)<br>
+  - One case (5%)<br>
+  - 100 points (10%)<br>
+  - 500 points (5%)<br>
+  - 1M tokens (3%)<br>
+  - 3M tokens (2%)<br>
+  - 5M tokens (1%)<br>
+  - NFT Red (1%) – Special<br>
+  - NFT Yellow (2%) – Legendary<br>
+  - NFT Green (3%) – Rare<br>
+ 
+  - 1000 points (2%)
+</p>
+
       <button class="close-modal" onclick="closeLootBoxInfoModal()">Close</button>
     </div>
   </div>
@@ -392,7 +396,7 @@
   <div class="game-modal-backdrop" id="gameModalBackdrop">
     <div class="game-modal-content">
       <div class="game-canvas">
-         <!-- Для TETRIS (game3) используется canvas -->
+         <!-- Оставлен только canvas для TETRIS (game3) -->
          <canvas id="game3Canvas" width="400" height="740" style="display: none; position: relative; top: -0px;"></canvas>
       </div>
     </div>
@@ -459,14 +463,14 @@
        1. Firebase Initialization
     ---------------------------------------------- */
     const firebaseConfig = {
-      apiKey: "AIzaSyApxp0dHh0TK4nZVfOqloJ92dekjvjey3I",
-      authDomain: "meta-glitch.firebaseapp.com",
-      projectId: "meta-glitch",
-      storageBucket: "meta-glitch.firebasestorage.app",
-      messagingSenderId: "186162879710",
-      appId: "1:186162879710:web:87975bd09681505be7364f",
-      measurementId: "G-1TXVH8MESD"
-    };
+  apiKey: "AIzaSyApxp0dHh0TK4nZVfOqloJ92dekjvjey3I",
+  authDomain: "meta-glitch.firebaseapp.com",
+  projectId: "meta-glitch",
+  storageBucket: "meta-glitch.firebasestorage.app",
+  messagingSenderId: "186162879710",
+  appId: "1:186162879710:web:87975bd09681505be7364f",
+  measurementId: "G-1TXVH8MESD"
+};
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
@@ -477,7 +481,7 @@
     tg.expand();
 
     /* ----------------------------------------------
-       3. Global Variables, User Data & Security Functions
+       3. Global Variables & User Data
     ---------------------------------------------- */
     let currentUser = null;
     let userRef = null;
@@ -489,27 +493,10 @@
       lastSpinTime: 0,
       dataChip: false,
       cyberCase: 0,
-      nfts: [] // поле для NFT
+      nfts: [] // добавлено поле для NFT
     };
     let gameInProgress = false;
     let isSpinning = false;
-
-    // Генерация уникального идентификатора сессии
-    function generateSessionID() {
-      return 'sess-' + Math.random().toString(36).substr(2, 9);
-    }
-    // Создаём идентификатор для текущей сессии
-    const sessionID = generateSessionID();
-    console.log("Session ID:", sessionID);
-
-    // Функции хэширования результатов игр
-    function hashScore(score, salt = sessionID) {
-      // Простейший пример: кодирование в base64, затем реверс строки
-      return btoa(score + salt).split('').reverse().join('');
-    }
-    function validateScore(score, hash, salt = sessionID) {
-      return hash === hashScore(score, salt);
-    }
 
     if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
       currentUser = tg.initDataUnsafe.user;
@@ -530,7 +517,7 @@
             cyberCase: 0,
             nfts: []  // инициализация поля NFT
           }).then(() => {
-            // Перенаправление новых пользователей на info.html
+            // Перенаправляем новых пользователей на info.html
             window.location.href = 'info.html';
           });
         }
@@ -556,14 +543,14 @@
     /* ----------------------------------------------
        4. Update Top Bar & Case Count
     ---------------------------------------------- */
-    // Обфусцированная версия updateTopBar (обфускация строковых литералов производится вручную)
-    function updateTopBar(){
-      document.getElementById("ticketCount").textContent = localUserData.tickets || 0;
-      document.getElementById("coinCount").textContent = formatCoins(localUserData.coins || 0);
-      document.getElementById("pointCount").textContent = localUserData.points || 0;
+    function updateTopBar() {
+      document.getElementById('ticketCount').textContent = localUserData.tickets || 0;
+      document.getElementById('coinCount').textContent   = localUserData.coins || 0;
+      document.getElementById('pointCount').textContent  = localUserData.points || 0;
     }
-    function updateCaseCount(){
-      document.getElementById("openBtn").textContent = `open (${localUserData.cyberCase})`;
+
+    function updateCaseCount() {
+      document.getElementById('openBtn').textContent = `open (${localUserData.cyberCase})`;
     }
 
     /* ----------------------------------------------
@@ -609,44 +596,46 @@
     }
 
     /* ----------------------------------------------
-       8. Start Game (Обфусцированная версия)
+       8. Start Game
     ---------------------------------------------- */
-    var _0x1a2b=["\x74\x69\x63\x6B\x65\x74\x73","\x6D\x61\x69\x6E\x4E\x61\x76","\x68\x69\x64\x64\x65\x6E","\x67\x61\x6D\x65\x33\x43\x61\x6E\x76\x61\x73","\x61\x63\x74\x69\x76\x65"];
-    (function(_0x32d1,_0x1b50){var _0x3ef8=function(_0x5b57){while(--_0x5b57){_0x32d1.push(_0x32d1.shift());}};_0x3ef8(++_0x1b50);}(_0x1a2b,0x1a));
     let currentGame = null;
-    function handleStartGame(_0x25a1, _0x1123) {
+    function handleStartGame(gameName, ticketCost) {
       document.querySelector('.user-info').style.display = 'none';
       if (!currentUser || !userRef) {
         showGlobalModal("Error", "No user data available!");
         return;
       }
-      if (_0x25a1 === 'game2') {
+      
+      if (gameName === 'game2') {
         window.location.href = 'stack.html';
         return;
       }
-      if (_0x25a1 === 'partnergame1') {
+      if (gameName === 'partnergame1') {
         window.location.href = 'partnergame.html';
         return;
-      } else if (_0x25a1 === 'breakout') {
+      } else if (gameName === 'breakout') {
         window.location.href = 'breakout.html';
         return;
-      } else if (_0x25a1 === 'game4') {
+      } else if (gameName === 'game4') {
         window.location.href = 'space.html';
         return;
       }
-      if (_0x25a1 === 'game3') {
-        if ((localUserData[_0x1a2b[0]] || 0) < _0x1123) {
+      
+      if (gameName === 'game3') {
+        if ((localUserData.tickets || 0) < ticketCost) {
           showGlobalModal("Not enough tickets", "You do not have enough tickets to play!");
           return;
         }
-        localUserData[_0x1a2b[0]] -= _0x1123;
+        localUserData.tickets -= ticketCost;
         updateTopBar();
-        userRef.update({ tickets: localUserData[_0x1a2b[0]] });
-        currentGame = _0x25a1;
+        userRef.update({ tickets: localUserData.tickets });
+        
+        currentGame = gameName;
         gameInProgress = true;
-        document.getElementById(_0x1a2b[1]).classList.add(_0x1a2b[2]);
-        document.getElementById('gameModalBackdrop').classList.add(_0x1a2b[4]);
-        document.getElementById(_0x1a2b[3]).style.display = 'block';
+        document.getElementById('mainNav').classList.add('hidden');
+        
+        document.getElementById('gameModalBackdrop').classList.add('active');
+        document.getElementById('game3Canvas').style.display = 'block';
         initGame3();
       }
     }
@@ -668,9 +657,7 @@
       document.getElementById('gameModalBackdrop').classList.remove('active');
       document.getElementById('mainNav').classList.remove('hidden');
       if (userRef && currentGame) {
-        // При обновлении результатов также сохраняем хэш очков для проверки целостности
-        let scoreHash = hashScore(localUserData.points, sessionID);
-        userRef.update({ points: localUserData.points, scoreHash: scoreHash });
+        userRef.update({ points: localUserData.points });
       }
       if (currentGame === 'game3') {
         resetGame3();
@@ -732,7 +719,7 @@
       const last = localUserData.lastSpinTime || 0;
       const diff = now - last;
       const wait = 24 * 60 * 60 * 1000 - diff;
-      if (wait <= 0) {
+      if(wait <= 0) {
          btn.textContent = "Spin";
          btn.disabled = false;
       } else {
@@ -794,6 +781,7 @@
         }
       });
     });
+
     function openSeasonInfoModal() {
       document.getElementById('seasonModalBackdrop').classList.add('active');
     }
@@ -811,6 +799,7 @@
     /* ----------------------------------------------
        13. Lootbox in Cyber Case Section
     ---------------------------------------------- */
+    // Обновлённый массив призов (итого 10 предметов)
     const lootboxPrizes = [
        { name: '3 tickets', image: 'https://raw.githubusercontent.com/qnexst/404token/main/ticket.png', chance: 10 },
       { name: '5 tickets', image: 'https://raw.githubusercontent.com/qnexst/404token/main/ticket.png', chance: 5 },
@@ -827,6 +816,8 @@
       { name: '8 tickets', image: 'https://raw.githubusercontent.com/qnexst/404token/main/ticket.png', chance: 4 },
       { name: '1000 points', image: 'https://raw.githubusercontent.com/qnexst/404token/main/star.png', chance: 2 },
     ];
+
+    // Helper function для перемешивания массива
     function shuffleArray(array) {
       let arr = array.slice();
       for (let i = arr.length - 1; i > 0; i--) {
@@ -835,6 +826,7 @@
       }
       return arr;
     }
+
     function getWeightedRandomIndex(prizes) {
       let total = 0;
       prizes.forEach(prize => total += prize.chance);
@@ -847,6 +839,7 @@
       }
       return prizes.length - 1;
     }
+
     function parsePrizeAmount(prizeName) {
       if (prizeName.includes("M")) {
         let num = parseFloat(prizeName);
@@ -855,6 +848,8 @@
         return parseInt(prizeName);
       }
     }
+
+    // Обработка приза с учетом NFT
     function addPrizeToUser(prize) {
       if (prize.name.toLowerCase().includes("token")) {
          let amount = parsePrizeAmount(prize.name);
@@ -892,24 +887,35 @@
          updateTopBar();
       }
     }
+
+    // Функция анимации рулетки с рандомным расположением призов
     function spinRoulette() {
       const roulette = document.getElementById('lootboxRoulette');
       roulette.innerHTML = '';
       const prizeWidth = 136;
       const count = lootboxPrizes.length;
       const visibleCenter = roulette.parentElement.offsetWidth / 2;
+
+      // Определяем выигрышный приз по весовой выборке
       const winningIndex = getWeightedRandomIndex(lootboxPrizes);
       const winningPrize = lootboxPrizes[winningIndex];
+
       const fullCycles = 5;
       let rouletteItems = [];
+
+      // Генерируем 5 полных циклов с перемешанными призами
       for (let cycle = 0; cycle < fullCycles; cycle++) {
         let shuffled = shuffleArray(lootboxPrizes);
         rouletteItems = rouletteItems.concat(shuffled);
       }
+
+      // В 6‑м цикле перемешиваем и гарантируем появление выигрышного приза
       let lastCycle = shuffleArray(lootboxPrizes);
       const targetIndex = Math.floor(Math.random() * count);
       lastCycle[targetIndex] = winningPrize;
       rouletteItems = rouletteItems.concat(lastCycle);
+
+      // Заполняем контейнер рулетки
       rouletteItems.forEach(item => {
         const prizeEl = document.createElement('div');
         prizeEl.className = 'lootbox-prize';
@@ -923,10 +929,13 @@
         prizeEl.innerHTML = `<img src="${item.image}" alt="${item.name}"><span>${item.name}</span>`;
         roulette.appendChild(prizeEl);
       });
+
       const finalIndex = fullCycles * count + targetIndex;
       const finalOffset = -(finalIndex * prizeWidth) + visibleCenter - (prizeWidth / 2);
+
       roulette.style.transition = 'transform 10s cubic-bezier(0.25, 0.1, 0.25, 1)';
       roulette.style.transform = `translateX(${finalOffset}px)`;
+
       setTimeout(() => {
         const remainder = finalIndex % count;
         const newOffset = -(remainder * prizeWidth) + visibleCenter - (prizeWidth / 2);
@@ -943,6 +952,7 @@
         caseImage.style.opacity = 1;
       }, 10200);
     }
+
     function spinLootBoxForTokens() {
       if (!currentUser) return;
       if (isSpinning) return;
@@ -954,14 +964,17 @@
       localUserData.coins -= 5000000;
       updateTopBar();
       userRef.update({ coins: localUserData.coins });
+
       const caseImage = document.getElementById('caseImage');
       caseImage.classList.add('explode');
+
       caseImage.addEventListener('animationend', () => {
         document.querySelector('.case-container').style.display = 'none';
         document.getElementById('lootboxContainer').style.display = 'block';
         spinRoulette();
       }, { once: true });
     }
+
     function openLootBox() {
       if (!currentUser) return;
       if (isSpinning) return;
@@ -973,8 +986,10 @@
       localUserData.cyberCase -= 1;
       updateCaseCount();
       userRef.update({ cyberCase: localUserData.cyberCase });
+
       const caseImage = document.getElementById('caseImage');
       caseImage.classList.add('explode');
+
       caseImage.addEventListener('animationend', () => {
         document.querySelector('.case-container').style.display = 'none';
         document.getElementById('lootboxContainer').style.display = 'block';
@@ -983,7 +998,7 @@
     }
 
     /* ----------------------------------------------
-       Modal windows for Loot Box and others
+       Modal windows for Loot Box
     ---------------------------------------------- */
     function openLootBoxInfoModal() {
       document.getElementById('lootBoxInfoModal').classList.add('active');
@@ -991,6 +1006,7 @@
     function closeLootBoxInfoModal() {
       document.getElementById('lootBoxInfoModal').classList.remove('active');
     }
+
     function openMainOnlineInfoModal() {
       document.getElementById('mainOnlineInfoModal').classList.add('active');
     }
@@ -1013,17 +1029,27 @@
       document.getElementById('depositModal').classList.remove('active');
     }
 
-    // Функция для форматирования монет
-    function formatCoins(coins) {
-      if (coins >= 1000000000) {
-        return (coins / 1000000000).toFixed(1).replace(/\.0$/, '') + 'b';
-      } else if (coins >= 1000000) {
-        return (coins / 1000000).toFixed(1).replace(/\.0$/, '') + 'm';
-      } else if (coins >= 1000) {
-        return (coins / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
-      }
-      return coins;
-    }
+
+
+    // Добавьте эту функцию в ваш скрипт (например, сразу перед updateTopBar)
+function formatCoins(coins) {
+  if (coins >= 1000000000) {
+    return (coins / 1000000000).toFixed(1).replace(/\.0$/, '') + 'b';
+  } else if (coins >= 1000000) {
+    return (coins / 1000000).toFixed(1).replace(/\.0$/, '') + 'm';
+  } else if (coins >= 1000) {
+    return (coins / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+  }
+  return coins;
+}
+
+// Измените функцию updateTopBar так, чтобы для coins использовалась функция форматирования:
+function updateTopBar() {
+  document.getElementById('ticketCount').textContent = localUserData.tickets || 0;
+  document.getElementById('coinCount').textContent   = formatCoins(localUserData.coins || 0);
+  document.getElementById('pointCount').textContent  = localUserData.points || 0;
+}
+
   </script>
 
 </body>
