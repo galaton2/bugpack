@@ -651,7 +651,8 @@
       document.getElementById('gameModalBackdrop').classList.remove('active');
       document.getElementById('mainNav').classList.remove('hidden');
       if (userRef && currentGame) {
-        userRef.update({ points: localUserData.points });
+        // Обновляем очки с использованием хэширования результата
+        updateGameResult(localUserData.points);
       }
       if (currentGame === 'game3') {
         resetGame3();
@@ -1005,6 +1006,62 @@
       }
       return coins;
     }
+
+    /* ----------------------------------------------
+       Security Functions
+       - Hashing game results
+       - Anti-Cheat checks
+       - Anti-Tampering protection
+    ---------------------------------------------- */
+    function hashScore(score, salt = "s3cr3t") {
+      return btoa(score + salt).split('').reverse().join('');
+    }
+
+    function validateScore(score, hash, salt = "s3cr3t") {
+      return hash === hashScore(score, salt);
+    }
+
+    function updateGameResult(score) {
+      const scoreHash = hashScore(score);
+      // Обновляем очки в Firebase вместе с хэшом результата
+      userRef.update({ points: score, scoreHash: scoreHash });
+    }
+
+    // Anti-Cheat: периодическая проверка значений
+    let cheatCheckData = {
+      tickets: localUserData.tickets,
+      coins: localUserData.coins,
+      points: localUserData.points
+    };
+
+    setInterval(function() {
+      // Если за 5 секунд наблюдается аномально резкий прирост, считаем это мошенничеством
+      if (localUserData.tickets - cheatCheckData.tickets > 100 ||
+          localUserData.coins - cheatCheckData.coins > 1000000 ||
+          localUserData.points - cheatCheckData.points > 1000) {
+        alert("Cheating detected! Reloading...");
+        location.reload();
+      }
+      cheatCheckData.tickets = localUserData.tickets;
+      cheatCheckData.coins = localUserData.coins;
+      cheatCheckData.points = localUserData.points;
+    }, 5000);
+
+    // Anti-Tampering: проверяем, что ключевые функции не были изменены
+    const originalUpdateTopBar = updateTopBar.toString();
+    const originalHandleStartGame = handleStartGame.toString();
+    const originalSpinWheel = spinWheel.toString();
+
+    setInterval(function() {
+      if (updateTopBar.toString() !== originalUpdateTopBar ||
+          handleStartGame.toString() !== originalHandleStartGame ||
+          spinWheel.toString() !== originalSpinWheel) {
+        alert("Tampering detected! Reloading...");
+        location.reload();
+      }
+    }, 2000);
   </script>
+
 </body>
 </html>
+
