@@ -11,6 +11,8 @@ html, body {
   overflow-x: hidden;
   margin: 0;
   padding: 0;
+  /* Предотвращаем стандартное поведение overscroll (если поддерживается) */
+  overscroll-behavior: none;
 }
 
 /* ========= Основной стиль страницы ========= */
@@ -175,8 +177,8 @@ header {
   left: 0;
   width: 100%;
   padding: 12px;
-  background: rgba(14,22,46,0.6); /* Фон с прозрачностью */
-  backdrop-filter: blur(10px);    /* Эффект блюра */
+  background: rgba(14,22,46,0.6);
+  backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-bottom: 2px solid #fff;
   display: flex;
@@ -267,7 +269,6 @@ main {
   box-sizing: border-box;
 }
 
-/* Центрирование названия секции игр */
 .games-section h2 {
   text-align: center;
 }
@@ -323,7 +324,7 @@ main {
   color: #000;
 }
 
-/* ========= Нижняя навигация (nav) с эффектом блюра ========= */
+/* ========= Нижняя навигация (nav) ========= */
 nav {
   display: flex;
   justify-content: center;
@@ -384,7 +385,7 @@ nav button img {
 }
 
 .modal {
-  background: #0e162e; /* Сплошной фон */
+  background: #0e162e;
   border: 2px solid #3b3b3b;
   padding: 20px;
   width: 80%;
@@ -403,7 +404,6 @@ nav button img {
   font-size: 12px;
 }
 
-/* Расстояние между кнопками модального окна */
 .modal button + button {
   margin-left: 10px;
 }
@@ -704,5 +704,5 @@ table tr.current-user {
   transition: opacity 2s ease;
   display: flex;
   gap: 10px;
-  margin-top: 50px;
+  margin-top: 80px;
 }
