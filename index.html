@@ -1058,6 +1058,43 @@ function updateTopBar() {
   document.getElementById('pointCount').textContent  = localUserData.points || 0;
 }
 
+    (function() {
+  // Функция для проверки, является ли устройство мобильным
+  function isMobileDevice() {
+    return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  }
+
+  // Функция для создания и отображения модального окна
+  function showModal() {
+    // Создаём затемняющий оверлей
+    var overlay = document.createElement('div');
+    overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%;' +
+                              'background: rgba(0, 0, 0, 0.8); display: flex; align-items: center;' +
+                              'justify-content: center; z-index: 9999;';
+    
+    // Создаём контейнер модального окна
+    var modal = document.createElement('div');
+    modal.style.cssText = 'background: #fff; padding: 20px; border-radius: 5px;' +
+                            'text-align: center; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);';
+    modal.innerHTML = '<h2>Доступ запрещён</h2><p>Вход с ПК невозможен.</p>';
+    
+    // Вставляем модальное окно в оверлей и добавляем оверлей на страницу
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+  }
+
+  // Если устройство не мобильное, показываем модальное окно
+  if (!isMobileDevice()) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', showModal);
+    } else {
+      showModal();
+    }
+    // Можно дополнительно остановить выполнение скриптов, если это необходимо:
+    // throw new Error("Доступ запрещён");
+  }
+})();
+
   </script>
 
 </body>
