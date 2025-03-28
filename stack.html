@@ -113,7 +113,7 @@
       left: 50%;
       transform: translate(-50%, -50%);
     }
-    /* Таймер-бар (уменьшенный) */
+    /* Таймер-бар (игровой) */
     #timerBar {
       position: absolute;
       top: 60px;
@@ -214,7 +214,7 @@
       START (1 Ticket)
     </button>
     
-    <!-- Таймер-бар -->
+    <!-- Таймер-бар (игровой) -->
     <div id="timerBar">
       <div id="timerFill"></div>
     </div>
@@ -319,7 +319,7 @@
     }
 
     /* ------------------------------------------------
-       2. Игра Floppy Bird с таймером, счётчиком и стартовой паузой
+       2. Игра Floppy Bird с 3-секундным обратным отсчётом
     ------------------------------------------------ */
     function startFlappyBird() {
       // Проверка наличия билетов
@@ -347,40 +347,53 @@
       const img = new Image();
       img.src = "https://i.ibb.co/Q9yv5Jk/flappy-bird-set.png";
 
-      let gamePlaying = false;
-      let gameStarted = false;
-      let gameEnded = false;
-      let timerInterval = null;
-      // Новые параметры:
+      // Переменные игры
+      let gameState = "countdown"; // Возможные состояния: "countdown", "playing", "ended"
+      let countdown = 3; // Обратный отсчёт в секундах
+      let timerInterval = null; // Для игрового таймера (120 сек.)
+      let index = 0;
+      let currentScore = 0;
       const gravity = 0.3;
       const speed = 2.5;
       const size = [51, 36];
       const jump = -8;
       const cTenth = canvas.width / 10;
-
-      let index = 0,
-          currentScore = 0,
-          flight,
-          flyHeight,
-          pipes = [];
-
+      let flight;
+      let flyHeight;
+      let pipes = [];
       const pipeWidth = 78;
       const pipeGap = 270;
       const pipeLoc = () => (Math.random() * ((canvas.height - (pipeGap + pipeWidth)) - pipeWidth)) + pipeWidth;
 
-      // Изначальная установка
+      // Инициализация игровых переменных
       function setup() {
         currentScore = 0;
         flight = jump;
         flyHeight = (canvas.height / 2) - (size[1] / 2);
-        // Создаём 3 трубы
         pipes = Array(3).fill().map((_, i) => [canvas.width + (i * (pipeGap + pipeWidth)), pipeLoc()]);
       }
       setup();
 
-      // Функция запуска таймера (2 минуты)
+      // Добавляем обработчик клика для прыжка во время игры
+      canvas.addEventListener('click', function() {
+        if (gameState === "playing") {
+          flight = jump;
+        }
+      });
+
+      // Обратный отсчёт: каждую секунду уменьшаем значение
+      const countdownInterval = setInterval(() => {
+        countdown--;
+        if (countdown <= 0) {
+          clearInterval(countdownInterval);
+          gameState = "playing";
+          startTimer(); // Запускаем игровой таймер (120 сек.)
+        }
+      }, 1000);
+
+      // Функция запуска игрового таймера (2 минуты)
       function startTimer() {
-        const totalTime = 120; // 120 секунд
+        const totalTime = 120;
         let timeLeft = totalTime;
         document.getElementById('timerBar').style.display = 'block';
         timerInterval = setInterval(() => {
@@ -394,9 +407,8 @@
       }
 
       function endGameDueToTime() {
-        if (!gameEnded) {
-          gameEnded = true;
-          gamePlaying = false;
+        if (gameState !== "ended") {
+          gameState = "ended";
           clearInterval(timerInterval);
           document.getElementById('endModal').classList.add('active');
           document.getElementById('endMessage').textContent = "Time's up! Your score: " + currentScore;
@@ -414,31 +426,33 @@
 
       // Основной цикл отрисовки
       function render() {
-        if (gameEnded) return;
-        index++;
+        if (gameState === "countdown") {
+          // Рисуем черный фон с большим числом (отсчёт)
+          ctx.fillStyle = "black";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.font = "48px 'Press Start 2P'";
+          ctx.fillStyle = "#fff";
+          ctx.textAlign = "center";
+          ctx.fillText(countdown, canvas.width / 2, canvas.height / 2);
+        } else if (gameState === "playing") {
+          index++;
 
-        // Рисуем фон
-        if (gameStarted) {
+          // Рисуем движущийся фон
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height,
                         -((index * (speed / 2)) % canvas.width) + canvas.width, 0,
                         canvas.width, canvas.height);
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height,
                         -(index * (speed / 2)) % canvas.width, 0,
                         canvas.width, canvas.height);
-        } else {
-          // Если игра не начата, фон статичен
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        }
 
-        if (gameStarted) {
-          // Отрисовка труб, обновление счёта и проверка столкновений
+          // Обновляем и отрисовываем трубы
           let collisionDetected = false;
           for (let i = 0; i < pipes.length; i++) {
             pipes[i][0] -= speed;
-            // Рисуем верхнюю трубу
+            // Верхняя труба
             ctx.drawImage(img, 432, 588 - pipes[i][1], pipeWidth, pipes[i][1],
                           pipes[i][0], 0, pipeWidth, pipes[i][1]);
-            // Рисуем нижнюю трубу
+            // Нижняя труба
             ctx.drawImage(img, 432 + pipeWidth, 108, pipeWidth, canvas.height - pipes[i][1] + pipeGap,
                           pipes[i][0], pipes[i][1] + pipeGap, pipeWidth, canvas.height - pipes[i][1] + pipeGap);
 
@@ -467,10 +481,9 @@
           }
 
           if (collisionDetected) {
-            if (!gameEnded) {
-              gameEnded = true;
+            if (gameState !== "ended") {
+              gameState = "ended";
               clearInterval(timerInterval);
-              gamePlaying = false;
               document.getElementById('endModal').classList.add('active');
               document.getElementById('endMessage').textContent = "Your score: " + currentScore;
               savePoints(currentScore);
@@ -484,37 +497,18 @@
           flight += gravity;
           flyHeight = Math.min(flyHeight + flight, canvas.height - size[1]);
 
-          // Отрисовка счёта
+          // Отрисовка счета
           ctx.font = "16px 'Press Start 2P'";
           ctx.fillStyle = "#fff";
           ctx.textAlign = "left";
           ctx.fillText("Score: " + currentScore, 10, 30);
-        } else {
-          // Начальный экран: только фон, птица и текст "Tap to Start"
-          ctx.drawImage(img, 432, Math.floor((index % 9) / 3) * size[1], ...size,
-                        (canvas.width / 2) - (size[0] / 2), (canvas.height / 2) - (size[1] / 2), ...size);
-          ctx.font = "20px 'Press Start 2P'";
-          ctx.fillStyle = "#fff";
-          ctx.textAlign = "center";
-          ctx.fillText("Tap to Start", canvas.width / 2, (canvas.height / 2) + size[1] + 20);
         }
         window.requestAnimationFrame(render);
       }
 
       img.onload = render;
-
-      // Обработчик клика для старта игры (и прыжка)
-      canvas.addEventListener('click', function onGameClick() {
-        if (!gameStarted) {
-          gameStarted = true;
-          gamePlaying = true;
-          startTimer();
-          flight = jump;
-        } else {
-          flight = jump;
-        }
-      });
     }
   </script>
 </body>
 </html>
+
