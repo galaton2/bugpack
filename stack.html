@@ -339,7 +339,7 @@
       document.getElementById('backContainer').style.display = 'none';
       document.getElementById('startBtn').style.display = 'none';
 
-      // Показываем канвас и таймер-бар
+      // Показываем канвас
       const canvas = document.getElementById('gameCanvas');
       canvas.style.display = 'block';
       const ctx = canvas.getContext('2d');
@@ -417,7 +417,7 @@
         if (gameEnded) return;
         index++;
 
-        // Рисуем фон (анимация фона будет работать только после старта игры)
+        // Рисуем фон
         if (gameStarted) {
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height,
                         -((index * (speed / 2)) % canvas.width) + canvas.width, 0,
@@ -430,8 +430,8 @@
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         }
 
-        // Если игра запущена, обновляем трубы и проверяем столкновения
         if (gameStarted) {
+          // Отрисовка труб, обновление счёта и проверка столкновений
           let collisionDetected = false;
           for (let i = 0; i < pipes.length; i++) {
             pipes[i][0] -= speed;
@@ -478,35 +478,25 @@
             return;
           }
 
-          // Обновляем позицию птицы
+          // Отрисовываем птицу
           ctx.drawImage(img, 432, Math.floor((index % 9) / 3) * size[1], ...size,
                         cTenth, flyHeight, ...size);
           flight += gravity;
           flyHeight = Math.min(flyHeight + flight, canvas.height - size[1]);
 
-          // Отрисовываем счёт прямо в игре
+          // Отрисовка счёта
           ctx.font = "16px 'Press Start 2P'";
           ctx.fillStyle = "#fff";
           ctx.textAlign = "left";
           ctx.fillText("Score: " + currentScore, 10, 30);
         } else {
-          // Если игра не начата, трубы отрисовываем без движения
-          for (let i = 0; i < pipes.length; i++) {
-            ctx.drawImage(img, 432, 588 - pipes[i][1], pipeWidth, pipes[i][1],
-                          pipes[i][0], 0, pipeWidth, pipes[i][1]);
-            ctx.drawImage(img, 432 + pipeWidth, 108, pipeWidth, canvas.height - pipes[i][1] + pipeGap,
-                          pipes[i][0], pipes[i][1] + pipeGap, pipeWidth, canvas.height - pipes[i][1] + pipeGap);
-          }
-          // Рисуем птицу в центральном положении
+          // Начальный экран: только фон, птица и текст "Tap to Start"
           ctx.drawImage(img, 432, Math.floor((index % 9) / 3) * size[1], ...size,
-                        (canvas.width / 2) - (size[0] / 2), flyHeight, ...size);
-          // Выводим текст "Tap to Start"
+                        (canvas.width / 2) - (size[0] / 2), (canvas.height / 2) - (size[1] / 2), ...size);
           ctx.font = "20px 'Press Start 2P'";
           ctx.fillStyle = "#fff";
           ctx.textAlign = "center";
-          ctx.fillText("Tap to Start", canvas.width / 2, canvas.height / 2);
-          // Сбрасываем позицию птицы
-          flyHeight = (canvas.height / 2) - (size[1] / 2);
+          ctx.fillText("Tap to Start", canvas.width / 2, (canvas.height / 2) + size[1] + 20);
         }
         window.requestAnimationFrame(render);
       }
@@ -514,7 +504,6 @@
       img.onload = render;
 
       // Обработчик клика для старта игры (и прыжка)
-      // Прикрепляем его к canvas, чтобы избежать срабатывания клика от кнопки "START"
       canvas.addEventListener('click', function onGameClick() {
         if (!gameStarted) {
           gameStarted = true;
