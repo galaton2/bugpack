@@ -2,7 +2,6 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <!-- Для мобильных устройств -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Crossy Road 3D Vertical с меню и таймером</title>
 
@@ -17,7 +16,7 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
-    /* Общие стили меню и интерфейса */
+    /* Общие стили */
     html, body {
       margin: 0;
       padding: 0;
@@ -26,6 +25,41 @@
       overflow: hidden;
       background: #00103c;
       font-family: 'Press Start 2P', monospace;
+    }
+    /* Preloader экран */
+    #preloader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #00103c;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+    }
+    #preloader h1 {
+      color: #ffffff;
+      margin-bottom: 20px;
+      animation: blink 1s linear infinite;
+    }
+    @keyframes blink {
+      0% { opacity: 1; }
+      50% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    #enterButton {
+      font-size: 12px;
+      padding: 10px 20px;
+      background: #06B6D1;
+      color: #262626;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      box-shadow: 0 3px #6b6b6b;
+      display: none;
     }
     /* Header с информацией о пользователе */
     #header {
@@ -115,7 +149,7 @@
       height: 100%;
       background: #ff66cc;
     }
-    /* Игровой счётчик, который отображается поверх игры */
+    /* Счётчики */
     #score {
       position: absolute;
       top: 40px;
@@ -124,7 +158,6 @@
       color: white;
       font-size: 16px;
     }
-    /* Новый счетчик поинтов (показывает сумму сохраненных и набранных очков) */
     #pointsCounter {
       position: absolute;
       top: 60px;
@@ -133,7 +166,7 @@
       color: white;
       font-size: 16px;
     }
-    /* Стили для игрового canvas */
+    /* Игровой canvas */
     canvas.game {
       position: absolute;
       z-index: 1;
@@ -141,7 +174,7 @@
       height: 100%;
       display: block;
     }
-    /* Стили для кнопок управления (используем svg-иконки) */
+    /* Кнопки управления */
     #controlls {
       position: absolute;
       top: 0;
@@ -177,7 +210,7 @@
     #controlls button svg path {
       fill: white;
     }
-    /* Модальное окно окончания игры */
+    /* Модальное окно */
     #end {
       position: absolute;
       top: 0;
@@ -216,6 +249,12 @@
   </style>
 </head>
 <body>
+  <!-- Preloader экран -->
+  <div id="preloader">
+    <h1 id="loadingText">Загрузка...</h1>
+    <button id="enterButton" onclick="enterSite()">Войти</button>
+  </div>
+
   <!-- Меню с информацией о пользователе -->
   <div id="header">
     <div id="info">
@@ -282,7 +321,6 @@
       </div>
       <!-- Счёт и новый счетчик поинтов -->
       <div id="score">0</div>
-      
       <div id="result-container">
         <div id="result">
           <h1>Game Over</h1>
@@ -292,7 +330,7 @@
       </div>
     </div>
   </div>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
   <!-- Модальное окно окончания игры/уведомлений -->
   <div id="end">
@@ -304,7 +342,6 @@
   </div>
 
   <!-- Звуки -->
-  <!-- Фоновая музыка изменена на предоставленный loop-трек -->
   <audio id="bgSound" src="https://raw.githubusercontent.com/qnexst/404token/main/loopcross.wav" loop></audio>
   <audio id="moveSound" src="move.mp3"></audio>
   <audio id="deathSound" src="death.mp3"></audio>
@@ -392,10 +429,9 @@
   <script type="module">
     import * as THREE from "https://esm.sh/three";
 
-    // Глобальные переменные для игры и таймера
     let gameStartTime = null;
     let gameEnded = false;
-    const gameDuration = 300000; // 5 минут в мс
+    const gameDuration = 300000;
 
     const minTileIndex = -8;
     const maxTileIndex = 8;
@@ -611,7 +647,6 @@
       position.currentRow = 0;
       position.currentTile = 0;
       movesQueue.length = 0;
-      // Обновляем счётчик поинтов (на старте игры это только сохранённые очки)
       updatePointsCounter();
     }
 
@@ -637,7 +672,6 @@
     }
 
     function updatePointsCounter() {
-      // Показываем сумму ранее сохранённых поинтов и очков текущей игры
       const pointsCounter = document.getElementById("pointsCounter");
       if (pointsCounter) {
         pointsCounter.innerText = "Points: " + (localUserData.points + position.currentRow);
@@ -937,7 +971,6 @@
       }
     });
 
-    // При столкновении с машиной/грузовиком завершаем игру
     function hitTest() {
       if (gameEnded) return;
       const row = metadata[position.currentRow - 1];
@@ -986,7 +1019,6 @@
     renderer.setAnimationLoop(animate);
 
     function animate() {
-      // Обновление таймера
       if (gameStartTime) {
         let elapsed = performance.now() - gameStartTime;
         let remaining = gameDuration - elapsed;
@@ -1006,13 +1038,11 @@
       renderer.render(scene, camera);
     }
 
-    // Функция завершения игры (вызывается при столкновении или истечении времени)
     function endGame() {
       if (gameEnded) return;
       gameEnded = true;
       document.getElementById("deathSound").play().catch(e => console.log(e));
       modalType = "gameOver";
-      // Обновляем контент модального окна
       const endTitle = document.getElementById("endTitle");
       const endMessage = document.getElementById("endMessage");
       if (endTitle && endMessage) {
@@ -1020,14 +1050,12 @@
         endMessage.textContent = "Your score: " + position.currentRow;
       }
       document.getElementById("end").style.visibility = "visible";
-      // Сохраняем очки в БД
       localUserData.points += position.currentRow;
       if (userRef) {
         userRef.update({ points: localUserData.points });
       }
     }
 
-    // Функция старта игры, вызываемая из внешнего (не модульного) скрипта
     function startThreeGame() {
       gameEnded = false;
       gameStartTime = performance.now();
@@ -1053,19 +1081,27 @@
       document.getElementById('header').style.display = 'none';
       document.getElementById('backContainer').style.display = 'none';
       document.getElementById('startBtn').style.display = 'none';
-      // Показываем контейнер с игрой
       document.getElementById('gameContainer').style.display = 'block';
-      // Показываем контролы
       document.getElementById('controlls').style.display = 'flex';
-      // Показываем time bar
       document.getElementById('timeBarContainer').style.display = 'block';
-      // Запускаем фоновый звук (на первый клик)
       const bgSound = document.getElementById('bgSound');
       if (bgSound.paused) {
         bgSound.play().catch(err => console.log(err));
       }
-      // Вызываем функцию из модульного скрипта, которая инициализирует игру
       window.startThreeGame();
+    }
+  </script>
+
+  <!-- Скрипт для preloader -->
+  <script>
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.getElementById('enterButton').style.display = 'block';
+      }, 500);
+    });
+
+    function enterSite() {
+      document.getElementById('preloader').style.display = 'none';
     }
   </script>
 </body>
