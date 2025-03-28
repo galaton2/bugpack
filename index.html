@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <!-- Единый meta-тег viewport -->
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
   <title>404</title>
@@ -12,87 +13,89 @@
 
   <!-- Default theme -->
   <link id="themeStylesheet" rel="stylesheet" href="st1.css">
+  
+  <!-- Скрипты для Three.js и Cannon.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cannon/0.6.2/cannon.min.js"></script>
 
   <!-- Additional CSS for Loot Box block -->
   <style>
-   .case-container {
-     flex-direction: column;
-     align-items: center;
-     justify-content: center;
-     margin-top: -60px;
-     text-align: center;
-     position: relative;
-     top: 50px;
-     display: inline-block;
-     transition: top 0.5s ease;
-   }
-   .case-container.open {
-     top: 20px;
-   }
-   .case-container img {
-     display: block;
-     margin: 0 auto;
-     width: 330px;
-     height: 330px;
-     transition: width 0.5s ease, height 0.5s ease, transform 0.5s ease;
-   }
-   .case-container.open img {
-     width: 500px;
-     height: 500px;
-     transform: translateY(-30px);
-   }
-   .explode {
-     animation: explode 0.8s ease-out forwards;
-   }
-   @keyframes explode {
-     0% {
-       transform: scale(1) rotate(0deg);
-       opacity: 1;
-       filter: brightness(1);
-     }
-     50% {
-       transform: scale(1.3) rotate(20deg);
-       opacity: 0.8;
-       filter: brightness(1.2);
-     }
-     70% {
-       transform: scale(1.1) rotate(10deg);
-       opacity: 0.9;
-       filter: brightness(1.1);
-     }
-     100% {
-       transform: scale(2.5) rotate(45deg);
-       opacity: 0;
-       filter: brightness(0.5);
-     }
-   }
-   .case-container p {
-     position: absolute;
-     bottom: 420px;
-     left: 50%;
-     transform: translateX(-50%);
-     font-weight: bold;
-     margin: 0;
-     pointer-events: none;
-     z-index: 1;
-   }
-   .lootbox-buttons {
-     position: relative;
-     z-index: 10;
-     transition: opacity 0.5s ease;
-     display: flex;
-     gap: 10px;
-     margin-top: 80px;
-   }
-   .case-container.open .lootbox-buttons {
-     opacity: 0;
-     pointer-events: none;
-   }
+    .case-container {
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-top: -60px;
+      text-align: center;
+      position: relative;
+      top: 50px;
+      display: inline-block;
+      transition: top 0.5s ease;
+    }
+    .case-container.open {
+      top: 20px;
+    }
+    .case-container img {
+      display: block;
+      margin: 0 auto;
+      width: 330px;
+      height: 330px;
+      transition: width 0.5s ease, height 0.5s ease, transform 0.5s ease;
+    }
+    .case-container.open img {
+      width: 500px;
+      height: 500px;
+      transform: translateY(-30px);
+    }
+    .explode {
+      animation: explode 0.8s ease-out forwards;
+    }
+    @keyframes explode {
+      0% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+        filter: brightness(1);
+      }
+      50% {
+        transform: scale(1.3) rotate(20deg);
+        opacity: 0.8;
+        filter: brightness(1.2);
+      }
+      70% {
+        transform: scale(1.1) rotate(10deg);
+        opacity: 0.9;
+        filter: brightness(1.1);
+      }
+      100% {
+        transform: scale(2.5) rotate(45deg);
+        opacity: 0;
+        filter: brightness(0.5);
+      }
+    }
+    .case-container p {
+      position: absolute;
+      bottom: 420px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-weight: bold;
+      margin: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .lootbox-buttons {
+      position: relative;
+      z-index: 10;
+      transition: opacity 0.5s ease;
+      display: flex;
+      gap: 10px;
+      margin-top: 80px;
+    }
+    .case-container.open .lootbox-buttons {
+      opacity: 0;
+      pointer-events: none;
+    }
   </style>
 
-  <!-- Telegram Web App API -->
+  <!-- Telegram Web App API и gifler -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://unpkg.com/gifler@0.1.0/gifler.min.js"></script>
 
@@ -126,8 +129,8 @@
     </div>
   </header>
 
-  <!-- Main Content -->
-  <main>
+  <!-- Main Content (обернут в контейнер с классом scrollable для разрешённой прокрутки) -->
+  <main class="scrollable">
     <!-- PLAY SECTION -->
     <section id="playSection" class="section active">
       <div class="games-section">
@@ -150,7 +153,7 @@
           <button id="miniGamesInfoBtn" class="info-button" onclick="openMiniGamesInfoModal()">Info</button>
         </h3>
         <div class="games-gallery">
-          <!-- Игра STACK (game2) – при нажатии происходит переход на stack.html без списания билетов -->
+          <!-- Игра STACK (game2) – без списания билетов -->
           <div class="game-card">
             <img src="https://i.pinimg.com/736x/ed/0d/12/ed0d1214bfce57bc73d3207f47ac1d9e.jpg" alt="Match-3">
             <p id="gameCard2Title">PAC-MAN</p>
@@ -206,19 +209,18 @@
           <button id="partnerInfoBtn" class="info-button" onclick="openPartnerInfoModal()">Info</button>
         </h3>
         <div class="games-gallery">
-         <div class="game-card">
-  <img src="https://img.icons8.com/ios-filled/50/00000/handshake.png" alt="Partner Game">
-  <p id="gameCard5Title">Partner Game</p>
-  <!-- Скрываем кнопку Play до момента, когда она станет доступной -->
-  <button id="gameCard5Button" style="display: none;" onclick="openGameInfoModal({ 
+          <div class="game-card">
+            <img src="https://img.icons8.com/ios-filled/50/00000/handshake.png" alt="Partner Game">
+            <p id="gameCard5Title">Partner Game</p>
+            <!-- Скрываем кнопку Play до момента, когда она станет доступной -->
+            <button id="gameCard5Button" style="display: none;" onclick="openGameInfoModal({ 
               gameId: 'partnergame1',
               title: 'soon',
               img: 'https://img.icons8.com/ios-filled/50/00000/handshake.png',
               desc: 'Game from our partner.',
               cost: 1
             })">Play</button>
-</div>
-
+          </div>
         </div>
       </div>
     </section>
@@ -265,7 +267,7 @@
     <!-- LEADERBOARD SECTION -->
     <section id="leaderboardSection" class="section">
       <h2 id="leaderboardHeader">Leaderboard</h2>
-       <h2 id="leaderboardHeader">Season 1</h2>
+      <h2 id="leaderboardHeader">Season 1</h2>
       <button class="info-button" onclick="openSeasonInfoModal()">Info</button>
       <div class="leaderboard-container">
         <table id="leaderboardTable">
@@ -292,8 +294,6 @@
       <h2 id="referralHeader">ㅤㅤ</h2>
       <h2 id="referralHeader">Bug Packs</h2>
       <button class="info-button" onclick="openLootBoxInfoModal()">Info</button>
-       
-
       <div class="case-container">
         <img id="caseImage" src="https://raw.githubusercontent.com/qnexst/404token/main/case.png" alt="Cyber Case">
       </div>
@@ -305,17 +305,11 @@
       </div>
       <div class="lootbox-buttons">
         <button id="openBtn" onclick="openLootBox()">open (0)</button>
-      <button id="openForTokenBtn" onclick="spinLootBoxForTokens()" style="display: flex; flex-direction: column; align-items: center;">
-  <span>Open for</span>
-  <span>5m tokens</span>
-</button>
-
-
-        <form action="soon.html">
-  <button type="submit">boost chance</button>
-</form>
+        <button id="openForTokenBtn" onclick="spinLootBoxForTokens()">
+          <span>Open for 5m tokens</span><br>
+          <span></span>
+        </button>
       </div>
-       
     </section>
   </main>
 
@@ -356,27 +350,24 @@
   <!-- Modal for Loot Box Info -->
   <div class="modal-backdrop" id="lootBoxInfoModal">
     <div class="modal">
-    
       <h2 id="lootBoxInfoTitle">Bug Pack Info</h2>
       <p id="lootBoxInfoDesc">
-  Prizes and Chances:<br>
-  - 3 tickets (10%)<br>
-  - 5 tickets (5%)<br>
-  - 10 tickets (8%)<br>
-  - 8 tickets (4%)<br>
-  - One case (5%)<br>
-  - 100 points (10%)<br>
-  - 500 points (5%)<br>
-  - 1M tokens (3%)<br>
-  - 3M tokens (2%)<br>
-  - 5M tokens (1%)<br>
-  - NFT Red (1%) – Special<br>
-  - NFT Yellow (2%) – Legendary<br>
-  - NFT Green (3%) – Rare<br>
- 
-  - 1000 points (2%)
-</p>
-
+        Prizes and Chances:<br>
+        - 3 tickets (10%)<br>
+        - 5 tickets (5%)<br>
+        - 10 tickets (8%)<br>
+        - 8 tickets (4%)<br>
+        - One case (5%)<br>
+        - 100 points (10%)<br>
+        - 500 points (5%)<br>
+        - 1M tokens (3%)<br>
+        - 3M tokens (2%)<br>
+        - 5M tokens (1%)<br>
+        - NFT Red (1%) – Special<br>
+        - NFT Yellow (2%) – Legendary<br>
+        - NFT Green (3%) – Rare<br>
+        - 1000 points (2%)
+      </p>
       <button class="close-modal" onclick="closeLootBoxInfoModal()">Close</button>
     </div>
   </div>
@@ -404,8 +395,8 @@
   <div class="game-modal-backdrop" id="gameModalBackdrop">
     <div class="game-modal-content">
       <div class="game-canvas">
-         <!-- Оставлен только canvas для TETRIS (game3) -->
-         <canvas id="game3Canvas" width="400" height="740" style="display: none; position: relative; top: -0px;"></canvas>
+        <!-- Оставлен только canvas для TETRIS (game3) -->
+        <canvas id="game3Canvas" width="400" height="740" style="display: none; position: relative; top: -0px;"></canvas>
       </div>
     </div>
   </div>
@@ -432,7 +423,7 @@
   <div class="modal-backdrop" id="miniGamesInfoModal">
     <div class="modal">
       <h2 id="miniGamesInfoTitle">Mini Games Info</h2>
-      <p id="miniGamesInfoDesc">Players participate in mini games for tickets, earning points for their activity. Every 7 days, top 10 players receive BUG PACKS.</p>
+      <p id="miniGamesInfoDesc">Players participate in mini games for tickets, earning points for their activity. Every 7 days, top 10 players receive BUG PACKs.</p>
       <button class="close-modal" onclick="closeMiniGamesInfoModal()">Close</button>
     </div>
   </div>
@@ -455,7 +446,7 @@
     </div>
   </div>
 
-  <!-- Include game scripts and main script -->
+  <!-- Подключение игровых скриптов -->
   <script src="game1.js"></script>
   <script src="game2.js"></script>
   <script src="partnergame1.js"></script>
@@ -501,7 +492,7 @@
       lastSpinTime: 0,
       dataChip: false,
       cyberCase: 0,
-      nfts: [] // добавлено поле для NFT
+      nfts: []
     };
     let gameInProgress = false;
     let isSpinning = false;
@@ -523,7 +514,7 @@
             lastSpinTime: 0,
             dataChip: false,
             cyberCase: 0,
-            nfts: []  // инициализация поля NFT
+            nfts: []
           }).then(() => {
             // Перенаправляем новых пользователей на info.html
             window.location.href = 'info.html';
@@ -551,12 +542,21 @@
     /* ----------------------------------------------
        4. Update Top Bar & Case Count
     ---------------------------------------------- */
+    function formatCoins(coins) {
+      if (coins >= 1000000000) {
+        return (coins / 1000000000).toFixed(1).replace(/\.0$/, '') + 'b';
+      } else if (coins >= 1000000) {
+        return (coins / 1000000).toFixed(1).replace(/\.0$/, '') + 'm';
+      } else if (coins >= 1000) {
+        return (coins / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+      }
+      return coins;
+    }
     function updateTopBar() {
       document.getElementById('ticketCount').textContent = localUserData.tickets || 0;
-      document.getElementById('coinCount').textContent   = localUserData.coins || 0;
+      document.getElementById('coinCount').textContent   = formatCoins(localUserData.coins || 0);
       document.getElementById('pointCount').textContent  = localUserData.points || 0;
     }
-
     function updateCaseCount() {
       document.getElementById('openBtn').textContent = `open (${localUserData.cyberCase})`;
     }
@@ -807,7 +807,6 @@
     /* ----------------------------------------------
        13. Lootbox in Cyber Case Section
     ---------------------------------------------- */
-    // Обновлённый массив призов (итого 10 предметов)
     const lootboxPrizes = [
        { name: '3 tickets', image: 'https://raw.githubusercontent.com/qnexst/404token/main/ticket.png', chance: 10 },
       { name: '5 tickets', image: 'https://raw.githubusercontent.com/qnexst/404token/main/ticket.png', chance: 5 },
@@ -824,8 +823,6 @@
       { name: '8 tickets', image: 'https://raw.githubusercontent.com/qnexst/404token/main/ticket.png', chance: 4 },
       { name: '1000 points', image: 'https://raw.githubusercontent.com/qnexst/404token/main/star.png', chance: 2 },
     ];
-
-    // Helper function для перемешивания массива
     function shuffleArray(array) {
       let arr = array.slice();
       for (let i = arr.length - 1; i > 0; i--) {
@@ -834,7 +831,6 @@
       }
       return arr;
     }
-
     function getWeightedRandomIndex(prizes) {
       let total = 0;
       prizes.forEach(prize => total += prize.chance);
@@ -847,7 +843,6 @@
       }
       return prizes.length - 1;
     }
-
     function parsePrizeAmount(prizeName) {
       if (prizeName.includes("M")) {
         let num = parseFloat(prizeName);
@@ -856,8 +851,6 @@
         return parseInt(prizeName);
       }
     }
-
-    // Обработка приза с учетом NFT
     function addPrizeToUser(prize) {
       if (prize.name.toLowerCase().includes("token")) {
          let amount = parsePrizeAmount(prize.name);
@@ -895,35 +888,24 @@
          updateTopBar();
       }
     }
-
-    // Функция анимации рулетки с рандомным расположением призов
     function spinRoulette() {
       const roulette = document.getElementById('lootboxRoulette');
       roulette.innerHTML = '';
       const prizeWidth = 136;
       const count = lootboxPrizes.length;
       const visibleCenter = roulette.parentElement.offsetWidth / 2;
-
-      // Определяем выигрышный приз по весовой выборке
       const winningIndex = getWeightedRandomIndex(lootboxPrizes);
       const winningPrize = lootboxPrizes[winningIndex];
-
       const fullCycles = 5;
       let rouletteItems = [];
-
-      // Генерируем 5 полных циклов с перемешанными призами
       for (let cycle = 0; cycle < fullCycles; cycle++) {
         let shuffled = shuffleArray(lootboxPrizes);
         rouletteItems = rouletteItems.concat(shuffled);
       }
-
-      // В 6‑м цикле перемешиваем и гарантируем появление выигрышного приза
       let lastCycle = shuffleArray(lootboxPrizes);
       const targetIndex = Math.floor(Math.random() * count);
       lastCycle[targetIndex] = winningPrize;
       rouletteItems = rouletteItems.concat(lastCycle);
-
-      // Заполняем контейнер рулетки
       rouletteItems.forEach(item => {
         const prizeEl = document.createElement('div');
         prizeEl.className = 'lootbox-prize';
@@ -937,13 +919,10 @@
         prizeEl.innerHTML = `<img src="${item.image}" alt="${item.name}"><span>${item.name}</span>`;
         roulette.appendChild(prizeEl);
       });
-
       const finalIndex = fullCycles * count + targetIndex;
       const finalOffset = -(finalIndex * prizeWidth) + visibleCenter - (prizeWidth / 2);
-
       roulette.style.transition = 'transform 10s cubic-bezier(0.25, 0.1, 0.25, 1)';
       roulette.style.transform = `translateX(${finalOffset}px)`;
-
       setTimeout(() => {
         const remainder = finalIndex % count;
         const newOffset = -(remainder * prizeWidth) + visibleCenter - (prizeWidth / 2);
@@ -960,7 +939,6 @@
         caseImage.style.opacity = 1;
       }, 10200);
     }
-
     function spinLootBoxForTokens() {
       if (!currentUser) return;
       if (isSpinning) return;
@@ -972,17 +950,14 @@
       localUserData.coins -= 5000000;
       updateTopBar();
       userRef.update({ coins: localUserData.coins });
-
       const caseImage = document.getElementById('caseImage');
       caseImage.classList.add('explode');
-
       caseImage.addEventListener('animationend', () => {
         document.querySelector('.case-container').style.display = 'none';
         document.getElementById('lootboxContainer').style.display = 'block';
         spinRoulette();
       }, { once: true });
     }
-
     function openLootBox() {
       if (!currentUser) return;
       if (isSpinning) return;
@@ -994,10 +969,8 @@
       localUserData.cyberCase -= 1;
       updateCaseCount();
       userRef.update({ cyberCase: localUserData.cyberCase });
-
       const caseImage = document.getElementById('caseImage');
       caseImage.classList.add('explode');
-
       caseImage.addEventListener('animationend', () => {
         document.querySelector('.case-container').style.display = 'none';
         document.getElementById('lootboxContainer').style.display = 'block';
@@ -1006,7 +979,7 @@
     }
 
     /* ----------------------------------------------
-       Modal windows for Loot Box
+       Modal windows functions
     ---------------------------------------------- */
     function openLootBoxInfoModal() {
       document.getElementById('lootBoxInfoModal').classList.add('active');
@@ -1014,7 +987,6 @@
     function closeLootBoxInfoModal() {
       document.getElementById('lootBoxInfoModal').classList.remove('active');
     }
-
     function openMainOnlineInfoModal() {
       document.getElementById('mainOnlineInfoModal').classList.add('active');
     }
@@ -1037,65 +1009,16 @@
       document.getElementById('depositModal').classList.remove('active');
     }
 
-
-
-    // Добавьте эту функцию в ваш скрипт (например, сразу перед updateTopBar)
-function formatCoins(coins) {
-  if (coins >= 1000000000) {
-    return (coins / 1000000000).toFixed(1).replace(/\.0$/, '') + 'b';
-  } else if (coins >= 1000000) {
-    return (coins / 1000000).toFixed(1).replace(/\.0$/, '') + 'm';
-  } else if (coins >= 1000) {
-    return (coins / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
-  }
-  return coins;
-}
-
-// Измените функцию updateTopBar так, чтобы для coins использовалась функция форматирования:
-function updateTopBar() {
-  document.getElementById('ticketCount').textContent = localUserData.tickets || 0;
-  document.getElementById('coinCount').textContent   = formatCoins(localUserData.coins || 0);
-  document.getElementById('pointCount').textContent  = localUserData.points || 0;
-}
-
-    (function() {
-  // Функция для проверки, является ли устройство мобильным
-  function isMobileDevice() {
-    return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-  }
-
-  // Функция для создания и отображения модального окна
-  function showModal() {
-    // Создаём затемняющий оверлей
-    var overlay = document.createElement('div');
-    overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%;' +
-                              'background: rgba(0, 0, 0, 0.8); display: flex; align-items: center;' +
-                              'justify-content: center; z-index: 9999;';
-    
-    // Создаём контейнер модального окна
-    var modal = document.createElement('div');
-    modal.style.cssText = 'background: #fff; padding: 20px; border-radius: 5px;' +
-                            'text-align: center; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);';
-    modal.innerHTML = '<h2>Доступ запрещён</h2><p>Вход с ПК невозможен.</p>';
-    
-    // Вставляем модальное окно в оверлей и добавляем оверлей на страницу
-    overlay.appendChild(modal);
-    document.body.appendChild(overlay);
-  }
-
-  // Если устройство не мобильное, показываем модальное окно
-  if (!isMobileDevice()) {
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', showModal);
-    } else {
-      showModal();
-    }
-    // Можно дополнительно остановить выполнение скриптов, если это необходимо:
-    // throw new Error("Доступ запрещён");
-  }
-})();
-
+    /* ----------------------------------------------
+       14. Предотвращение нежелательного скроллинга на iOS
+       Для мини-приложения Telegram мы запрещаем стандартное поведение touchmove 
+       вне области с классом "scrollable", чтобы избежать эффекта "отскока" и случайного закрытия приложения.
+    ---------------------------------------------- */
+    document.addEventListener('touchmove', function(event) {
+      if (!event.target.closest('.scrollable')) {
+        event.preventDefault();
+      }
+    }, { passive: false });
   </script>
-
 </body>
 </html>
