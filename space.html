@@ -292,6 +292,7 @@
       </div>
     </div>
   </div>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
   <!-- Модальное окно окончания игры/уведомлений -->
   <div id="end">
@@ -602,14 +603,19 @@
 
     const position = { currentRow: 0, currentTile: 0 };
     const movesQueue = [];
-    let lastMoveTimestamp = 0; // переменная для ограничения ввода
-    const moveCooldown = 500; // задержка 500 мс между командами
 
-    // Функция обработки входных команд с ограничением по частоте
+    function initializePlayer() {
+      player.position.x = 0;
+      player.position.y = 0;
+      player.children[0].position.z = 0;
+      position.currentRow = 0;
+      position.currentTile = 0;
+      movesQueue.length = 0;
+      // Обновляем счётчик поинтов (на старте игры это только сохранённые очки)
+      updatePointsCounter();
+    }
+
     function queueMove(direction) {
-      const now = performance.now();
-      if (now - lastMoveTimestamp < moveCooldown) return;
-      lastMoveTimestamp = now;
       const isValidMove = endsUpInValidPosition(
         { rowIndex: position.currentRow, tileIndex: position.currentTile },
         [...movesQueue, direction]
@@ -1029,16 +1035,6 @@
     }
 
     window.startThreeGame = startThreeGame;
-    
-    function initializePlayer() {
-      player.position.x = 0;
-      player.position.y = 0;
-      player.children[0].position.z = 0;
-      position.currentRow = 0;
-      position.currentTile = 0;
-      movesQueue.length = 0;
-      updatePointsCounter();
-    }
   </script>
 
   <!-- Скрипт для обработки старта игры, звуков и скрытия меню -->
