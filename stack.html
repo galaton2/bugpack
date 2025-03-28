@@ -1,359 +1,194 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <!-- For mobile devices -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pac-Man with Menu</title>
-  
+  <!-- Для мобильных устройств -->
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+  <title>Floppy Bird 8-bit Retro</title>
+
   <!-- Font: Press Start 2P -->
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  
+
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-  
-  <!-- Telegram Web App API -->
+
+  <!-- Telegram Web App API (если требуется) -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  
+
   <style>
-    /* ------------------ Global & Menu Styles ------------------ */
+    /* Базовые стили, фон в стиле "8-bit" */
     html, body {
       margin: 0;
       padding: 0;
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background: black;
+      background: #000 url('https://raw.githubusercontent.com/qnexst/404token/main/8bit_bg.png') repeat;
       font-family: 'Press Start 2P', monospace;
-      -webkit-touch-callout: none;
-      -webkit-user-select: none;
-      user-select: none;
+      color: #fff;
     }
-    /* Header with user info */
+    /* Общие вспомогательные классы */
+    .pixel-border {
+      border: 4px solid #0ff;
+      box-sizing: border-box;
+    }
+    .pixel-button {
+      font-size: 12px;
+      padding: 10px 20px;
+      background: #0ff;
+      color: #000;
+      cursor: pointer;
+      border: none;
+      outline: none;
+      font-family: 'Press Start 2P', monospace;
+    }
+    .pixel-button:active {
+      filter: brightness(0.8);
+    }
+    /* Шапка (header) */
     #header {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 50px;
-      background: #6d4fba;
+      background: #6600cc;
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 1000;
+      border-bottom: 4px solid #0ff;
     }
     #info {
       display: flex;
       gap: 20px;
-      font-size: 10px;
+      font-size: 12px;
       color: #fff;
       align-items: center;
     }
-    #info span { white-space: nowrap; }
+    #info span {
+      white-space: nowrap;
+    }
     .balance {
       display: flex;
       align-items: center;
       gap: 4px;
     }
-    .balance img { width: 16px; height: 16px; }
-    /* Back button */
+    .balance img {
+      width: 16px;
+      height: 16px;
+    }
+    /* Кнопка Back */
     #backContainer {
       position: absolute;
-      top: 50px;
+      top: 60px;
       left: 10px;
       z-index: 1000;
     }
     #backBtn {
       font-size: 10px;
-      padding: 5px 10px;
-      background: #06B6D1;
-      color: #262626;
-      border: none;
-      border-radius: 4px;
+      padding: 6px 12px;
+      background: #f0f;
+      color: #000;
       cursor: pointer;
-      box-shadow: 0 3px #6b6b6b;
+      font-family: 'Press Start 2P', monospace;
+      border: 4px solid #ff0;
     }
-    /* Wrapper for game (menu + game) */
-    /* Before game start – menu with dark blue background */
-    #gameWrapper.menu {
-      background: #00103c;
+    #backBtn:active {
+      filter: brightness(0.8);
     }
-    /* During game – background becomes pure black */
-    #gameWrapper.game {
-      background: black;
-    }
+    /* Обёртка для всей игры */
     #gameWrapper {
       position: relative;
       width: 100%;
       height: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
     }
-    /* Start button in menu */
+    /* Кнопка Start (видна до начала игры) */
     #startBtn {
       position: absolute;
       z-index: 10;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 12px;
-      padding: 10px 20px;
-      background: #06B6D1;
-      color: #262626;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      box-shadow: 0 3px #6b6b6b;
     }
-    
-    /* ------------------ Modal Windows ------------------ */
+    /* Таймер-бар (уменьшенный) */
+    #timerBar {
+      position: absolute;
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      height: 10px;
+      background: #444;
+      display: none;
+      border: 2px solid #0ff;
+      box-sizing: border-box;
+      z-index: 1000;
+    }
+    #timerFill {
+      height: 100%;
+      width: 100%;
+      background: #0ff;
+    }
+    /* Стили для канваса Floppy Bird */
+    #gameCanvas {
+      display: none;
+      margin: 0 auto;
+    }
+    /* Модальное окно (ошибки, game over) */
     .modal-backdrop {
-      position: fixed;
+      position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.8);
+      background: rgba(0,0,0,0.8);
       display: none;
-      justify-content: center;
       align-items: center;
-      z-index: 2000;
+      justify-content: center;
+      z-index: 9999;
     }
     .modal-backdrop.active {
       display: flex;
     }
     .modal {
-      background: #000;
-      border: 2px solid #fff;
-      border-radius: 8px;
+      background: #222;
       padding: 20px;
+      width: 80%;
       max-width: 400px;
       text-align: center;
       color: #fff;
+      font-size: 14px;
+      position: relative;
+      box-shadow: 0 0 10px #0ff;
+    }
+    .modal h2 {
+      color: #0ff;
+      margin-bottom: 10px;
+    }
+    .modal p {
+      margin: 10px 0;
     }
     .modal button {
       margin-top: 10px;
       font-size: 12px;
       padding: 6px 12px;
-      background: #06B6D1;
-      color: #262626;
+      background: #0ff;
+      color: #000;
       border: none;
-      border-radius: 4px;
       cursor: pointer;
-      box-shadow: 0 3px #6b6b6b;
+      font-family: 'Press Start 2P', monospace;
     }
-    
-    /* ------------------ Pac-Man Game Styles ------------------ */
-    :root {
-      --yellow-sprite-x: ;
-      --yellow-sprite-y: ;
-      --red-sprite-x: ;
-      --red-sprite-y: ;
-      --pink-sprite-x: ;
-      --pink-sprite-y: ;
-      --blue-sprite-x: ;
-      --blue-sprite-y: ;
-      --orange-sprite-x: ;
-      --orange-sprite-y: ;
-      --yellow-animation-length: 190ms;
-      --red-animation-length: 200ms;
-      --pink-animation-length: 200ms;
-      --blue-animation-length: 200ms;
-      --orange-animation-length: 200ms;
+    .modal button:active {
+      filter: brightness(0.8);
     }
-    html { font-size: 0.625em; }
-    @media (max-width: 600px), (max-height: 700px) {
-      html { font-size: 0.3125em; }
-    }
-    
-    /* Game container – hidden until start; scaled up */
-    #game { 
-      flex-direction: column; 
-      display: none;
-      transform: scale(1.3);
-      transform-origin: center center;
-    }
-    
-    /* Game internal info */
-    #game #info {
-      box-sizing: border-box;
-      width: 100%;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1em 2em;
-    }
-    #score {
-      color: white;
-      margin: 0;
-      font-size: 2rem;
-    }
-    /* Only 2 lives are shown */
-    .live {
-      width: 3.2rem;
-      height: 2.6rem;
-      background-image: url("https://dominikgorczyca.github.io/Pac-Man/sprites.png");
-      background-position: -26rem -3.2rem;
-    }
-    /* Remove one "live" indicator in HTML markup below */
-    
-    /* Game board – centered with black background */
-    #game-board {
-      position: relative;
-      overflow: hidden;
-      box-sizing: border-box;
-      width: 56rem;
-      height: 62rem;
-      margin: auto;
-      background-color: black;
-      display: grid;
-      grid-template-columns: repeat(28, 2rem);
-    }
-    #game-board > * {
-      position: relative;
-      box-sizing: border-box;
-      width: 2rem;
-      height: 2rem;
-    }
-    
-    /* Remove any extra text ("Click Anywhere to play") */
-    
-    /* Game objects */
-    .wall {
-      background-image: url("https://dominikgorczyca.github.io/Pac-Man/map.png");
-      z-index: 1;
-    }
-    @media (max-width: 600px), (max-height: 700px) {
-      .wall { background-image: url("https://dominikgorczyca.github.io/Pac-Man/small_map.png"); }
-    }
-    .blank { background-color: black; }
-    .wall > * {
-      box-sizing: border-box;
-      background-color: black;
-      display: block;
-      position: relative;
-      width: 1.5rem;
-      height: 1.5rem;
-      border: .2rem solid #161693;
-      border-radius: 80%;
-      z-index: 1;
-    }
-    .point,
-    .big-point {
-      box-sizing: border-box;
-      width: 2rem;
-      height: 2rem;
-      background-color: #ffb897;
-      border-radius: 0;
-      z-index: 10;
-    }
-    .point { border: .8rem solid black; }
-    .big-point {
-      border: .4rem solid black;
-      border-radius: 45%;
-      background-color: #ffb897;
-    }
-    .gate {
-      background-color: #ffb897;
-      border-top: .7rem solid black;
-      border-bottom: .7rem solid black;
-    }
-    .yellow,
-    .red,
-    .pink,
-    .blue,
-    .orange,
-    .points::after {
-      image-rendering: pixelated;
-      position: absolute;
-      top: -0.4rem;
-      left: -0.55rem;
-      width: 3rem;
-      height: 2.8rem;
-    }
-    .points::after {
-      background-image: url("https://dominikgorczyca.github.io/Pac-Man/sprites.png");
-      background-position: var(--yellow-sprite-x) var(--yellow-sprite-y);
-    }
-    .yellow-visible,
-    .red-visible,
-    .pink-visible,
-    .blue-visible,
-    .orange-visible {
-      background-image: url("https://dominikgorczyca.github.io/Pac-Man/sprites.png");
-      z-index: 101;
-      will-change: transform, background-position;
-    }
-    @media (max-width: 600px), (max-height: 700px) {
-      .points::after,
-      .yellow-visible,
-      .red-visible,
-      .pink-visible,
-      .blue-visible,
-      .orange-visible {
-        background-image: url("https://dominikgorczyca.github.io/Pac-Man/sprites_small.png");
-      }
-    }
-    .yellow-visible {
-      background-position: var(--yellow-sprite-x) var(--yellow-sprite-y);
-      transition: transform var(--yellow-animation-length) linear;
-      z-index: 100;
-    }
-    .red-visible {
-      background-position: var(--red-sprite-x) var(--red-sprite-y);
-      transition: transform var(--red-animation-length) linear;
-      z-index: 104;
-    }
-    .pink-visible {
-      background-position: var(--pink-sprite-x) var(--pink-sprite-y);
-      transition: transform var(--pink-animation-length) linear;
-      z-index: 103;
-    }
-    .blue-visible {
-      background-position: var(--blue-sprite-x) var(--blue-sprite-y);
-      transition: transform var(--blue-animation-length) linear;
-      z-index: 102;
-    }
-    .orange-visible {
-      background-position: var(--orange-sprite-x) var(--orange-sprite-y);
-      transition: transform var(--orange-animation-length) linear;
-    }
-    
-    /* Pac-Man mouth animation */
-    .yellow-animation-move {
-      animation: var(--yellow-animation-length) forwards steps(1, end) yellow;
-    }
-    @keyframes yellow {
-      0%, 70%, 100% { background-position: -3.2rem var(--yellow-sprite-y); }
-      30% { background-position: 0rem var(--yellow-sprite-y); }
-      80% { background-position: -6.4rem 0rem; }
-    }
-    /* Additional keyframes can be added as needed */
   </style>
 </head>
 <body>
-  <!-- Modal for Game Over -->
-  <div id="endModal" class="modal-backdrop">
-    <div class="modal">
-      <h2 id="endTitle">Game Over!</h2>
-      <p id="endMessage">Your final score is: 0</p>
-      <button id="endBtn" onclick="redirectToIndex()">OK</button>
-    </div>
-  </div>
-  
-  <!-- Modal for Error (not enough tickets) -->
-  <div id="errorModal" class="modal-backdrop">
-    <div class="modal">
-      <h2 id="errorTitle">Error</h2>
-      <p id="errorMessage">Not enough tickets!</p>
-      <button id="errorBtn" onclick="closeErrorModal()">Back</button>
-    </div>
-  </div>
-  
-  <!-- Header with user info -->
-  <div id="header">
+  <!-- Header с информацией -->
+  <div id="header" class="pixel-border">
     <div id="info">
       <span id="username">@User</span>
       <div class="balance">
@@ -366,1060 +201,330 @@
       </div>
     </div>
   </div>
-  
-  <!-- Back button -->
+
+  <!-- Кнопка Back -->
   <div id="backContainer">
     <button id="backBtn" onclick="goBack()">Back</button>
   </div>
-  
-  <!-- Wrapper for game (menu + game) -->
-  <!-- Initially with class "menu" (dark blue background) -->
-  <div id="gameWrapper" class="menu">
-    <!-- Start button in menu -->
-    <button id="startBtn" onclick="startPacmanGame()">Start (1 Ticket)</button>
+
+  <!-- Обёртка для игры -->
+  <div id="gameWrapper">
+    <!-- Кнопка Start -->
+    <button id="startBtn" class="pixel-button" onclick="startFlappyBird()">
+      START (1 Ticket)
+    </button>
     
-    <!-- Pac-Man Game Markup -->
-    <div id="game">
-      <div id="info">
-        <h3 id="score">Score 0</h3>
-        <!-- Only 2 lives -->
-        <div id="lives">
-          <div class="live"></div>
-          <div class="live"></div>
-        </div>
+    <!-- Таймер-бар -->
+    <div id="timerBar">
+      <div id="timerFill"></div>
+    </div>
+    
+    <!-- Канвас для Floppy Bird -->
+    <canvas id="gameCanvas" width="431" height="768"></canvas>
+    
+    <!-- Модальное окно окончания игры -->
+    <div id="endModal" class="modal-backdrop">
+      <div class="modal pixel-border">
+        <h2 id="endTitle">Game Over!</h2>
+        <p id="endMessage"></p>
+        <button onclick="window.location.reload()">CONTINUE</button>
       </div>
-      <div id="game-board">
-        <p id="start">Ready!</p>
+    </div>
+    
+    <!-- Модальное окно для ошибок -->
+    <div id="errorModal" class="modal-backdrop">
+      <div class="modal pixel-border">
+        <h2 id="errorCodeTitle">Error</h2>
+        <p id="errorMessage"></p>
+        <button onclick="closeErrorModal()">OK</button>
       </div>
     </div>
   </div>
-  
+
   <script>
-    // Block default touchmove to prevent native swipe actions (e.g. closing window)
-    document.addEventListener("touchmove", function(e) {
-      e.preventDefault();
-    }, { passive: false });
-    
-    /* ------------------ Firebase & Telegram Initialization ------------------ */
-  const firebaseConfig = {
-  apiKey: "AIzaSyApxp0dHh0TK4nZVfOqloJ92dekjvjey3I",
-  authDomain: "meta-glitch.firebaseapp.com",
-  projectId: "meta-glitch",
-  storageBucket: "meta-glitch.firebasestorage.app",
-  messagingSenderId: "186162879710",
-  appId: "1:186162879710:web:87975bd09681505be7364f",
-  measurementId: "G-1TXVH8MESD"
-};
+    /* ------------------------------------------------
+       1. Инициализация Firebase и Telegram
+    ------------------------------------------------ */
+    const firebaseConfig = {
+      apiKey: "AIzaSyApxp0dHh0TK4nZVfOqloJ92dekjvjey3I",
+      authDomain: "meta-glitch.firebaseapp.com",
+      projectId: "meta-glitch",
+      storageBucket: "meta-glitch.firebasestorage.app",
+      messagingSenderId: "186162879710",
+      appId: "1:186162879710:web:87975bd09681505be7364f",
+      measurementId: "G-1TXVH8MESD"
+    };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-  
+
     let tg = null;
-    if(window.Telegram && window.Telegram.WebApp) {
+    if (window.Telegram && window.Telegram.WebApp) {
       tg = window.Telegram.WebApp;
       tg.expand();
     }
-  
+
     let currentUser = null;
     let userRef = null;
-    let localUserData = { tickets: 0, points: 0 };
-  
-    if(tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+    let localUserData = {
+      tickets: 0,
+      points: 0
+    };
+
+    if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
       currentUser = tg.initDataUnsafe.user;
       document.getElementById('username').textContent = '@' + currentUser.username;
       userRef = db.ref('users/' + currentUser.username);
-      userRef.once('value').then(snapshot => {
-        if(!snapshot.exists()){
-          userRef.set({ tickets: 5, points: 0 });
-        }
-      });
-      userRef.on('value', snapshot => {
-        const data = snapshot.val() || {};
-        localUserData.tickets = data.tickets || 0;
-        localUserData.points  = data.points  || 0;
-        updateHeader();
-      });
     } else {
       currentUser = { username: 'TestUser' };
       document.getElementById('username').textContent = '@TestUser';
       userRef = db.ref('users/TestUser');
-      userRef.once('value').then(snapshot => {
-        if(!snapshot.exists()){
-          userRef.set({ tickets: 5, points: 0 });
-        }
-      });
-      userRef.on('value', snapshot => {
-        const data = snapshot.val() || {};
-        localUserData.tickets = data.tickets || 0;
-        localUserData.points  = data.points  || 0;
-        updateHeader();
-      });
     }
-  
+
+    userRef.once('value').then(snapshot => {
+      if (!snapshot.exists()) {
+        userRef.set({
+          tickets: 5,
+          points: 0
+        });
+      }
+    }).catch(err => {
+      showErrorModal(404, "Firebase недоступен: " + err.message);
+    });
+
+    userRef.on('value', snapshot => {
+      const data = snapshot.val() || {};
+      localUserData.tickets = data.tickets || 0;
+      localUserData.points  = data.points  || 0;
+      updateHeader();
+    }, (error) => {
+      showErrorModal(404, "Ошибка чтения из БД: " + error.message);
+    });
+
     function updateHeader() {
       document.getElementById('ticketCount').textContent = localUserData.tickets;
       document.getElementById('pointCount').textContent = localUserData.points;
     }
-  
+
     function goBack() {
       window.location.href = 'index.html';
     }
-  
-    /* ------------------ Modal Functions ------------------ */
-    function showErrorModal(message) {
+
+    function showErrorModal(code, message) {
+      document.getElementById('errorCodeTitle').textContent = "Error " + code;
       document.getElementById('errorMessage').textContent = message;
       document.getElementById('errorModal').classList.add('active');
     }
     function closeErrorModal() {
       document.getElementById('errorModal').classList.remove('active');
     }
-  
-    function showEndModal() {
-      document.getElementById('endMessage').textContent = "Your final score is: " + score;
-      document.getElementById('endModal').classList.add('active');
-    }
-    function redirectToIndex() {
-      window.location.href = "index.html";
-    }
-  
-    /* ------------------ Pac-Man Game Code ------------------ */
-    const game = document.getElementById("game");
-    const gameBoard = document.getElementById("game-board");
-    const start = document.getElementById("start");
-    const scoreElement = document.getElementById("score");
-    const lives = document.getElementById("lives");
-    const root = document.documentElement.style;
-  
-    let soundtrack = document.createElement("audio");
-    soundtrack.loop = true;
-    soundtrack.volume = 0.7;
-    let sound = document.createElement("audio");
-    sound.volume = 0.5;
-  
-    const startingPositions = [658, 322, 406, 404, 408];
-    const positionChange = {
-      "ArrowRight": 1,
-      "ArrowLeft": -1,
-      "ArrowUp": -28,
-      "ArrowDown": 28,
-    };
-    const oppositeDirection = {
-      "ArrowUp": "ArrowDown",
-      "ArrowDown": "ArrowUp",
-      "ArrowRight": "ArrowLeft",
-      "ArrowLeft": "ArrowRight",
-    };
-    const yellowSprite = {
-      "ArrowRight": 0,
-      "ArrowLeft": 3.2,
-      "ArrowUp": 6.4,
-      "ArrowDown": 9.6,
-    };
-    const ghostSprite = {
-      "ArrowRight": 0,
-      "ArrowLeft": 6.4,
-      "ArrowUp": 12.8,
-      "ArrowDown": 19.2,
-    };
-    const eatenSprite = {
-      "ArrowRight": 25.6,
-      "ArrowLeft": 28.8,
-      "ArrowUp": 32,
-      "ArrowDown": 35.2,
-    };
-    const characters = [{
-      name: "yellow",
-      direction: "ArrowLeft",
-      directionNew: undefined,
-      position: 658,
-      nextPosition: undefined,
-      mode: "normal",
-      status: "normal",
-      characterNode: undefined,
-      animationLength: undefined,
-      animationStart: undefined,
-    },
-    {
-      name: "red",
-      direction: "ArrowLeft",
-      directionOld: undefined,
-      directionList: ["ArrowUp", "ArrowUp", "ArrowUp"],
-      position: 38,
-      nextPosition: undefined,
-      scatterTarget: 27,
-      mode: "normal",
-      status: "normal",
-      characterNode: undefined,
-      animationLength: undefined,
-      animationStart: undefined,
-    },
-    {
-      name: "pink",
-      direction: "ArrowDown",
-      directionOld: undefined,
-      directionList: ["ArrowDown", "ArrowUp", "ArrowUp", "ArrowUp", "ArrowUp"],
-      position: 406,
-      nextPosition: undefined,
-      scatterTarget: 0,
-      mode: "normal",
-      status: "normal",
-      characterNode: undefined,
-      animationLength: undefined,
-      animationStart: undefined,
-    },
-    {
-      name: "blue",
-      direction: "ArrowUp",
-      directionOld: undefined,
-      directionList: ["ArrowUp", "ArrowDown", "ArrowDown", "ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowUp", "ArrowRight", "ArrowRight", "ArrowUp", "ArrowUp", "ArrowUp"],
-      position: 404,
-      nextPosition: undefined,
-      scatterTarget: 867,
-      mode: "normal",
-      status: "normal",
-      characterNode: undefined,
-      animationLength: undefined,
-      animationStart: undefined,
-    },
-    {
-      name: "orange",
-      direction: "ArrowUp",
-      directionOld: undefined,
-      directionList: ["ArrowUp", "ArrowDown", "ArrowDown", "ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowUp", "ArrowLeft", "ArrowLeft", "ArrowUp", "ArrowUp", "ArrowUp"],
-      position: 408,
-      nextPosition: undefined,
-      scatterTarget: 840,
-      mode: "normal",
-      status: "normal",
-      characterNode: undefined,
-      animationLength: undefined,
-      animationStart: undefined,
-    },
-    ];
-    let elements;
-    let points = 0;
-    let collisionInterval;
-    let ghostMode;
-    let ghostModeInterval;
-    let changingBackInterval;
-    let isFrightenedWhite = false;
-    let ghostsEaten = 0;
-    let newLevel = true;
-    let score = 0;
-    let livesLost = 0; // With 2 lives, gameOver when livesLost == 2
-    let gameStartLength = 4200;
-    let whichMunch = 1;
-  
-    /* ------------------ Start Game Function ------------------ */
-    function startPacmanGame() {
-      if(localUserData.tickets < 1){
-        showErrorModal("Not enough tickets!");
+
+    /* ------------------------------------------------
+       2. Игра Floppy Bird с таймером, счётчиком и стартовой паузой
+    ------------------------------------------------ */
+    function startFlappyBird() {
+      // Проверка наличия билетов
+      if (localUserData.tickets < 1) {
+        showErrorModal(402, "Недостаточно билетов!");
         return;
       }
+      // Списываем билет
       localUserData.tickets--;
-      if(userRef) userRef.update({ tickets: localUserData.tickets });
+      if (userRef) {
+        userRef.update({ tickets: localUserData.tickets });
+      }
       updateHeader();
-      // Change wrapper class so that during game background is black
-      document.getElementById("gameWrapper").className = "game";
-      document.getElementById("startBtn").style.display = "none";
-      document.getElementById("header").style.display = "none";
-      document.getElementById("backContainer").style.display = "none";
-      game.style.display = "block";
-      startLevel();
-    }
-  
-    soundtrack.addEventListener('timeupdate', () => {
-      let buffer = 0.3;
-      if(soundtrack.currentTime > soundtrack.duration - buffer){
-        soundtrack.currentTime = 0; 
-        soundtrack.play();
+
+      // Скрываем элементы интерфейса
+      document.getElementById('header').style.display = 'none';
+      document.getElementById('backContainer').style.display = 'none';
+      document.getElementById('startBtn').style.display = 'none';
+
+      // Показываем канвас и таймер-бар
+      const canvas = document.getElementById('gameCanvas');
+      canvas.style.display = 'block';
+      const ctx = canvas.getContext('2d');
+
+      const img = new Image();
+      img.src = "https://i.ibb.co/Q9yv5Jk/flappy-bird-set.png";
+
+      let gamePlaying = false;
+      let gameStarted = false;
+      let gameEnded = false;
+      let timerInterval = null;
+      // Новые параметры:
+      const gravity = 0.3;
+      const speed = 2.5;
+      const size = [51, 36];
+      const jump = -8;
+      const cTenth = canvas.width / 10;
+
+      let index = 0,
+          currentScore = 0,
+          flight,
+          flyHeight,
+          pipes = [];
+
+      const pipeWidth = 78;
+      const pipeGap = 270;
+      const pipeLoc = () => (Math.random() * ((canvas.height - (pipeGap + pipeWidth)) - pipeWidth)) + pipeWidth;
+
+      // Изначальная установка
+      function setup() {
+        currentScore = 0;
+        flight = jump;
+        flyHeight = (canvas.height / 2) - (size[1] / 2);
+        // Создаём 3 трубы
+        pipes = Array(3).fill().map((_, i) => [canvas.width + (i * (pipeGap + pipeWidth)), pipeLoc()]);
       }
-    });
-  
-    function startLevel() {
-      if (newLevel === true) {
-        gameStartLength = 4200;
-        sound.src = "https://dominikgorczyca.github.io/Pac-Man/audio/game_start.wav";
-        makeLevel();
-        sound.play();
+      setup();
+
+      // Функция запуска таймера (2 минуты)
+      function startTimer() {
+        const totalTime = 120; // 120 секунд
+        let timeLeft = totalTime;
+        document.getElementById('timerBar').style.display = 'block';
+        timerInterval = setInterval(() => {
+          timeLeft--;
+          document.getElementById('timerFill').style.width = (timeLeft / totalTime * 100) + '%';
+          if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            endGameDueToTime();
+          }
+        }, 1000);
       }
-      setStartingProperties();
-      setTimeout(() => {
-        soundtrack.src = "https://dominikgorczyca.github.io/Pac-Man/audio/siren1.wav";
-        soundtrack.play();
-        lives.children[livesLost].style.visibility = "hidden";
-        livesLost++;
-        characterMove(0);
-        characterMove(1);
-        ghostRevive(2, 0);
-        ghostRevive(3, 0);
-        ghostRevive(4, 0);
-  
-        collisionInterval = setInterval(checkCollisions, 10);
-        ghostModeInterval = setTimeout(changeModes, 5000);
-      }, gameStartLength);
-    }
-  
-    function makeLevel() {
-      const gameClass = {
-        0: "blank",
-        1: "left-right wall",
-        2: "top-bottom wall",
-        3: "top-right wall",
-        4: "top-left wall",
-        5: "bottom-right wall",
-        6: "bottom-left wall",
-        7: "top wall",
-        8: "bottom wall",
-        9: "right wall",
-        10: "left wall",
-        11: "gate wall",
-        12: "wall-empty" 
-      };
-  
-      const gameArray = [0, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 18, 19, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1,
-        9, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 11, 13, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 9,
-        9, 126, 4, 10, 10, 5, 126, 4, 10, 10, 10, 5, 126, 11, 13, 126, 4, 10, 10, 10, 5, 126, 4, 10, 10, 5, 126, 9,
-        9, 262, 11, 25, 25, 13, 126, 11, 25, 25, 25, 13, 126, 11, 13, 126, 11, 25, 25, 25, 13, 126, 11, 25, 25, 13, 262, 9,
-        9, 126, 6, 12, 12, 7, 126, 6, 12, 12, 12, 7, 126, 6, 7, 126, 6, 12, 12, 12, 7, 126, 6, 12, 12, 7, 126, 9,
-        9, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 9,
-        9, 126, 4, 10, 10, 5, 126, 4, 5, 126, 4, 10, 10, 10, 10, 10, 10, 5, 126, 4, 5, 126, 4, 10, 10, 5, 126, 9,
-        9, 126, 6, 12, 12, 7, 126, 11, 13, 126, 6, 12, 12, 15, 14, 12, 12, 7, 126, 11, 13, 126, 6, 12, 12, 7, 126, 9,
-        9, 126, 126, 126, 126, 126, 126, 11, 13, 126, 126, 126, 126, 11, 13, 126, 126, 126, 126, 11, 13, 126, 126, 126, 126, 126, 126, 9,
-        2, 8, 8, 8, 8, 1, 126, 11, 16, 10, 10, 5, 26, 11, 13, 26, 4, 10, 10, 17, 13, 126, 0, 8, 8, 8, 8, 3,
-        25, 25, 25, 25, 25, 9, 126, 11, 14, 12, 12, 7, 26, 6, 7, 26, 6, 12, 12, 15, 13, 126, 9, 25, 25, 25, 25, 25,
-        25, 25, 25, 25, 25, 9, 126, 11, 13, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 11, 13, 126, 9, 25, 25, 25, 25, 25,
-        25, 25, 25, 25, 25, 9, 126, 11, 13, 26, 0, 8, 8, 24, 24, 8, 8, 1, 26, 11, 13, 126, 9, 25, 25, 25, 25, 25,
-        8, 8, 8, 8, 8, 3, 126, 6, 7, 26, 9, 26, 25, 25, 25, 25, 25, 9, 26, 6, 7, 126, 2, 8, 8, 8, 8, 8,
-        26, 26, 26, 26, 26, 26, 126, 26, 26, 26, 9, 26, 26, 26, 26, 26, 26, 9, 26, 26, 26, 126, 26, 26, 26, 26, 26, 26,
-        8, 8, 8, 8, 8, 1, 126, 4, 5, 26, 9, 25, 25, 25, 25, 25, 25, 9, 26, 4, 5, 126, 0, 8, 8, 8, 8, 8,
-        25, 25, 25, 25, 25, 9, 126, 11, 13, 26, 2, 8, 8, 8, 8, 8, 8, 3, 26, 11, 13, 126, 9, 25, 25, 25, 25, 25,
-        25, 25, 25, 25, 25, 9, 126, 11, 13, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 11, 13, 126, 9, 25, 25, 25, 25, 25,
-        25, 25, 25, 25, 25, 9, 126, 11, 13, 26, 4, 10, 10, 10, 10, 10, 10, 5, 26, 11, 13, 126, 9, 25, 25, 25, 25, 25,
-        0, 8, 8, 8, 8, 3, 126, 6, 7, 26, 6, 12, 12, 15, 14, 12, 12, 7, 26, 6, 7, 126, 2, 8, 8, 8, 8, 1,
-        9, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 11, 13, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 9,
-        9, 126, 4, 10, 10, 5, 126, 4, 10, 10, 10, 5, 126, 11, 13, 126, 4, 10, 10, 10, 5, 126, 4, 10, 10, 5, 126, 9,
-        9, 126, 6, 12, 15, 13, 126, 6, 12, 12, 12, 7, 126, 6, 7, 126, 6, 12, 12, 12, 7, 126, 11, 14, 12, 7, 126, 9,
-        9, 262, 126, 126, 11, 13, 126, 126, 126, 126, 126, 126, 126, 26, 26, 126, 126, 126, 126, 126, 126, 126, 11, 13, 126, 126, 262, 9,
-        20, 10, 5, 126, 11, 13, 126, 4, 5, 126, 4, 10, 10, 10, 10, 10, 10, 5, 126, 4, 5, 126, 11, 13, 126, 4, 10, 22,
-        21, 12, 7, 126, 6, 7, 126, 11, 13, 126, 6, 12, 12, 15, 14, 12, 12, 7, 126, 11, 13, 126, 6, 7, 126, 6, 12, 23,
-        9, 126, 126, 126, 126, 126, 126, 11, 13, 126, 126, 126, 126, 11, 13, 126, 126, 126, 126, 11, 13, 126, 126, 126, 126, 126, 126, 9,
-        9, 126, 4, 10, 10, 10, 10, 17, 16, 10, 10, 5, 126, 11, 13, 126, 4, 10, 10, 17, 16, 10, 10, 10, 10, 5, 126, 9,
-        9, 126, 6, 12, 12, 12, 12, 12, 12, 12, 12, 7, 126, 6, 7, 126, 6, 12, 12, 12, 12, 12, 12, 12, 12, 7, 126, 9,
-        9, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 126, 9,
-        2, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 3
-      ];
-  
-      for (let i = 0; i < gameArray.length; i++) {
-        const element = document.createElement("DIV");
-  
-        if (gameArray[i] > 25) {
-          element.className = "blank";
-          for (let j = 0; j < characters.length; j++) {
-            let character = document.createElement("DIV");
-            character.className = characters[j].name;
-            element.append(character);
-          }
-          if(gameArray[i] / 100 > 1) {
-            let character = document.createElement("DIV");
-            character.className = Math.floor(gameArray[i] / 100) == 1 ? "point" : "big-point";
-            element.append(character);
-          }
+
+      function endGameDueToTime() {
+        if (!gameEnded) {
+          gameEnded = true;
+          gamePlaying = false;
+          clearInterval(timerInterval);
+          document.getElementById('endModal').classList.add('active');
+          document.getElementById('endMessage').textContent = "Time's up! Your score: " + currentScore;
+          savePoints(currentScore);
+        }
+      }
+
+      function savePoints(score) {
+        localUserData.points += score;
+        if (userRef) {
+          userRef.update({ points: localUserData.points });
+        }
+        updateHeader();
+      }
+
+      // Основной цикл отрисовки
+      function render() {
+        if (gameEnded) return;
+        index++;
+
+        // Рисуем фон (анимация фона будет работать только после старта игры)
+        if (gameStarted) {
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height,
+                        -((index * (speed / 2)) % canvas.width) + canvas.width, 0,
+                        canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height,
+                        -(index * (speed / 2)) % canvas.width, 0,
+                        canvas.width, canvas.height);
         } else {
-          element.className = "wall";
-          element.style.backgroundPosition = `-${gameArray[i] * 2}rem 0`;
+          // Если игра не начата, фон статичен
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         }
-  
-        gameBoard.append(element);
-      }
-  
-      points = 0;
-      elements = Array.from(gameBoard.children).splice(1);
-      transformStartingElements();
-    }
-  
-    function setStartingProperties() {
-      newLevel = undefined;
-      window.removeEventListener("keydown", getDirection);
-      document.removeEventListener("touchstart", handleTouchStart);
-      document.removeEventListener("touchmove", handleTouchMove);
-  
-      clearTimeout(ghostModeInterval);
-      game.style.visibility = "visible";
-      start.style.display = "block";
-      ghostMode = "scatter";
-      ghostsEaten = 0;
-      scoreElement.innerHTML = "Score " + score;
-  
-      for (let i = 0; i < characters.length; i++) {
-        characters[i].position = startingPositions[i];
-        characters[i].direction = i < 2 ? "ArrowLeft" : characters[i].directionList[0];
-        characters[i].characterNode = elements[characters[i].position].children[i];
-        characters[i].characterNode.classList.add(`${characters[i].name}-visible`);
-        characters[i].mode = "normal";
-        characters[i].status = "normal";
-  
-        if (i == 0) {
-          root.setProperty(`--${characters[i].name}-sprite-x`, "-6.4rem");
-          root.setProperty(`--${characters[i].name}-sprite-y`, "0rem");
-          characters[i].directionNew = undefined;
-        } else {
-          getSprite(i);
-        }
-      }
-  
-      setTimeout(() => {
-        window.addEventListener("keydown", getDirection);
-        document.addEventListener('touchstart', handleTouchStart);        
-        document.addEventListener('touchmove', handleTouchMove);
-  
-        for (let i = 2; i < 5; i++) {
-          characters[i].animationLength = 200;
-          characters[i].characterNode.classList.add(`${characters[i].name}-revive`);
-        }
-        start.style.display = "none";
-  
-        getSprite(0);
-      }, gameStartLength);
-    }
-  
-    function transformStartingElements() {
-      for (let i = 0; i < 5; i++) {
-        if (i == 1) {
-          for (let j = 1; j < 5; j++) {
-            elements[startingPositions[i]].children[j].style.transform = "translateX(-1rem)";
+
+        // Если игра запущена, обновляем трубы и проверяем столкновения
+        if (gameStarted) {
+          let collisionDetected = false;
+          for (let i = 0; i < pipes.length; i++) {
+            pipes[i][0] -= speed;
+            // Рисуем верхнюю трубу
+            ctx.drawImage(img, 432, 588 - pipes[i][1], pipeWidth, pipes[i][1],
+                          pipes[i][0], 0, pipeWidth, pipes[i][1]);
+            // Рисуем нижнюю трубу
+            ctx.drawImage(img, 432 + pipeWidth, 108, pipeWidth, canvas.height - pipes[i][1] + pipeGap,
+                          pipes[i][0], pipes[i][1] + pipeGap, pipeWidth, canvas.height - pipes[i][1] + pipeGap);
+
+            // Если труба ушла за экран, удаляем её и добавляем новую
+            if (pipes[i][0] <= -pipeWidth) {
+              currentScore++;
+              pipes.shift();
+              let lastPipeX = pipes.length ? pipes[pipes.length - 1][0] : canvas.width;
+              pipes.push([lastPipeX + pipeGap + pipeWidth, pipeLoc()]);
+              i--;
+              continue;
+            }
+            // Проверка столкновения
+            if (
+              pipes[i][0] <= cTenth + size[0] &&
+              pipes[i][0] + pipeWidth >= cTenth &&
+              (pipes[i][1] > flyHeight || pipes[i][1] + pipeGap < flyHeight + size[1])
+            ) {
+              collisionDetected = true;
+            }
           }
-        } else {
-          elements[startingPositions[i]].children[i].style.transform = "translateX(-1rem)";
-        }
-      }
-    }
-  
-    function changeModes() {
-      if (ghostMode === "scatter") {
-        ghostMode = "chase";
-        ghostModeInterval = setTimeout(changeModes, 25000);
-      } else if (ghostMode === "chase") {
-        ghostMode = "scatter";
-        ghostModeInterval = setTimeout(changeModes, 5000);
-      }
-      changeGhostDirections();
-    }
-  
-    function checkCollisions() {
-      const yellowTransform = new WebKitCSSMatrix(getComputedStyle(characters[0].characterNode).transform);
-      let yellowTranslateX = yellowTransform.e;
-      let yellowTranslateY = yellowTransform.f;
-  
-      for (let i = 1; i < 5; i++) {
-        if (characters[0].status == "freeze") {
-          clearInterval(collisionInterval);
-          return;
-        }
-  
-        const distance = calculateDistance(characters[0].position, characters[i].position);
-  
-        const ghostTransform = new WebKitCSSMatrix(getComputedStyle(characters[i].characterNode).transform);
-        let ghostTranslateX = ghostTransform.e;
-        let ghostTranslateY = ghostTransform.f;
-  
-        let requirement;
-        let yellowNewPosition;
-        let ghostNewPosition;
-  
-        if(distance == 0) {
-           requirement = -30;
-           yellowNewPosition = characters[0].position + positionChange[characters[0].direction] + positionChange[oppositeDirection[characters[i].direction]];
-           ghostNewPosition = characters[i].position + positionChange[characters[i].direction] + positionChange[oppositeDirection[characters[0].direction]]; 
-        }
-        if (distance == 1) {
-          requirement = 10;
-          yellowNewPosition = characters[0].position + positionChange[characters[0].direction];
-          ghostNewPosition = characters[i].position + positionChange[characters[i].direction];
-        } else if (distance == 4) {
-          requirement = 30;
-          yellowNewPosition = characters[0].position + positionChange[characters[0].direction] * 2;
-          ghostNewPosition = characters[i].position + positionChange[characters[i].direction] * 2;
-        } else if (distance == 2) {
-          requirement = 25;
-          yellowNewPosition = characters[0].position + positionChange[characters[0].direction] + positionChange[oppositeDirection[characters[i].direction]];
-          ghostNewPosition = characters[i].position + positionChange[characters[i].direction] + positionChange[oppositeDirection[characters[0].direction]];
-        } else if (distance != 0) {
-          continue;
-        }
-        if(window.innerWidth < 600 || window.innerHeight < 700) {
-          requirement /= 2;
-        }
-  
-        if (yellowNewPosition == characters[i].position) {
-          yellowTranslateX = Math.abs(yellowTranslateX);
-          yellowTranslateY = Math.abs(yellowTranslateY);
-        } else {
-          yellowTranslateX = -Math.abs(yellowTranslateX);
-          yellowTranslateY = -Math.abs(yellowTranslateY);
-        }
-        if (ghostNewPosition == characters[0].position) {
-          ghostTranslateY = Math.abs(ghostTranslateY);
-          ghostTranslateX = Math.abs(ghostTranslateX);
-        } else {
-          ghostTranslateY = -Math.abs(ghostTranslateY);
-          ghostTranslateX = -Math.abs(ghostTranslateX);
-        }
-  
-        const transformDistance = yellowTranslateY + ghostTranslateY + yellowTranslateX + ghostTranslateX;
-  
-        if (transformDistance > requirement) {
-          if (characters[i].mode == "frightened") {
-            gameFreeze(i);
-          } else if (characters[i].mode == "normal") {
-            gameOver();
+
+          // Если птица коснулась земли
+          if (flyHeight >= canvas.height - size[1]) {
+            collisionDetected = true;
           }
-        }
-      }
-    }
-  
-    function characterMove(i) {
-      if (characters[i].status == "freeze") return;
-  
-      characters[i].nextPosition = getNewPosition(i);
-  
-      if (elements[characters[i].nextPosition].classList.contains("wall")) {
-        if(sound.src.includes("https://dominikgorczyca.github.io/Pac-Man/munch")) {
-          sound.pause();
-        }
-        // Reduced delay from 50ms to 20ms
-        setTimeout(() => {
-          characterMove(i);
-        }, 20);
-        return;
-      }
-  
-      getAnimationLength(i);
-      getSprite(i);
-      getTransition(i);
-      changePosition(i);
-    }
-  
-    function getNewPosition(i) {
-      if (i == 0) {
-        getYellowDirection(i);
-      } else if (characters[i].direction != oppositeDirection[characters[i].directionOld]) {
-        if (characters[i].mode == "frightened") {
-          getRandomDirection(i);
+
+          if (collisionDetected) {
+            if (!gameEnded) {
+              gameEnded = true;
+              clearInterval(timerInterval);
+              gamePlaying = false;
+              document.getElementById('endModal').classList.add('active');
+              document.getElementById('endMessage').textContent = "Your score: " + currentScore;
+              savePoints(currentScore);
+            }
+            return;
+          }
+
+          // Обновляем позицию птицы
+          ctx.drawImage(img, 432, Math.floor((index % 9) / 3) * size[1], ...size,
+                        cTenth, flyHeight, ...size);
+          flight += gravity;
+          flyHeight = Math.min(flyHeight + flight, canvas.height - size[1]);
+
+          // Отрисовываем счёт прямо в игре
+          ctx.font = "16px 'Press Start 2P'";
+          ctx.fillStyle = "#fff";
+          ctx.textAlign = "left";
+          ctx.fillText("Score: " + currentScore, 10, 30);
         } else {
-          getGhostDirection(i);
+          // Если игра не начата, трубы отрисовываем без движения
+          for (let i = 0; i < pipes.length; i++) {
+            ctx.drawImage(img, 432, 588 - pipes[i][1], pipeWidth, pipes[i][1],
+                          pipes[i][0], 0, pipeWidth, pipes[i][1]);
+            ctx.drawImage(img, 432 + pipeWidth, 108, pipeWidth, canvas.height - pipes[i][1] + pipeGap,
+                          pipes[i][0], pipes[i][1] + pipeGap, pipeWidth, canvas.height - pipes[i][1] + pipeGap);
+          }
+          // Рисуем птицу в центральном положении
+          ctx.drawImage(img, 432, Math.floor((index % 9) / 3) * size[1], ...size,
+                        (canvas.width / 2) - (size[0] / 2), flyHeight, ...size);
+          // Выводим текст "Tap to Start"
+          ctx.font = "20px 'Press Start 2P'";
+          ctx.fillStyle = "#fff";
+          ctx.textAlign = "center";
+          ctx.fillText("Tap to Start", canvas.width / 2, canvas.height / 2);
+          // Сбрасываем позицию птицы
+          flyHeight = (canvas.height / 2) - (size[1] / 2);
         }
-      } else {
-        characters[i].directionOld = characters[i].direction;
+        window.requestAnimationFrame(render);
       }
-      let nextPosition = characters[i].position + positionChange[characters[i].direction];
-  
-      if (characters[i].position == 392 && nextPosition == 391) {
-        nextPosition = 419;
-      } else if (characters[i].position == 419 && nextPosition == 420) {
-        nextPosition = 392;
-      }
-  
-      return nextPosition;
-    }
-  
-    function getYellowDirection(i) {
-      if (characters[i].directionNew != undefined) {
-        const newPosition = characters[i].position + positionChange[characters[i].directionNew];
-        if (!elements[newPosition].classList.contains("wall")) {
-          characters[i].direction = characters[i].directionNew;
-          characters[i].directionNew = undefined;
-        }
-      }
-    }
-  
-    function getGhostDirection(i) {
-      let newDirection = characters[i].directionOld = characters[i].direction;
-      let biggestDistance = 100000;
-      let target;
-  
-      if (characters[i].mode == "eaten") {
-        target = 322;
-      } else if (ghostMode == "scatter") {
-        target = characters[i].scatterTarget;
-      } else {
-        target = getChaseTarget(i);
-      }
-  
-      for (let [direction, value] of Object.entries(positionChange)) {
-        const newPosition = characters[i].position + value;
-        const newDistance = calculateDistance(target, newPosition);
-  
-        if (newDistance < biggestDistance) {
-          if (!elements[newPosition].classList.contains("wall") &&
-              oppositeDirection[direction] != characters[i].direction) {
-            biggestDistance = newDistance;
-            newDirection = direction;
-          }
-        }
-      }
-      characters[i].direction = newDirection;
-    }
-  
-    function getRandomDirection(i) {
-      let nextPosition = characters[i].position + positionChange[characters[i].direction];
-  
-      if ((characters[i].position == 392 && nextPosition == 391) ||
-          (characters[i].position == 419 && nextPosition == 420)) {
-        return;
-      }
-  
-      let newDirection;
-      do {
-        const random = Math.floor(Math.random() * 4);
-        newDirection = Object.keys(positionChange)[random];
-        nextPosition = characters[i].position + positionChange[newDirection];
-      } while (elements[nextPosition].classList.contains("wall") ||
-               oppositeDirection[newDirection] == characters[i].direction);
-  
-      characters[i].direction = newDirection;
-    }
-  
-    function getChaseTarget(i) {
-      switch (i) {
-        case 1:
-          if(characters[0].position == characters[i].position && !elements[characters[0].nextPosition].classList.contains("wall")) {
-            return characters[0].position + positionChange[characters[0].direction];
-          }
-          return characters[0].position;
-        case 2:
-          return characters[0].position + positionChange[characters[0].direction] * 2;
-        case 3:
-          return getBlueTarget();
-        case 4:
-          const yellowOrangeDistance = calculateDistance(characters[0].position, characters[4].position);
-          if (yellowOrangeDistance < 64) {
-            return 840;
-          } else {
-            return characters[0].position;
-          }
-      }
-    }
-  
-    function getBlueTarget() {
-      const yellowPosition = characters[0].position + positionChange[characters[0].direction];
-      const yellowRedDistanceX = yellowPosition % 28 - characters[1].position % 28;
-      const yellowRedDistanceY = Math.floor(yellowPosition / 28) - Math.floor(characters[1].position / 28);
-  
-      let bluePositionX = yellowPosition % 28 + yellowRedDistanceX;
-  
-      if (bluePositionX < 0) { bluePositionX = 0; }
-      else if (bluePositionX > 27) { bluePositionX = 27; }
-  
-      const bluePositionY = Math.floor(yellowPosition / 28) + yellowRedDistanceY;
-  
-      return bluePositionX + bluePositionY * 28;
-    }
-  
-    function calculateDistance(target, newGhostPosition) {
-      const distanceX = Math.floor(target / 28) - Math.floor(newGhostPosition / 28);
-      const distanceY = target % 28 - newGhostPosition % 28;
-      return distanceX ** 2 + distanceY ** 2;
-    }
-  
-    // Reduce all animation lengths by 20%
-    function getAnimationLength(i) {
-      let animationLength;
-      if (i == 0) {
-        // Pac-Man: normal 190ms => 152ms; hasEaten: 210ms => 168ms
-        animationLength = characters[i].mode == "hasEaten" ? 168 : 152;
-      } else {
-        const tunnel = [392, 393, 394, 395, 396, 419, 418, 417, 416, 415];
-        if (characters[i].mode == "eaten") {
-          if (characters[i].nextPosition === 322) {
-            animationLength = characters[i].direction == "ArrowLeft" ? 25 : 75;
-          } else {
-            animationLength = 50;
-          }
-        } else if (tunnel.includes(characters[i].position) || tunnel.includes(characters[i].nextPosition)) {
-          animationLength = 350 * 0.8; // 280ms
-        } else if (characters[i].mode == "frightened") {
-          animationLength = 300 * 0.8; // 240ms
-        } else if (
-          characters[i].direction == characters[i].directionOld ||
-          characters[i].direction == oppositeDirection[characters[i].directionOld]
-        ) {
-          animationLength = 200 * 0.8; // 160ms
+
+      img.onload = render;
+
+      // Обработчик клика для старта игры (и прыжка)
+      // Прикрепляем его к canvas, чтобы избежать срабатывания клика от кнопки "START"
+      canvas.addEventListener('click', function onGameClick() {
+        if (!gameStarted) {
+          gameStarted = true;
+          gamePlaying = true;
+          startTimer();
+          flight = jump;
         } else {
-          animationLength = 220 * 0.8; // ~176ms (округлим до 170)
+          flight = jump;
         }
-      }
-      if (characters[i].characterNode.style.transform == 'translateX(-1rem)') {
-        animationLength /= 1.5;
-      }
-      root.setProperty(`--${characters[i].name}-animation-length`, animationLength + "ms");
-      characters[i].animationLength = animationLength;
-    }
-  
-    function getSprite(i) {
-      let spriteX;
-      let spriteY;
-      if (i == 0) {
-        spriteX = 3.2;
-        spriteY = yellowSprite[characters[i].direction];
-      } else {
-        if (characters[i].mode == "normal") {
-          spriteX = ghostSprite[characters[i].direction];
-          spriteY = 9.6 + 3.2 * i;
-        } else if (characters[i].mode == "frightened") {
-          spriteX = isFrightenedWhite ? 32 : 25.6;
-          spriteY = 12.8;
-        } else {
-          spriteX = eatenSprite[characters[i].direction];
-          spriteY = 16;
-        }
-      }
-      root.setProperty(`--${characters[i].name}-sprite-x`, `-${spriteX}rem`);
-      root.setProperty(`--${characters[i].name}-sprite-y`, `-${spriteY}rem`);
-    }
-  
-    function getTransition(i) {
-      const isGoingToRespawn = characters[i].mode == "eaten" && characters[i].nextPosition == 322;
-      const transitionMove = {
-        "ArrowUp": "Y(-2rem)",
-        "ArrowDown": "Y(2rem)",
-        "ArrowRight": isGoingToRespawn ? "X(1rem)" : "X(2rem)",
-        "ArrowLeft": isGoingToRespawn ? "X(-3rem)" : "X(-2rem)",
-      };
-      characters[i].characterNode.style.transform = `translate${transitionMove[characters[i].direction]}`;
-    }
-  
-    async function changePosition(i) {
-      await new Promise(resolve => {
-        if (characters[i].mode != "eaten") {
-          characters[i].characterNode.classList.add(`${characters[i].name}-animation-move`);
-        }
-        characters[i].animationStart = performance.now();
-        setTimeout(() => {
-          if (characters[i].status == "freeze") return;
-          characters[i].characterNode.classList.remove(`${characters[i].name}-animation-move`, `${characters[i].name}-visible`);
-          characters[i].characterNode.style.transform = "";
-          characters[i].position = characters[i].nextPosition;
-          characters[i].characterNode = elements[characters[i].position].children[i];
-          characters[i].characterNode.classList.add(`${characters[i].name}-visible`);
-          if (i == 0) {
-            eatPoint(i);
-          } else if (characters[i].mode == "eaten" && characters[i].position === 322) {
-            ghostRetreat(i);
-          }
-          resolve();
-        }, characters[i].animationLength);
       });
-      characterMove(i);
-    }
-  
-    function eatPoint(i) {
-      const point = elements[characters[i].position].children[5];
-      if (point != undefined) {
-        points++;
-        characters[i].mode = "hasEaten";
-        if (point.classList.contains("big-point")) {
-          makeGhostsScared();
-          // Big point gives 10 points
-          score += 10;
-        } else {
-          // Normal point gives 1 point
-          score += 1;
-          if(!sound.src.includes("munch") || sound.paused) {
-            sound.src = "https://dominikgorczyca.github.io/Pac-Man/audio/munch.wav";
-            sound.play();
-          }
-        }
-        scoreElement.innerHTML = "Score " + score;
-        point.remove();
-        // If all points collected, win level
-        if (points >= 244) {
-          winLevel();
-          freezeCharacters();
-        }
-      } else {
-        characters[i].mode = "normal";
-        if(sound.src.includes("munch")) {
-          sound.pause();
-        }
-      }
-    }
-  
-    function makeGhostsScared() {
-      soundtrack.src = "https://dominikgorczyca.github.io/Pac-Man/audio/power_pellet.wav";
-      soundtrack.play();
-      clearInterval(changingBackInterval);
-      isFrightenedWhite = false;
-      ghostsEaten = 0;
-      changeGhostDirections();
-      for (let i = 0; i < 5; i++) {
-        if (characters[i].mode != "eaten") {
-          characters[i].mode = "frightened";
-          getSprite(i);
-        }
-      }
-      setTimeout(() => {
-        let intervalCount = 1;
-        changingBackInterval = setInterval(() => {
-          if (characters[0].status == "freeze") return;
-          if (intervalCount == 10) {
-            clearInterval(changingBackInterval);
-            if(!soundtrack.src.includes("retreating")){
-              soundtrack.src = "https://dominikgorczyca.github.io/Pac-Man/audio/siren1.wav";
-              soundtrack.play();
-            }
-            for (let i = 0; i < characters.length; i++) {
-              if (characters[i].mode != "eaten") {
-                characters[i].mode = "normal";
-              }
-            }
-          }
-          isFrightenedWhite = (intervalCount % 2 == 1);
-          for (let i = 0; i < 5; i++) {
-            getSprite(i);
-          }
-          intervalCount++;
-        }, 300);
-      }, 800);
-    }
-  
-    function changeGhostDirections() {
-      for (let i = 1; i < 5; i++) {
-        if (characters[i].mode == "normal" &&
-            !characters[i].characterNode.className.includes("revive")) {
-          characters[i].directionOld = characters[i].direction;
-          characters[i].direction = oppositeDirection[characters[i].direction];
-        }
-      }
-    }
-  
-    function gameFreeze(i) {
-      sound.src = "https://dominikgorczyca.github.io/Pac-Man/audio/eat_ghost.wav";
-      sound.play();
-      const animationStop = performance.now();
-      stopAnimations("stop");
-      clearTimeout(ghostModeInterval);
-      characters[i].mode = "eaten";
-      characters[0].characterNode.classList.remove("yellow-visible");
-      characters[i].characterNode.classList.remove(`${characters[i].name}-animation-move`);
-      root.setProperty(`--${characters[i].name}-sprite-x`, `-${(ghostsEaten * 32) / 10}rem`);
-      root.setProperty(`--${characters[i].name}-sprite-y`, "-25.6rem");
-      for (let j = 0; j < 5; j++) {
-        characters[j].animationLength = characters[j].animationLength - (animationStop - characters[j].animationStart);
-        if (j == i) {
-          characters[j].animationLength /= 6;
-        }
-        root.setProperty(`--${characters[j].name}-animation-length`, `${characters[j].animationLength}ms`);
-      }
-      setTimeout(() => {
-        soundtrack.src = "https://dominikgorczyca.github.io/Pac-Man/audio/retreating.wav";
-        soundtrack.play();
-        characters[0].characterNode.classList.add("yellow-visible");
-        getSprite(i);
-        for (let j = 0; j < 5; j++) {
-          characters[j].characterNode.style.removeProperty("transition");
-          if (characters[j].status == "freeze") {
-            characters[j].status = "normal";
-            if (!characters[j].characterNode.className.includes("revive")) {
-              if (j == 0 && elements[characters[j].nextPosition].classList.contains("wall")) {
-                characterMove(j);
-              } else {
-                getTransition(j);
-                changePosition(j);
-              }
-            }
-            characters[j].characterNode.style.animationPlayState = "running";
-          }
-        }
-        collisionInterval = setInterval(checkCollisions, 10);
-        ghostModeInterval = setTimeout(changeModes, 5000);
-      }, 1000);
-      ghostsEaten++;
-      score += 10;
-      scoreElement.innerHTML = "Score " + score;
-    }
-  
-    function ghostRetreat(i) {
-      characters[i].status = "freeze";
-      characters[i].characterNode.classList.add(`${characters[i].name}-retreat`);
-      setTimeout(() => {
-        if(characters.some(char => char.mode == "frightened")){
-          soundtrack.src = "https://dominikgorczyca.github.io/Pac-Man/audio/power_pellet.wav";
-        } else {
-          soundtrack.src = "https://dominikgorczyca.github.io/Pac-Man/audio/siren1.wav";
-        }
-        soundtrack.play();
-        characters[i].position = i == 1 ? 406 : startingPositions[i];
-        characters[i].characterNode.classList.remove(`${characters[i].name}-visible`, `${characters[i].name}-animation-move`, `${characters[i].name}-retreat`);
-        characters[i].characterNode.style.transform = "translateX(-1rem)";
-        characters[i].characterNode = elements[characters[i].position].children[i];
-        characters[i].animationLength = 200;
-        characters[i].characterNode.classList.add(`${characters[i].name}-visible`, `${characters[i].name}-revive`);
-        characters[i].mode = "normal";
-        characters[i].animationLength = 200;
-        ghostRevive(i, 0);
-      }, i > 2 ? 250 : 150);
-    }
-  
-    function ghostRevive(i, progress) {
-      if (characters[i].direction != characters[i].directionList[progress] &&
-          characters[i].directionList[progress] != undefined &&
-          characters[i].mode != "frightened") {
-        characters[i].direction = characters[i].directionList[progress];
-        getSprite(i);
-      }
-      if (progress != characters[i].directionList.length && newLevel == undefined) {
-        if (characters[0].status == "freeze") {
-          characters[i].characterNode.style.animationPlayState = "paused";
-        } else {
-          characters[i].characterNode.style.animationPlayState = "running";
-        }
-        setTimeout(() => {
-          characters[i].animationStart = performance.now();
-          if (characters[0].status != "freeze") {
-            progress++;
-            characters[i].animationLength = 200;
-          }
-          ghostRevive(i, progress);
-        }, characters[i].animationLength);
-      } else if (newLevel == undefined) {
-        characters[i].characterNode.classList.remove(`${characters[i].name}-visible`, `${characters[i].name}-revive`);
-        characters[i].position = 322;
-        characters[i].characterNode = elements[characters[i].position].children[i];
-        characters[i].characterNode.classList.add(`${characters[i].name}-visible`);
-        characters[i].status = "normal";
-        characters[i].direction = "ArrowLeft";
-        getSprite(i);
-        characterMove(i);
-      }
-    }
-  
-    function gameOver() {
-      stopAnimations();
-      setTimeout(() => {
-        for (let i = 1; i < 5; i++) {
-          characters[i].characterNode.classList.remove(`${characters[i].name}-visible`);
-        }
-        characters[0].characterNode.classList.add("yellow-death-animation");
-        sound.src = "https://dominikgorczyca.github.io/Pac-Man/audio/death_1.wav";
-        sound.play();
-        setTimeout(() => {
-          sound.src = "https://dominikgorczyca.github.io/Pac-Man/audio/death_2.wav";
-          sound.play();
-        }, 1400);
-        // With 2 lives, game over modal after 2 deaths
-        if (livesLost == 2) {
-          newLevel = true;
-          // Обновляем очки в базе: прибавляем заработанные очки к уже имеющимся
-          userRef.update({ points: localUserData.points + score });
-          setTimeout(() => {
-            showEndModal();
-          }, 1500);
-        } else {
-          newLevel = false;
-          gameStartLength = 2000;
-          setTimeout(() => {
-            game.style.visibility = "hidden";
-            deleteClasses();
-            setTimeout(startLevel, 500);
-          }, 2000);
-        }
-      }, 1000);
-    }
-  
-    // When all points are collected, win level and proceed to next level (score and lives remain)
-    function winLevel() {
-      stopAnimations();
-      newLevel = true;
-      sound.src = "https://dominikgorczyca.github.io/Pac-Man/audio/extend.wav";
-      sound.play();
-      setTimeout(() => {
-        deleteGameBoard();
-        setTimeout(startLevel, 500);
-      }, 2000);
-    }
-  
-    function stopAnimations(stop) {
-      freezeCharacters(stop);
-      for (let i = 0; i < 5; i++) {
-        const characterTransform = new WebKitCSSMatrix(getComputedStyle(characters[i].characterNode).transform);
-        if (stop == "stop" && characters[i].mode == "eaten") continue;
-        characters[i].characterNode.style.transition = "none";
-        characters[i].characterNode.style.transform = `translate(${parseInt(characterTransform.e)}px, ${parseInt(characterTransform.f)}px)`;
-        if (stop != "stop") {
-          soundtrack.pause();
-          sound.pause();
-          if (i != 0) {
-            characters[i].characterNode.style.animationPlayState = "paused";
-          }
-          characters[i].characterNode.classList.remove(`${characters[i].name}-animation-move`);
-        } else {
-          characters[i].characterNode.style.animationPlayState = "paused";
-        }
-      }
-    }
-  
-    function deleteGameBoard() {
-      for (let element of elements) {
-        element.remove();
-      }
-    }
-  
-    function deleteClasses() {
-      for (let i = 0; i < 5; i++) {
-        if (characters[i].characterNode != undefined) {
-          characters[i].characterNode.className = characters[i].name;
-          characters[i].characterNode.removeAttribute("style");
-        }
-        transformStartingElements();
-      }
-    }
-  
-    function hardReset() {
-      livesLost = 0;
-      score = 0;
-      setTimeout(() => {
-        for (let i = 0; i < 2; i++) {  // 2 lives only
-          lives.children[i].removeAttribute("style");
-        }
-      }, 500);
-    }
-  
-    function freezeCharacters(stop) {
-      for (let i = 0; i < 5; i++) {
-        if (stop == "stop" && characters[i].mode == "eaten") continue;
-        characters[i].status = "freeze";
-      }
-    }
-  
-    function getDirection(e) {
-      switch (e.key) {
-        case "ArrowUp":
-        case "ArrowDown":
-        case "ArrowRight":
-        case "ArrowLeft":
-          characters[0].directionNew = e.key;
-      }
-    }
-  
-    let xDown = null, yDown = null;
-    function handleTouchStart(e) {
-      const firstTouch = e.touches[0];
-      xDown = firstTouch.clientX;
-      yDown = firstTouch.clientY;
-    }
-    function handleTouchMove(e) {
-      if (!xDown || !yDown) return;
-      let xMove = e.touches[0].clientX;
-      let yMove = e.touches[0].clientY;
-      let xDiff = xDown - xMove;
-      let yDiff = yDown - yMove;
-      if (Math.abs(xDiff) > Math.abs(yDiff)) {
-        characters[0].directionNew = xDiff > 0 ? "ArrowLeft" : "ArrowRight";
-      } else {
-        characters[0].directionNew = yDiff > 0 ? "ArrowUp" : "ArrowDown";
-      }
-      xDown = null;
-      yDown = null;
     }
   </script>
 </body>
