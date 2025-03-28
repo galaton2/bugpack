@@ -93,13 +93,11 @@
       width: 100%;
       height: 100vh;
       background: #000;
-      display: flex;
       align-items: center;
       justify-content: center;
       z-index: 90;
     }
     .video-container video {
-      playsinline: true;
       width: 720px;
       height: 720px;
       max-width: 90%;
@@ -220,7 +218,7 @@
 
   <!-- Контейнер для видео -->
   <div id="videoContainer" class="video-container">
-    <video id="introVideo" playsinline preload="auto">
+    <video id="introVideo" playsinline webkit-playsinline muted preload="auto">
       <source src="https://res.cloudinary.com/do8tg9gfg/video/upload/v1742838664/lzz8jyntfq2nui7eaiqt.mp4" type="video/mp4" />
       Your browser does not support the video tag.
     </video>
@@ -296,6 +294,8 @@
     document.addEventListener('DOMContentLoaded', function() {
       const totalSlides = 5;
       let currentLanguage = "en"; // начальный язык - английский
+      let videoLoadFailed = false;
+      const progressStartTime = Date.now();
 
       const englishContent = {
         slide1Title: "Welcome to Meta GL!TCH GameFi-Zone!",
@@ -374,34 +374,49 @@
       const videoProgress = document.getElementById('videoProgress');
       const progressBar = document.getElementById('progressBar');
 
-      // После загрузки метаданных начинаем отслеживать прогресс буферизации
-      introVideo.addEventListener('loadedmetadata', function() {
-        updateVideoProgress();
-      });
-
       // Функция обновления индикатора загрузки видео
       function updateVideoProgress() {
-        if (introVideo.buffered.length > 0 && introVideo.duration) {
-          const bufferedEnd = introVideo.buffered.end(0);
-          let percent = Math.floor((bufferedEnd / introVideo.duration) * 100);
-          // Если процент меньше 0 или NaN, принудительно выставляем 0
-          if (isNaN(percent) || percent < 0) { percent = 0; }
+        if (introVideo.duration) {
+          let percent = 0;
+          if (introVideo.buffered.length > 0) {
+            const bufferedEnd = introVideo.buffered.end(0);
+            percent = Math.floor((bufferedEnd / introVideo.duration) * 100);
+            if (isNaN(percent) || percent < 0) { percent = 0; }
+          }
           videoProgress.innerText = percent + '%';
-          // Если достигли 90% или событие canplaythrough сработало, считаем видео загруженным
+
+          // Если достигли 90% загрузки, считаем видео загруженным
           if (percent >= 90) {
             videoProgress.innerText = 'Loaded';
             setTimeout(function(){
-              // Скрываем индикаторы загрузки и показываем кнопку воспроизведения
               loadingScreen.querySelector('.spinner').style.display = 'none';
               videoProgress.style.display = 'none';
               playButton.style.display = 'inline-block';
             }, 300);
-          } else {
-            // Продолжаем обновлять прогресс через 200 мс
-            setTimeout(updateVideoProgress, 200);
+            return;
           }
+
+          // Если прошло 10 секунд и процент всё ещё 0, считаем, что загрузка не удалась
+          if (Date.now() - progressStartTime >= 10000 && percent === 0) {
+            videoProgress.innerText = 'Loaded';
+            videoLoadFailed = true;
+            setTimeout(function(){
+              loadingScreen.querySelector('.spinner').style.display = 'none';
+              videoProgress.style.display = 'none';
+              playButton.style.display = 'inline-block';
+            }, 300);
+            return;
+          }
+
+          // Продолжаем обновление прогресса
+          setTimeout(updateVideoProgress, 200);
         }
       }
+
+      // После загрузки метаданных начинаем отслеживать прогресс буферизации
+      introVideo.addEventListener('loadedmetadata', function() {
+        updateVideoProgress();
+      });
 
       // Событие canplaythrough в качестве запасного варианта
       introVideo.addEventListener('canplaythrough', function() {
@@ -413,13 +428,19 @@
         }, 300);
       });
 
-      // По клику на кнопку Play скрываем загрузочный экран и показываем видео
+      // По клику на кнопку Play
       playButton.addEventListener('click', function() {
         loadingScreen.style.display = 'none';
-        videoContainer.style.display = 'flex';
-        introVideo.play().catch(function(error) {
-          console.log("Video play error:", error);
-        });
+        // Если загрузка видео не удалась, переходим сразу к слайдам
+        if (videoLoadFailed) {
+          document.getElementById('appDescription').style.display = 'flex';
+          updateProgress(1);
+        } else {
+          videoContainer.style.display = 'flex';
+          introVideo.play().catch(function(error) {
+            console.log("Video play error:", error);
+          });
+        }
       });
 
       // По окончании видео показываем экран описания и слайдов
