@@ -1151,89 +1151,92 @@
       }, 1000);
     }
 
-    /* ======================================
-       12. РЕНДЕР ИГРЫ (с интерполяцией)
-    ====================================== */
-    function renderGame() {
-      specialCtx.clearRect(0, 0, specialGameCanvas.width, specialGameCanvas.height);
-      specialCtx.fillStyle = '#00103c';
-      specialCtx.fillRect(0, 0, specialGameCanvas.width, specialGameCanvas.height);
-      drawMatrixGrid();
-      const now = performance.now();
-      const factor = Math.min((now - lastLogicUpdateTime) / LOGIC_INTERVAL, 1);
-      
-      let appleImg = new Image();
-      appleImg.src = 'https://www.pngkit.com/png/full/784-7843310_christmas-star-star-pixel-art.png';
-      if (appleImg.complete) {
-        specialCtx.drawImage(
-          appleImg,
-          GAME_AREA_X + applePos.x * gridSize,
-          GAME_AREA_Y + applePos.y * gridSize,
-          gridSize,
-          gridSize
-        );
-      }
-      
-      for (let i = 0; i < localSnake.length; i++) {
-        const curr = localSnake[i];
-        const prev = previousSnake[i] || curr;
-        const interpX = interpolateCoordinate(prev.x, curr.x, factor, tileCountX);
-        const interpY = interpolateCoordinate(prev.y, curr.y, factor, tileCountY);
-        const x = GAME_AREA_X + interpX * gridSize;
-        const y = GAME_AREA_Y + interpY * gridSize;
-        specialCtx.fillStyle = snakeColors[playerId] || '#800080';
-        specialCtx.fillRect(x, y, gridSize, gridSize);
-        specialCtx.strokeStyle = '#000';
-        specialCtx.lineWidth = 2;
-        specialCtx.strokeRect(x, y, gridSize, gridSize);
-      }
-      
-      const opponentFactor = Math.min((now - lastOpponentUpdateTime) / LOGIC_INTERVAL, 1);
-      for (let i = 0; i < opponentSnake.length; i++) {
-        const curr = opponentSnake[i];
-        const prev = previousOpponentSnake[i] || curr;
-        const interpX = interpolateCoordinate(prev.x, curr.x, opponentFactor, tileCountX);
-        const interpY = interpolateCoordinate(prev.y, curr.y, opponentFactor, tileCountY);
-        const x = GAME_AREA_X + interpX * gridSize;
-        const y = GAME_AREA_Y + interpY * gridSize;
-        specialCtx.fillStyle = snakeColors[opponentId] || '#FFFF00';
-        specialCtx.fillRect(x, y, gridSize, gridSize);
-        specialCtx.strokeStyle = '#000';
-        specialCtx.lineWidth = 2;
-        specialCtx.strokeRect(x, y, gridSize, gridSize);
-      }
-      
-      specialCtx.fillStyle = '#00FF00';
-      specialCtx.font = '12px "Press Start 2P", sans-serif';
-      specialCtx.fillText(`Score: ${formatScore(score)}`, GAME_AREA_X + GAME_AREA_WIDTH - 140, GAME_AREA_Y - 30);
-      specialCtx.fillText(`Opp: ${formatScore(opponentScore)}`, GAME_AREA_X + GAME_AREA_WIDTH - 140, GAME_AREA_Y - 15);
-      const barWidth = (timerCurrent / timerTotal) * GAME_AREA_WIDTH;
-      specialCtx.fillStyle = '#FF00FF';
-      specialCtx.fillRect(GAME_AREA_X, GAME_AREA_Y - 5, barWidth, 4);
-    }
+  // Глобально создаём и загружаем изображение звезды
+const appleImg = new Image();
+appleImg.src = 'https://www.pngkit.com/png/full/784-7843310_christmas-star-star-pixel-art.png';
 
-    function drawMatrixGrid() {
-      specialCtx.fillStyle = '#433171';
-      specialCtx.fillRect(GAME_AREA_X, GAME_AREA_Y, GAME_AREA_WIDTH, GAME_AREA_HEIGHT);
-      specialCtx.strokeStyle = '#00103c';
-      for (let i = 0; i <= tileCountX; i++) {
-        const x = GAME_AREA_X + i * gridSize;
-        specialCtx.beginPath();
-        specialCtx.moveTo(x, GAME_AREA_Y);
-        specialCtx.lineTo(x, GAME_AREA_Y + GAME_AREA_HEIGHT);
-        specialCtx.stroke();
-      }
-      for (let j = 0; j <= tileCountY; j++) {
-        const y = GAME_AREA_Y + j * gridSize;
-        specialCtx.beginPath();
-        specialCtx.moveTo(GAME_AREA_X, y);
-        specialCtx.lineTo(GAME_AREA_X + GAME_AREA_WIDTH, y);
-        specialCtx.stroke();
-      }
-      specialCtx.strokeStyle = '#8F509D';
-      specialCtx.lineWidth = 2;
-      specialCtx.strokeRect(GAME_AREA_X, GAME_AREA_Y, GAME_AREA_WIDTH, GAME_AREA_HEIGHT);
-    }
+/* ======================================
+   12. РЕНДЕР ИГРЫ (с интерполяцией)
+====================================== */
+function renderGame() {
+  specialCtx.clearRect(0, 0, specialGameCanvas.width, specialGameCanvas.height);
+  specialCtx.fillStyle = '#00103c';
+  specialCtx.fillRect(0, 0, specialGameCanvas.width, specialGameCanvas.height);
+  drawMatrixGrid();
+  const now = performance.now();
+  const factor = Math.min((now - lastLogicUpdateTime) / LOGIC_INTERVAL, 1);
+  
+  // Рисуем звезду, если изображение загружено
+  if (appleImg.complete) {
+    specialCtx.drawImage(
+      appleImg,
+      GAME_AREA_X + applePos.x * gridSize,
+      GAME_AREA_Y + applePos.y * gridSize,
+      gridSize,
+      gridSize
+    );
+  }
+  
+  for (let i = 0; i < localSnake.length; i++) {
+    const curr = localSnake[i];
+    const prev = previousSnake[i] || curr;
+    const interpX = interpolateCoordinate(prev.x, curr.x, factor, tileCountX);
+    const interpY = interpolateCoordinate(prev.y, curr.y, factor, tileCountY);
+    const x = GAME_AREA_X + interpX * gridSize;
+    const y = GAME_AREA_Y + interpY * gridSize;
+    specialCtx.fillStyle = snakeColors[playerId] || '#800080';
+    specialCtx.fillRect(x, y, gridSize, gridSize);
+    specialCtx.strokeStyle = '#000';
+    specialCtx.lineWidth = 2;
+    specialCtx.strokeRect(x, y, gridSize, gridSize);
+  }
+  
+  const opponentFactor = Math.min((now - lastOpponentUpdateTime) / LOGIC_INTERVAL, 1);
+  for (let i = 0; i < opponentSnake.length; i++) {
+    const curr = opponentSnake[i];
+    const prev = previousOpponentSnake[i] || curr;
+    const interpX = interpolateCoordinate(prev.x, curr.x, opponentFactor, tileCountX);
+    const interpY = interpolateCoordinate(prev.y, curr.y, opponentFactor, tileCountY);
+    const x = GAME_AREA_X + interpX * gridSize;
+    const y = GAME_AREA_Y + interpY * gridSize;
+    specialCtx.fillStyle = snakeColors[opponentId] || '#FFFF00';
+    specialCtx.fillRect(x, y, gridSize, gridSize);
+    specialCtx.strokeStyle = '#000';
+    specialCtx.lineWidth = 2;
+    specialCtx.strokeRect(x, y, gridSize, gridSize);
+  }
+  
+  specialCtx.fillStyle = '#00FF00';
+  specialCtx.font = '12px "Press Start 2P", sans-serif';
+  specialCtx.fillText(`Score: ${formatScore(score)}`, GAME_AREA_X + GAME_AREA_WIDTH - 140, GAME_AREA_Y - 30);
+  specialCtx.fillText(`Opp: ${formatScore(opponentScore)}`, GAME_AREA_X + GAME_AREA_WIDTH - 140, GAME_AREA_Y - 15);
+  const barWidth = (timerCurrent / timerTotal) * GAME_AREA_WIDTH;
+  specialCtx.fillStyle = '#FF00FF';
+  specialCtx.fillRect(GAME_AREA_X, GAME_AREA_Y - 5, barWidth, 4);
+}
+
+function drawMatrixGrid() {
+  specialCtx.fillStyle = '#433171';
+  specialCtx.fillRect(GAME_AREA_X, GAME_AREA_Y, GAME_AREA_WIDTH, GAME_AREA_HEIGHT);
+  specialCtx.strokeStyle = '#00103c';
+  for (let i = 0; i <= tileCountX; i++) {
+    const x = GAME_AREA_X + i * gridSize;
+    specialCtx.beginPath();
+    specialCtx.moveTo(x, GAME_AREA_Y);
+    specialCtx.lineTo(x, GAME_AREA_Y + GAME_AREA_HEIGHT);
+    specialCtx.stroke();
+  }
+  for (let j = 0; j <= tileCountY; j++) {
+    const y = GAME_AREA_Y + j * gridSize;
+    specialCtx.beginPath();
+    specialCtx.moveTo(GAME_AREA_X, y);
+    specialCtx.lineTo(GAME_AREA_X + GAME_AREA_WIDTH, y);
+    specialCtx.stroke();
+  }
+  specialCtx.strokeStyle = '#8F509D';
+  specialCtx.lineWidth = 2;
+  specialCtx.strokeRect(GAME_AREA_X, GAME_AREA_Y, GAME_AREA_WIDTH, GAME_AREA_HEIGHT);
+}
 
     /* ======================================
        13. ЭКРАНЫ "SEARCHING / WAITING..."
