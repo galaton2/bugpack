@@ -3,67 +3,63 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  /* Убрали pixelated для картинок */
 }
 
-/* Отключаем прокрутку для html и body, чтобы на iOS нельзя было листать сам сайт */
+/* ========= Настройки корневых переменных ========= */
+:root {
+  --bg-color: #000;
+  --primary-color: #0c0;        /* матричный зелёный, чуть темнее */
+  --accent-color: #cc00cc;       /* неоновый розовый/пурпурный, темнее */
+  --secondary-accent: #00cccc;   /* неоновый голубой, темнее */
+  --container-bg: rgba(0, 0, 0, 0.85);
+  --border-color: #cc00cc;
+  --font-body: 'Courier New', monospace;
+  --font-title: 'Press Start 2P', monospace;
+}
+
+/* ========= Общие стили для html и body ========= */
 html, body {
   width: 100%;
   height: 100%;
-  overflow: hidden; /* запрет вертикальной и горизонтальной прокрутки */
-  margin: 0;
-  padding: 0;
-}
-
-/* ========= Основной стиль страницы ========= */
-body {
-  display: flex;
-  flex-direction: column;
-  background-color: #0e162e; /* Тёмный фон */
-  color: #e0e0e0;          /* Основной цвет текста */
-  font-family: sans-serif;
-}
-
-body.en {
-  font-weight: bold;
+  /* Разрешаем прокрутку */
+  overflow: auto;
+  background: linear-gradient(135deg, #000, #222);
+  font-family: var(--font-body);
+  color: var(--primary-color);
 }
 
 /* ========= Заголовки ========= */
 h1, h2, h3, h4 {
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-title);
   text-transform: uppercase;
-  color: #bb86fc; /* Неоновый фиолетовый акцент */
-}
-
-/* ========= Анимация "нажатия" ========= */
-@keyframes press {
-  0%   { transform: translateY(0) scale(1); }
-  50%  { transform: translateY(2px) scale(0.97); }
-  100% { transform: translateY(0) scale(1); }
+  color: var(--accent-color);
+  text-shadow: 0 0 5px var(--accent-color);
+  /* Убрана анимация глитча */
 }
 
 /* ========= Кнопки ========= */
 button {
-  font-family: 'Press Start 2P', monospace;
+  font-family: var(--font-title);
   font-size: 12px;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  background: linear-gradient(135deg, #bb86fc, #29b6f6);
-  color: #000; /* Чёрный текст */
-  border: none;
-  border-radius: 4px;
+  background: #222;
+  border: 2px solid var(--border-color);
+  color: var(--primary-color);
   padding: 8px 16px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  box-shadow: 0 0 5px var(--border-color);
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.1s, box-shadow 0.1s;
+  outline: none;
 }
 
 button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+  transform: scale(1.05);
+  box-shadow: 0 0 10px var(--border-color);
 }
 
 button:active {
-  animation: press 0.15s forwards;
+  transform: scale(0.95);
 }
 
 /* ========= Специфичные кнопки ========= */
@@ -76,15 +72,15 @@ button:active {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #bb86fc, #29b6f6);
-  border: none;
+  background: #222;
+  border: 2px solid var(--border-color);
   border-radius: 4px;
   padding: 0;
   width: 40px;
   height: 40px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  box-shadow: 0 0 5px var(--border-color);
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.1s, box-shadow 0.1s;
   text-decoration: none;
   margin-top: 2px;
   margin-right: 10px;
@@ -97,12 +93,12 @@ button:active {
 }
 
 #walletLink:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+  transform: scale(1.05);
+  box-shadow: 0 0 10px var(--border-color);
 }
 
 #walletLink:active {
-  animation: press 0.15s forwards;
+  transform: scale(0.95);
 }
 
 /* ========= Кнопка "гамбургер" для настроек дизайна ========= */
@@ -111,34 +107,6 @@ button:active {
   top: 20px;
   left: 10px;
   z-index: 1100;
-}
-
-#design-options {
-  display: none;
-  background: rgba(0, 0, 0, 0.85);
-  padding: 10px;
-  border: 1px solid #FF69B4;
-  text-align: center;
-  margin-top: 5px;
-  font-size: 14px;
-  color: #FF69B4;
-}
-
-#design-options p {
-  display: inline-block;
-  background: transparent;
-  border: 2px solid #FF69B4;
-  padding: 5px 10px;
-  margin: 5px;
-  cursor: pointer;
-  border-radius: 4px;
-  transition: background 0.2s, transform 0.2s;
-}
-
-#design-options p:hover {
-  background: #FF69B4;
-  color: #000;
-  transform: translateY(-2px);
 }
 
 #design-settings button {
@@ -157,35 +125,63 @@ button:active {
 #design-settings .hamburger-line {
   width: 80%;
   height: 3px;
-  background: #FF00FF;
+  background: var(--accent-color);
   border-radius: 2px;
 }
 
 #design-settings button:hover .hamburger-line {
-  background: #ff0037;
+  background: var(--secondary-accent);
 }
 
 #design-settings button:active {
   transform: translateY(2px);
 }
 
-/* ========= Шапка (header) с эффектом блюра ========= */
+#design-options {
+  display: none;
+  background: var(--container-bg);
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  text-align: center;
+  margin-top: 5px;
+  font-size: 14px;
+  color: var(--accent-color);
+}
+
+#design-options p {
+  display: inline-block;
+  background: transparent;
+  border: 2px solid var(--border-color);
+  padding: 5px 10px;
+  margin: 5px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.2s, transform 0.2s;
+}
+
+#design-options p:hover {
+  background: var(--border-color);
+  color: var(--bg-color);
+  transform: translateY(-2px);
+}
+
+/* ========= Шапка (header) ========= */
 header {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   padding: 12px;
-  background: rgba(14,22,46,0.6);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-bottom: 2px solid #fff;
+  background: var(--container-bg);
+  border-bottom: 2px solid var(--border-color);
   display: flex;
   flex-direction: column;
   align-items: center;
-  z-index: 100;
+  z-index: 1000;
+  text-shadow: 0 0 5px var(--border-color);
 }
 
+/* Информация о пользователе */
 .user-info {
   display: flex;
   align-items: center;
@@ -196,10 +192,11 @@ header {
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  border: 2px solid #fff;
+  border: 2px solid var(--border-color);
   object-fit: cover;
 }
 
+/* Балансы */
 .balances {
   display: flex;
   gap: 16px;
@@ -220,11 +217,10 @@ header {
 }
 
 /* ========= Основной блок (main) ========= */
-/* Теперь main – единственная прокручиваемая область */
 main {
   flex: 1;
   overflow-y: auto;
-  padding: 30px 20px 70px;
+  padding: 50px 20px 70px;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -237,8 +233,9 @@ main {
   width: 100%;
   margin: 60px 0 20px;
   padding: 20px;
-  background-color: transparent;
-  box-sizing: border-box;
+  background-color: var(--container-bg);
+  border: 2px solid var(--border-color);
+  border-radius: 4px;
 }
 
 .section.active {
@@ -266,62 +263,43 @@ main {
   grid-template-columns: repeat(2, 1fr);
   gap: 10px;
   padding: 0 10px;
-  box-sizing: border-box;
-}
-
-.games-section h2 {
-  text-align: center;
 }
 
 /* ========= Карточки игр ========= */
 .game-card,
 .game-card1 {
-  background-color: #45cac5;
-  color: #ff2553;
+  background-color: #222;
+  color: var(--primary-color);
   padding: 10px;
   text-align: center;
   font-size: 0.8rem;
   position: relative;
-  box-shadow: inset -2px 2px 1px 1px grey,
-              inset -2px -2px 1px 1px lightgray,
-              inset 2px 0px 1px 1px lightgray;
-  transition: transform 0.2s, box-shadow 0.2s;
+  border: 2px solid var(--border-color);
+  transition: transform 0.2s;
 }
 
 .game-card:hover,
 .game-card1:hover {
-  cursor: pointer;
-  transform: scale(1.02);
+  transform: scale(1.05);
+  box-shadow: 0 0 10px var(--border-color);
 }
 
 .game-card:active,
 .game-card1:active {
-  transform: translateY(3px);
-  box-shadow: -2px 2px 1px 1px grey,
-              -2px -2px 1px 1px lightgray,
-              2px 0px 1px 1px lightgray;
+  transform: scale(0.95);
 }
 
 .game-card img,
 .game-card1 img {
-  object-fit: contain;
+  width: 100%;
+  height: auto;
   margin-bottom: 6px;
-}
-
-.game-card img {
-  width: 120px;
-  height: 120px;
-}
-
-.game-card1 img {
-  width: 150px;
-  height: 150px;
+  /* Убраны эффекты для изображений */
 }
 
 .game-card p,
 .game-card1 p {
-  margin-bottom: 6px;
-  color: #000;
+  color: var(--primary-color);
 }
 
 /* ========= Нижняя навигация (nav) ========= */
@@ -329,42 +307,39 @@ nav {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 40px;
+  gap: 20px;
   position: fixed;
-  bottom: 10px; /* навигация чуть выше нижнего края */
+  bottom: 10px;
   left: 0;
   width: 100%;
-  padding: 20px 0;
-  background: rgba(14,22,46,0.6);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  padding: 10px 0;
+  background: var(--container-bg);
+  border-top: 2px solid var(--border-color);
   z-index: 1000;
 }
 
 nav button {
-  width: 120px;
-  height: 120px;
-  border: none;
-  position: relative;
-  box-shadow: inset -3px 1px 1px 1px grey,
-              inset -3px -1px 1px 1px lightgray,
-              inset 3px 0px 1px 1px lightgray;
+  width: 80px;
+  height: 80px;
+  border: 2px solid var(--border-color);
+  background: #222;
+  cursor: pointer;
   transition: transform 0.2s;
+  outline: none;
 }
 
-
 nav button:hover {
-  background-color: #06B6D1;
+  transform: scale(1.1);
+  box-shadow: 0 0 10px var(--border-color);
 }
 
 nav button:active {
-  top: 2px;
+  transform: scale(0.9);
 }
 
 nav button img {
-  width: 20px;
-  height: 20px;
-  filter: brightness(0) saturate(100%);
+  width: 24px;
+  height: 24px;
 }
 
 /* ========= Модальные окна ========= */
@@ -374,7 +349,7 @@ nav button img {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.3);
+  background: rgba(0,0,0,0.8);
   display: none;
   align-items: center;
   justify-content: center;
@@ -386,18 +361,21 @@ nav button img {
 }
 
 .modal {
-  background: #0e162e;
-  border: 2px solid #3b3b3b;
+  background: #111;
+  border: 2px solid var(--border-color);
   padding: 20px;
   width: 80%;
   max-width: 360px;
   text-align: center;
-  border-radius: 10px;
+  border-radius: 8px;
+  box-shadow: 0 0 15px var(--border-color);
+  color: var(--primary-color);
 }
 
 .modal h2 {
   margin-bottom: 10px;
   font-size: 14px;
+  text-shadow: 0 0 5px var(--border-color);
 }
 
 .modal p {
@@ -416,7 +394,7 @@ nav button img {
   left: 0;
   width: 100%;
   height: 100vh;
-  background: #150069;
+  background: var(--bg-color);
   display: none;
   flex-direction: column;
   z-index: 10000;
@@ -430,11 +408,6 @@ nav button img {
   flex: 1;
   display: flex;
   flex-direction: column;
-  margin-top: 0;
-}
-
-.hidden {
-  display: none !important;
 }
 
 .game-canvas {
@@ -442,6 +415,7 @@ nav button img {
   display: flex;
   align-items: center;
   justify-content: center;
+  background: var(--bg-color);
 }
 
 /* ========= Модальное окно результата игры ========= */
@@ -451,7 +425,7 @@ nav button img {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.3);
+  background: rgba(0,0,0,0.8);
   display: none;
   align-items: center;
   justify-content: center;
@@ -463,14 +437,15 @@ nav button img {
 }
 
 .endgame-modal {
-  background: #0e162e;
-  border: 2px solid #3b3b3b;
+  background: #111;
+  border: 2px solid var(--border-color);
   border-radius: 4px;
   padding: 16px;
   width: 80%;
   max-width: 360px;
   text-align: center;
-  box-shadow: 0 0 15px #0ff;
+  box-shadow: 0 0 15px var(--border-color);
+  color: var(--primary-color);
 }
 
 .endgame-modal h2 {
@@ -487,7 +462,6 @@ nav button img {
 .leaderboard-container {
   margin-top: 20px;
   padding: 0 10px;
-  box-sizing: border-box;
 }
 
 #leaderboardSection h2 {
@@ -498,60 +472,47 @@ nav button img {
 table {
   width: 100%;
   border-collapse: collapse;
-  background: #150069;
+  background: #111;
   font-size: 12px;
+  color: var(--primary-color);
 }
 
 table th,
 table td {
   padding: 8px;
   text-align: left;
-  border: 1px solid transparent;
+  border: 1px solid var(--border-color);
 }
 
 table th {
-  background: #1f1c2c;
-  color: #FF00FF;
+  background: #222;
+  color: var(--border-color);
   font-weight: bold;
 }
 
 table tr:nth-child(even) {
-  background: #1f1c2c;
+  background: #111;
 }
 
 table tr:nth-child(odd) {
-  background: #150069;
-}
-
-table tr {
-  color: #fff;
+  background: #000;
 }
 
 table tr.current-user {
-  background: #FF00FF;
+  background: var(--border-color);
   color: #000;
-}
-
-/* ========= Блок топ-10 лидеров ========= */
-#leaderboardTop10 {
-  border: 2px solid #FF00FF;
-  border-collapse: separate;
-}
-
-#leaderboardTop10 td {
-  border: none;
 }
 
 /* ========= Колесо фортуны (Tickets) ========= */
 .wheel {
   width: 250px;
   height: 250px;
-  background: #4ed4c6;
+  /* Сделали фон чуть темнее */
+  background: #111;
   position: relative;
   border-radius: 50%;
   overflow: hidden;
-  box-shadow: 0 0 10px gray;
-  transition: all 3s;
+  box-shadow: 0 0 10px var(--border-color);
   margin: 20px auto;
 }
 
@@ -567,39 +528,44 @@ table tr.current-user {
   align-items: center;
   justify-content: center;
   font-size: 14px;
-  font-family: monospace;
-  font-weight: 1000;
-  color: #fff;
+  font-family: var(--font-title);
+  color: var(--primary-color);
   writing-mode: vertical-rl;
 }
 
 .slice1 {
-  background: #6d4fba;
+  background: var(--accent-color);
+  color: #000000
 }
 
 .slice2 {
-  background: #06C1DE;
+  background: var(--secondary-accent);
   transform: translateX(-50%) rotate(60deg);
+  color: #000000
 }
 
 .slice3 {
-  background: #6d4fba;
+  background: var(--accent-color);
   transform: translateX(-50%) rotate(120deg);
+  color: #000000
 }
 
 .slice4 {
-  background: #06C1DE;
+  background: var(--secondary-accent);
   transform: translateX(-50%) rotate(180deg);
+  color: #000000
 }
 
 .slice5 {
-  background: #6d4fba;
+  background: var(--accent-color);
   transform: translateX(-50%) rotate(240deg);
+  color: #000000
 }
 
 .slice6 {
-  background: #06C1DE;
+  background: var(--secondary-accent);
   transform: translateX(-50%) rotate(300deg);
+  color: #000000
 }
 
 .mid {
@@ -607,7 +573,7 @@ table tr.current-user {
   width: 20px;
   border-radius: 50%;
   position: absolute;
-  background: #000;
+  background: var(--bg-color);
   top: calc(50% - 10px);
   left: calc(50% - 10px);
   z-index: 5;
@@ -634,21 +600,16 @@ table tr.current-user {
   height: 160px;
   overflow: hidden;
   margin: 60px auto;
-  border: 3px solid #06C1DE;
+  border: 3px solid var(--secondary-accent);
   border-radius: 8px;
-  background: rgba(0,0,0,0.2);
-  box-shadow: 0 0 12px #06C1DE;
-}
-
-#lootbox h2 {
-  margin-top: 100px;
+  background: var(--bg-color);
+  box-shadow: 0 0 12px var(--secondary-accent);
 }
 
 .lootbox-roulette {
   display: flex;
   height: 100%;
   align-items: center;
-  animation: none;
 }
 
 .lootbox-prize {
@@ -656,23 +617,22 @@ table tr.current-user {
   width: 120px;
   height: 120px;
   margin: 0 8px;
-  background: #06C1DE;
+  background: var(--secondary-accent);
   border-radius: 6px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 4px #009bad;
+  box-shadow: 0 0 5px var(--border-color);
 }
 
 .lootbox-prize img {
   width: 60px;
   height: 60px;
-  object-fit: contain;
 }
 
 .lootbox-prize span {
-  color: #000;
+  color: var(--primary-color);
   font-size: 11px;
   margin-top: 6px;
   text-align: center;
@@ -684,10 +644,10 @@ table tr.current-user {
   bottom: 0;
   left: 50%;
   width: 3px;
-  background: rgba(255,255,255,0.7);
+  background: var(--border-color);
   transform: translateX(-50%);
   z-index: 2;
-  box-shadow: 0 0 8px #fff;
+  box-shadow: 0 0 8px var(--border-color);
 }
 
 #lootboxSpinBtn {
@@ -697,6 +657,9 @@ table tr.current-user {
   padding: 10px;
   font-size: 12px;
   cursor: pointer;
+  background: #222;
+  border: 2px solid var(--border-color);
+  color: var(--primary-color);
 }
 
 .lootbox-buttons {
@@ -727,7 +690,7 @@ table tr.current-user {
   }
 }
 
-/* Для мобильных устройств (портрет и ландшафт) */
+/* Для мобильных устройств */
 @media (max-width: 768px) {
   header {
     padding: 8px;
@@ -788,4 +751,3 @@ table tr.current-user {
     height: 50px;
   }
 }
-
