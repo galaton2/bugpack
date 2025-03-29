@@ -331,7 +331,7 @@ nav {
   align-items: center;
   gap: 40px;
   position: fixed;
-  bottom: 0;
+  bottom: 20px; /* Изменено: навигация поднята выше нижнего края экрана */
   left: 0;
   width: 100%;
   padding: 8px 0;
@@ -340,6 +340,7 @@ nav {
   -webkit-backdrop-filter: blur(10px);
   z-index: 1000;
 }
+
 
 nav button {
   width: 50px;
