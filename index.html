@@ -20,6 +20,25 @@
 
   <!-- Additional CSS for Loot Box block -->
   <style>
+    html, body {
+  overscroll-behavior: none;
+ 
+}
+
+body {
+  padding-top: env(safe-area-inset-top);
+}
+
+header {
+  padding-top: env(safe-area-inset-top);
+}
+
+.scrollable {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
     .case-container {
       flex-direction: column;
       align-items: center;
