@@ -24,7 +24,7 @@ html, body {
   height: 100%;
   /* Разрешаем прокрутку */
   overflow: auto;
-  background: linear-gradient(135deg, #000, #222);
+  background: linear-gradient(135deg, #000, #000000);
   font-family: var(--font-body);
   color: var(--primary-color);
 }
@@ -234,7 +234,7 @@ main {
   margin: 60px 0 20px;
   padding: 20px;
   background-color: var(--container-bg);
-  border: 2px solid var(--border-color);
+  
   border-radius: 4px;
 }
 
