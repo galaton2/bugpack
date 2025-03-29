@@ -331,7 +331,7 @@ nav {
   align-items: center;
   gap: 40px;
   position: fixed;
-  bottom: 20px; /* Поднято выше */
+  bottom: 0;
   left: 0;
   width: 100%;
   padding: 8px 0;
