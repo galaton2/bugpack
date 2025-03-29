@@ -706,3 +706,84 @@ table tr.current-user {
   gap: 10px;
   margin-top: 80px;
 }
+
+/* ========= Responsive Media Queries ========= */
+
+/* Для планшетов и небольших экранов */
+@media (max-width: 1024px) {
+  header {
+    padding: 10px;
+  }
+  main {
+    padding: 20px 15px 60px;
+  }
+  nav button {
+    width: 45px;
+    height: 45px;
+  }
+  .games-gallery {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Для мобильных устройств (портрет и ландшафт) */
+@media (max-width: 768px) {
+  header {
+    padding: 8px;
+  }
+  main {
+    padding: 15px 10px 50px;
+  }
+  .games-gallery {
+    grid-template-columns: 1fr; /* Одна колонка для узких экранов */
+  }
+  button {
+    font-size: 10px;
+    padding: 6px 12px;
+  }
+  nav button {
+    width: 40px;
+    height: 40px;
+  }
+  nav button img {
+    width: 16px;
+    height: 16px;
+  }
+  .lootbox-container {
+    height: 120px;
+  }
+  .lootbox-prize {
+    width: 100px;
+    height: 100px;
+  }
+  .modal,
+  .endgame-modal {
+    width: 90%;
+    max-width: 300px;
+  }
+}
+
+/* Для очень маленьких экранов */
+@media (max-width: 480px) {
+  header {
+    flex-direction: column;
+    padding: 5px;
+  }
+  h1, h2, h3, h4 {
+    font-size: 14px;
+  }
+  button {
+    font-size: 8px;
+    padding: 4px 8px;
+  }
+  .games-gallery {
+    grid-template-columns: 1fr;
+  }
+  nav {
+    gap: 20px;
+  }
+  nav button {
+    width: 35px;
+    height: 35px;
+  }
+}
