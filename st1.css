@@ -331,7 +331,7 @@ nav {
   align-items: center;
   gap: 40px;
   position: fixed;
-  bottom: 20px; /* Изменено: навигация поднята выше нижнего края экрана */
+  bottom: 20px; /* Поднято выше */
   left: 0;
   width: 100%;
   padding: 8px 0;
@@ -340,7 +340,6 @@ nav {
   -webkit-backdrop-filter: blur(10px);
   z-index: 1000;
 }
-
 
 nav button {
   width: 50px;
@@ -736,7 +735,7 @@ table tr.current-user {
     padding: 15px 10px 50px;
   }
   .games-gallery {
-    grid-template-columns: 1fr; /* Одна колонка для узких экранов */
+    grid-template-columns: repeat(2, 1fr);
   }
   button {
     font-size: 10px;
@@ -778,7 +777,7 @@ table tr.current-user {
     padding: 4px 8px;
   }
   .games-gallery {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
   nav {
     gap: 20px;
@@ -788,3 +787,4 @@ table tr.current-user {
     height: 35px;
   }
 }
+
