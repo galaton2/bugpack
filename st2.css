@@ -3,21 +3,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 html, body {
   width: 100%;
@@ -70,7 +56,6 @@ button {
   box-shadow: 0 4px 8px rgba(0,0,0,0.3);
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
-
 }
 
 button:hover {
@@ -186,34 +171,6 @@ button:active {
 }
 
 /* ========= Шапка (header) с эффектом блюра ========= */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 header {
   position: fixed;
   top: 0;
@@ -228,9 +185,7 @@ header {
   flex-direction: column;
   align-items: center;
   z-index: 100;
-
 }
-
 
 .user-info {
   display: flex;
@@ -245,7 +200,6 @@ header {
   border: 2px solid #fff;
   object-fit: cover;
 }
-
 
 .balances {
   display: flex;
@@ -285,7 +239,6 @@ main {
   padding: 20px;
   background-color: transparent;
   box-sizing: border-box;
-
 }
 
 .section.active {
@@ -352,7 +305,6 @@ main {
 .game-card img,
 .game-card1 img {
   object-fit: contain;
-
   margin-bottom: 6px;
 }
 
@@ -398,12 +350,10 @@ nav button {
               inset -3px -1px 1px 1px lightgray,
               inset 3px 0px 1px 1px lightgray;
   transition: transform 0.2s;
-
 }
 
 nav button:hover {
   background-color: #06B6D1;
-
 }
 
 nav button:active {
@@ -442,14 +392,11 @@ nav button img {
   max-width: 360px;
   text-align: center;
   border-radius: 10px;
-
-
 }
 
 .modal h2 {
   margin-bottom: 10px;
   font-size: 14px;
-
 }
 
 .modal p {
@@ -494,7 +441,6 @@ nav button img {
   display: flex;
   align-items: center;
   justify-content: center;
-
 }
 
 /* ========= Модальное окно результата игры ========= */
@@ -524,7 +470,6 @@ nav button img {
   max-width: 360px;
   text-align: center;
   box-shadow: 0 0 15px #0ff;
-
 }
 
 .endgame-modal h2 {
@@ -554,7 +499,6 @@ table {
   border-collapse: collapse;
   background: #150069;
   font-size: 12px;
-
 }
 
 table th,
@@ -602,7 +546,6 @@ table tr.current-user {
   width: 250px;
   height: 250px;
   background: #4ed4c6;
-
   position: relative;
   border-radius: 50%;
   overflow: hidden;
@@ -631,37 +574,31 @@ table tr.current-user {
 
 .slice1 {
   background: #6d4fba;
-
 }
 
 .slice2 {
   background: #06C1DE;
   transform: translateX(-50%) rotate(60deg);
-
 }
 
 .slice3 {
   background: #6d4fba;
   transform: translateX(-50%) rotate(120deg);
-
 }
 
 .slice4 {
   background: #06C1DE;
   transform: translateX(-50%) rotate(180deg);
-
 }
 
 .slice5 {
   background: #6d4fba;
   transform: translateX(-50%) rotate(240deg);
-
 }
 
 .slice6 {
   background: #06C1DE;
   transform: translateX(-50%) rotate(300deg);
-
 }
 
 .mid {
@@ -759,9 +696,6 @@ table tr.current-user {
   padding: 10px;
   font-size: 12px;
   cursor: pointer;
-
-
-
 }
 
 .lootbox-buttons {
