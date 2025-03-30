@@ -502,9 +502,9 @@
     // Позиция яблока
     let applePos = { x: 0, y: 0 };
 
-    // Глобальное изображение яблока (предзагружается один раз)
-    let appleImg = new Image();
-    appleImg.src = 'https://www.pngkit.com/png/full/784-7843310_christmas-star-star-pixel-art.png';
+    // Глобальный объект для изображения яблока – теперь загружается один раз
+    let appleImage = new Image();
+    appleImage.src = 'https://www.pngkit.com/png/full/784-7843310_christmas-star-star-pixel-art.png';
 
     // Флаги игры
     let isGameRunning = false;
@@ -1166,15 +1166,19 @@
       const now = performance.now();
       const factor = Math.min((now - lastLogicUpdateTime) / LOGIC_INTERVAL, 1);
       
-      // Используем глобально предзагруженное изображение яблока
-      if (appleImg.complete) {
+      // Используем глобальный appleImage вместо создания нового каждый кадр
+      if (appleImage.complete) {
         specialCtx.drawImage(
-          appleImg,
+          appleImage,
           GAME_AREA_X + applePos.x * gridSize,
           GAME_AREA_Y + applePos.y * gridSize,
           gridSize,
           gridSize
         );
+      } else {
+        // Фолбэк: отрисовка простого прямоугольника, если изображение не загружено
+        specialCtx.fillStyle = '#FF0000';
+        specialCtx.fillRect(GAME_AREA_X + applePos.x * gridSize, GAME_AREA_Y + applePos.y * gridSize, gridSize, gridSize);
       }
       
       for (let i = 0; i < localSnake.length; i++) {
