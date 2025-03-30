@@ -499,7 +499,7 @@
     let previousOpponentSnake = [];
     let lastOpponentUpdateTime = performance.now();
 
-    // Позиция «яблока» (звезды)
+    // Позиция яблока
     let applePos = { x: 0, y: 0 };
 
     // Флаги игры
@@ -535,18 +535,6 @@
 
     // Глобальная переменная для текущего баланса монет
     let currentCoins = 0;
-
-    /*
-      ======================================
-       Загрузка звёздочки (apple) один раз
-      ======================================
-    */
-    let starImage = new Image();
-    let starImageLoaded = false;
-    starImage.src = 'https://www.pngkit.com/png/full/784-7843310_christmas-star-star-pixel-art.png';
-    starImage.onload = () => {
-      starImageLoaded = true;
-    };
 
     /* ======================================
        Вспомогательная функция интерполяции
@@ -848,7 +836,7 @@
           }
         }
       });
-
+      
       oppListener = firebase.database().ref('snakeGames/' + roomId + '/players/' + opponentId)
         .on('value', (snapshot) => {
           const oppData = snapshot.val();
@@ -1059,7 +1047,7 @@
     }
 
     function checkSelfCollision() {
-      return false; // нет коллизии с собой (по условию)
+      return false;
     }
 
     /* ======================================
@@ -1170,24 +1158,22 @@
       specialCtx.clearRect(0, 0, specialGameCanvas.width, specialGameCanvas.height);
       specialCtx.fillStyle = '#00103c';
       specialCtx.fillRect(0, 0, specialGameCanvas.width, specialGameCanvas.height);
-
       drawMatrixGrid();
-
-      // Рисуем звезду (apple) только после полной загрузки
-      if (starImageLoaded) {
+      const now = performance.now();
+      const factor = Math.min((now - lastLogicUpdateTime) / LOGIC_INTERVAL, 1);
+      
+      let appleImg = new Image();
+      appleImg.src = 'https://www.pngkit.com/png/full/784-7843310_christmas-star-star-pixel-art.png';
+      if (appleImg.complete) {
         specialCtx.drawImage(
-          starImage,
+          appleImg,
           GAME_AREA_X + applePos.x * gridSize,
           GAME_AREA_Y + applePos.y * gridSize,
           gridSize,
           gridSize
         );
       }
-
-      const now = performance.now();
-      const factor = Math.min((now - lastLogicUpdateTime) / LOGIC_INTERVAL, 1);
-
-      // Интерполяция для локальной змейки
+      
       for (let i = 0; i < localSnake.length; i++) {
         const curr = localSnake[i];
         const prev = previousSnake[i] || curr;
@@ -1201,8 +1187,7 @@
         specialCtx.lineWidth = 2;
         specialCtx.strokeRect(x, y, gridSize, gridSize);
       }
-
-      // Интерполяция для змейки противника
+      
       const opponentFactor = Math.min((now - lastOpponentUpdateTime) / LOGIC_INTERVAL, 1);
       for (let i = 0; i < opponentSnake.length; i++) {
         const curr = opponentSnake[i];
@@ -1217,14 +1202,11 @@
         specialCtx.lineWidth = 2;
         specialCtx.strokeRect(x, y, gridSize, gridSize);
       }
-
-      // Текущие очки
+      
       specialCtx.fillStyle = '#00FF00';
       specialCtx.font = '12px "Press Start 2P", sans-serif';
       specialCtx.fillText(`Score: ${formatScore(score)}`, GAME_AREA_X + GAME_AREA_WIDTH - 140, GAME_AREA_Y - 30);
       specialCtx.fillText(`Opp: ${formatScore(opponentScore)}`, GAME_AREA_X + GAME_AREA_WIDTH - 140, GAME_AREA_Y - 15);
-
-      // Полоска таймера
       const barWidth = (timerCurrent / timerTotal) * GAME_AREA_WIDTH;
       specialCtx.fillStyle = '#FF00FF';
       specialCtx.fillRect(GAME_AREA_X, GAME_AREA_Y - 5, barWidth, 4);
@@ -1508,13 +1490,14 @@
     ====================================== */
     window.addEventListener('load', () => {
       const firebaseConfig = {
-        apiKey: "AIzaSyApxp0dHh0TK4nZVfOqloJ92dekjvjey3I",
-        authDomain: "meta-glitch.firebaseapp.com",
-        projectId: "meta-glitch",
-        storageBucket: "meta-glitch.firebasestorage.app",
-        messagingSenderId: "186162879710",
-        appId: "1:186162879710:web:87975bd09681505be7364f",
-        measurementId: "G-1TXVH8MESD"
+        apiKey: "AIzaSyB90ev3fJRDKmn64hLTJaWjVjpHQtMjhLg",
+        authDomain: "test-with-likes.firebaseapp.com",
+        databaseURL: "https://test-with-likes-default-rtdb.firebaseio.com",
+        projectId: "test-with-likes",
+        storageBucket: "test-with-likes.appspot.com",
+        messagingSenderId: "764738820142",
+        appId: "1:764738820142:web:b22c6608a30e46cdcea7bf",
+        measurementId: "G-WJNF0HSN9P"
       };
       if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
@@ -1617,7 +1600,7 @@
       document.getElementById('createRoomBtn').textContent = languageStrings[currentLanguage].createRoomBtn;
       document.getElementById('searchRoomBtn').textContent = languageStrings[currentLanguage].searchRoomBtn;
       document.getElementById('playFreeBtn').textContent = languageStrings[currentLanguage].playFreeBtn;
-
+      
       if(document.getElementById('createRoomTitle'))
         document.getElementById('createRoomTitle').textContent = languageStrings[currentLanguage].createRoomTitle;
       if(document.getElementById('createRoomHint'))
@@ -1626,14 +1609,14 @@
         document.getElementById('confirmCreateRoomBtn').textContent = languageStrings[currentLanguage].confirmCreateRoom;
       if(document.getElementById('cancelCreateRoomBtn'))
         document.getElementById('cancelCreateRoomBtn').textContent = languageStrings[currentLanguage].cancel;
-
+      
       if(document.getElementById('searchRoomTitle'))
         document.getElementById('searchRoomTitle').textContent = languageStrings[currentLanguage].searchRoomTitle;
       if(document.getElementById('refreshRoomsBtn'))
         document.getElementById('refreshRoomsBtn').textContent = languageStrings[currentLanguage].refresh;
       if(document.getElementById('cancelSearchRoomBtn'))
         document.getElementById('cancelSearchRoomBtn').textContent = languageStrings[currentLanguage].back;
-
+      
       if(document.getElementById('betError'))
         document.getElementById('betError').textContent = languageStrings[currentLanguage].betError;
     }
