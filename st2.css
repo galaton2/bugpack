@@ -1,0 +1,774 @@
+/* ========= Базовые сбросы ========= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+  /* Предотвращаем стандартное поведение overscroll (если поддерживается) */
+  overscroll-behavior: none;
+}
+
+/* ========= Основной стиль страницы ========= */
+body {
+  display: flex;
+  flex-direction: column;
+  background-color: #0e162e; /* Тёмный фон */
+  color: #e0e0e0;          /* Основной цвет текста */
+  font-family: sans-serif;
+}
+
+body.en {
+  font-weight: bold;
+}
+
+/* ========= Заголовки ========= */
+h1, h2, h3, h4 {
+  font-family: 'Press Start 2P', monospace;
+  text-transform: uppercase;
+  color: #bb86fc; /* Неоновый фиолетовый акцент */
+}
+
+/* ========= Анимация "нажатия" ========= */
+@keyframes press {
+  0%   { transform: translateY(0) scale(1); }
+  50%  { transform: translateY(2px) scale(0.97); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+/* ========= Кнопки ========= */
+button {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: linear-gradient(135deg, #bb86fc, #29b6f6);
+  color: #000; /* Чёрный текст */
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+}
+
+button:active {
+  animation: press 0.15s forwards;
+}
+
+/* ========= Специфичные кнопки ========= */
+.info-button {
+  margin: 20px;
+  float: right;
+}
+
+#walletLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #bb86fc, #29b6f6);
+  border: none;
+  border-radius: 4px;
+  padding: 0;
+  width: 40px;
+  height: 40px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  text-decoration: none;
+  margin-top: 2px;
+  margin-right: 10px;
+}
+
+#walletLink img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+#walletLink:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+}
+
+#walletLink:active {
+  animation: press 0.15s forwards;
+}
+
+/* ========= Кнопка "гамбургер" для настроек дизайна ========= */
+#design-settings {
+  position: fixed;
+  top: 20px;
+  left: 10px;
+  z-index: 1100;
+}
+
+#design-options {
+  display: none;
+  background: rgba(0, 0, 0, 0.85);
+  padding: 10px;
+  border: 1px solid #FF69B4;
+  text-align: center;
+  margin-top: 5px;
+  font-size: 14px;
+  color: #FF69B4;
+}
+
+#design-options p {
+  display: inline-block;
+  background: transparent;
+  border: 2px solid #FF69B4;
+  padding: 5px 10px;
+  margin: 5px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.2s, transform 0.2s;
+}
+
+#design-options p:hover {
+  background: #FF69B4;
+  color: #000;
+  transform: translateY(-2px);
+}
+
+#design-settings button {
+  width: 30px;
+  height: 20px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0;
+}
+
+#design-settings .hamburger-line {
+  width: 80%;
+  height: 3px;
+  background: #FF00FF;
+  border-radius: 2px;
+}
+
+#design-settings button:hover .hamburger-line {
+  background: #ff0037;
+}
+
+#design-settings button:active {
+  transform: translateY(2px);
+}
+
+/* ========= Шапка (header) с эффектом блюра ========= */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 12px;
+  background: rgba(14,22,46,0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 2px solid #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 100;
+
+}
+
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-info img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  object-fit: cover;
+}
+
+
+.balances {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-top: 6px;
+}
+
+.balances span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.balances img {
+  width: 35px;
+  height: 35px;
+  filter: brightness(1.2) contrast(1.1);
+}
+
+/* ========= Основной блок (main) ========= */
+main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 30px 20px 70px;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ========= Секции ========= */
+.section {
+  display: none;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  width: 100%;
+  margin: 60px 0 20px;
+  padding: 20px;
+  background-color: transparent;
+  box-sizing: border-box;
+
+}
+
+.section.active {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.section h2 {
+  font-size: 16px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.section h3 {
+  font-size: 20px;
+  margin: 50px 0 20px;
+  text-align: center;
+}
+
+/* ========= Галерея (две колонки) ========= */
+.games-gallery {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+.games-section h2 {
+  text-align: center;
+}
+
+/* ========= Карточки игр ========= */
+.game-card,
+.game-card1 {
+  background-color: #45cac5;
+  color: #ff2553;
+  padding: 10px;
+  text-align: center;
+  font-size: 0.8rem;
+  position: relative;
+  box-shadow: inset -2px 2px 1px 1px grey,
+              inset -2px -2px 1px 1px lightgray,
+              inset 2px 0px 1px 1px lightgray;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.game-card:hover,
+.game-card1:hover {
+  cursor: pointer;
+  transform: scale(1.02);
+}
+
+.game-card:active,
+.game-card1:active {
+  transform: translateY(3px);
+  box-shadow: -2px 2px 1px 1px grey,
+              -2px -2px 1px 1px lightgray,
+              2px 0px 1px 1px lightgray;
+}
+
+.game-card img,
+.game-card1 img {
+  object-fit: contain;
+
+  margin-bottom: 6px;
+}
+
+.game-card img {
+  width: 120px;
+  height: 120px;
+}
+
+.game-card1 img {
+  width: 150px;
+  height: 150px;
+}
+
+.game-card p,
+.game-card1 p {
+  margin-bottom: 6px;
+  color: #000;
+}
+
+/* ========= Нижняя навигация (nav) ========= */
+nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 8px 0;
+  background: rgba(14,22,46,0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 1000;
+}
+
+nav button {
+  width: 50px;
+  height: 50px;
+  border: none;
+  position: relative;
+  box-shadow: inset -3px 1px 1px 1px grey,
+              inset -3px -1px 1px 1px lightgray,
+              inset 3px 0px 1px 1px lightgray;
+  transition: transform 0.2s;
+
+}
+
+nav button:hover {
+  background-color: #06B6D1;
+
+}
+
+nav button:active {
+  top: 2px;
+}
+
+nav button img {
+  width: 20px;
+  height: 20px;
+  filter: brightness(0) saturate(100%);
+}
+
+/* ========= Модальные окна ========= */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.3);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.modal-backdrop.active {
+  display: flex;
+}
+
+.modal {
+  background: #0e162e;
+  border: 2px solid #3b3b3b;
+  padding: 20px;
+  width: 80%;
+  max-width: 360px;
+  text-align: center;
+  border-radius: 10px;
+
+
+}
+
+.modal h2 {
+  margin-bottom: 10px;
+  font-size: 14px;
+
+}
+
+.modal p {
+  margin-bottom: 16px;
+  font-size: 12px;
+}
+
+.modal button + button {
+  margin-left: 10px;
+}
+
+/* ========= Полноэкранное окно для игр ========= */
+.game-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: #150069;
+  display: none;
+  flex-direction: column;
+  z-index: 10000;
+}
+
+.game-modal-backdrop.active {
+  display: flex;
+}
+
+.game-modal-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-top: 0;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.game-canvas {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
+
+/* ========= Модальное окно результата игры ========= */
+.endgame-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.3);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+}
+
+.endgame-backdrop.active {
+  display: flex;
+}
+
+.endgame-modal {
+  background: #0e162e;
+  border: 2px solid #3b3b3b;
+  border-radius: 4px;
+  padding: 16px;
+  width: 80%;
+  max-width: 360px;
+  text-align: center;
+  box-shadow: 0 0 15px #0ff;
+
+}
+
+.endgame-modal h2 {
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.endgame-modal p {
+  margin-bottom: 16px;
+  font-size: 12px;
+}
+
+/* ========= Лидерборд ========= */
+.leaderboard-container {
+  margin-top: 20px;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+#leaderboardSection h2 {
+  margin-top: 40px;
+  margin-bottom: 30px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #150069;
+  font-size: 12px;
+
+}
+
+table th,
+table td {
+  padding: 8px;
+  text-align: left;
+  border: 1px solid transparent;
+}
+
+table th {
+  background: #1f1c2c;
+  color: #FF00FF;
+  font-weight: bold;
+}
+
+table tr:nth-child(even) {
+  background: #1f1c2c;
+}
+
+table tr:nth-child(odd) {
+  background: #150069;
+}
+
+table tr {
+  color: #fff;
+}
+
+table tr.current-user {
+  background: #FF00FF;
+  color: #000;
+}
+
+/* ========= Блок топ-10 лидеров ========= */
+#leaderboardTop10 {
+  border: 2px solid #FF00FF;
+  border-collapse: separate;
+}
+
+#leaderboardTop10 td {
+  border: none;
+}
+
+/* ========= Колесо фортуны (Tickets) ========= */
+.wheel {
+  width: 250px;
+  height: 250px;
+  background: #4ed4c6;
+
+  position: relative;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 0 10px gray;
+  transition: all 3s;
+  margin: 20px auto;
+}
+
+.slice {
+  height: 50%;
+  width: 60%;
+  clip-path: polygon(100% 0, 50% 100%, 0 0);
+  transform: translateX(-50%);
+  transform-origin: bottom;
+  position: absolute;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-family: monospace;
+  font-weight: 1000;
+  color: #fff;
+  writing-mode: vertical-rl;
+}
+
+.slice1 {
+  background: #6d4fba;
+
+}
+
+.slice2 {
+  background: #06C1DE;
+  transform: translateX(-50%) rotate(60deg);
+
+}
+
+.slice3 {
+  background: #6d4fba;
+  transform: translateX(-50%) rotate(120deg);
+
+}
+
+.slice4 {
+  background: #06C1DE;
+  transform: translateX(-50%) rotate(180deg);
+
+}
+
+.slice5 {
+  background: #6d4fba;
+  transform: translateX(-50%) rotate(240deg);
+
+}
+
+.slice6 {
+  background: #06C1DE;
+  transform: translateX(-50%) rotate(300deg);
+
+}
+
+.mid {
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  position: absolute;
+  background: #000;
+  top: calc(50% - 10px);
+  left: calc(50% - 10px);
+  z-index: 5;
+}
+
+/* ========= Секция Tickets ========= */
+#ticketsSection h2 {
+  margin-top: 40px;
+  font-size: 16px;
+  text-align: center;
+}
+
+.tickets-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* ========= Рулетка Lootbox ========= */
+.lootbox-container {
+  position: relative;
+  width: 95%;
+  max-width: 100%;
+  height: 160px;
+  overflow: hidden;
+  margin: 60px auto;
+  border: 3px solid #06C1DE;
+  border-radius: 8px;
+  background: rgba(0,0,0,0.2);
+  box-shadow: 0 0 12px #06C1DE;
+}
+
+#lootbox h2 {
+  margin-top: 100px;
+}
+
+.lootbox-roulette {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  animation: none;
+}
+
+.lootbox-prize {
+  flex: none;
+  width: 120px;
+  height: 120px;
+  margin: 0 8px;
+  background: #06C1DE;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px #009bad;
+}
+
+.lootbox-prize img {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+}
+
+.lootbox-prize span {
+  color: #000;
+  font-size: 11px;
+  margin-top: 6px;
+  text-align: center;
+}
+
+.lootbox-indicator {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 3px;
+  background: rgba(255,255,255,0.7);
+  transform: translateX(-50%);
+  z-index: 2;
+  box-shadow: 0 0 8px #fff;
+}
+
+#lootboxSpinBtn {
+  display: block;
+  width: 150px;
+  margin: 15px auto;
+  padding: 10px;
+  font-size: 12px;
+  cursor: pointer;
+
+
+
+}
+
+.lootbox-buttons {
+  position: relative;
+  z-index: 10;
+  transition: opacity 2s ease;
+  display: flex;
+  gap: 10px;
+  margin-top: 80px;
+}
