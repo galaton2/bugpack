@@ -502,6 +502,10 @@
     // Позиция яблока
     let applePos = { x: 0, y: 0 };
 
+    // Глобальное изображение яблока (предзагружается один раз)
+    let appleImg = new Image();
+    appleImg.src = 'https://www.pngkit.com/png/full/784-7843310_christmas-star-star-pixel-art.png';
+
     // Флаги игры
     let isGameRunning = false;
     let isGameOver = false;
@@ -1162,8 +1166,7 @@
       const now = performance.now();
       const factor = Math.min((now - lastLogicUpdateTime) / LOGIC_INTERVAL, 1);
       
-      let appleImg = new Image();
-      appleImg.src = 'https://www.pngkit.com/png/full/784-7843310_christmas-star-star-pixel-art.png';
+      // Используем глобально предзагруженное изображение яблока
       if (appleImg.complete) {
         specialCtx.drawImage(
           appleImg,
