@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
   <!-- Подключение внешнего файла CSS, если нужно -->
-  <link id="themeStylesheet" rel="stylesheet" href="st2.css">
+  <link id="themeStylesheet" rel="stylesheet" href="st1.css">
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -330,7 +330,7 @@
   <!-- Верхняя панель -->
   <div id="topBar">
     <button id="homeBackBtn">Back</button>
-    <button id="coinButton" onclick="window.location.href='soon.html'">
+    <button id="coinButton" onclick="window.location.href='buy.html'">
       0m <img src="https://raw.githubusercontent.com/qnexst/404token/main/token.png" alt="Coins" width="20"/>
     </button>
     <button id="langToggleBtn">RU</button>
@@ -344,7 +344,7 @@
     <div class="landingContent">
       <h1 id="landingTitle">Special Snake PvP</h1>
       <p id="landingText">
-       Special Snake PvP is a real-time multiplayer snake game where two players compete in a one-minute match to collect more stars than their opponent. Control your snake using keyboard arrows or swipe gestures with the on-screen joystick on mobile devices. There are no collisions—winning is determined solely by who gathers the most stars. Players enter the room with a coin bet that’s deducted once both are connected; the winner gets double the bet, while a draw refunds the stake.
+        Welcome to Special Snake PvP – an exciting world of dynamic PvP battles where speed, strategy, and reflexes determine every fight! Control your unique snake in retro style, with striking graphics and atmospheric sound effects. Every second is a battle for survival: avoid collisions, collect bonuses, and outmaneuver your opponent in the arena maze. Play with friends or random opponents in real-time and prove that you are a true snake master!
       </p>
       <button id="createRoomBtn">Create Room</button>
       <button id="searchRoomBtn">Search Room</button>
@@ -356,7 +356,7 @@
   <div id="createRoomModal" class="modal-backdrop">
     <div class="modal create-room-modal">
       <h2 id="createRoomTitle">Create Room</h2>
-      <p id="createRoomHint">Choose bet:</p>
+      <p id="createRoomHint">Choose bet (in millions):</p>
       <div class="bet-container">
         <input type="range" id="betSlider" min="1" max="100" value="1" step="1">
         <span id="betValueDisplay">1 m</span>
@@ -414,7 +414,7 @@
     <div class="modal">
       <h2>Not enough coins</h2>
       <p>You don't have enough coins to join the game.</p>
-      <button onclick="window.location.href='soon.html'">Top Up</button>
+      <button onclick="window.location.href='buy.html'">Top Up</button>
     </div>
   </div>
 
@@ -425,11 +425,9 @@
        • Если игрок выходит (обновляет страницу или закрывает окно) во время игры – его счёт устанавливается в -1, что означает автоматический проигрыш.
        • Кнопка "Join" в списке комнат отключается после первого нажатия.
        • Логика ставок:
-            - Создатель комнаты (player1) не теряет монеты до подключения противника.
-            - При заходе второго игрока (player2) списывается ставка сразу.
-            - После изменения статуса комнаты на "ready" списание для player1 происходит один раз.
-            - Если списание не удалось у одного из игроков – игра не запускается.
-            - При победе выигравший получает банк (2×ставка), при ничьей ставка возвращается, проигравший не получает ничего.
+            - Если игрок выигрывает (score больше), он получает весь банк (2×ставка).
+            - Если ничья – возвращается его исходная ставка.
+            - Проигравший не получает ничего.
        • Итоговое модальное окно отображает, сколько коинов выиграл или проиграл игрок.
     ============================================================
     */
@@ -437,14 +435,9 @@
     // Глобальная переменная для хранения текущей ставки (в монетах)
     let currentBet = 0;
 
-    // Флаги списания ставки
-    let betDeducted = {
-      player1: false,
-      player2: false
-    };
 
-    // Флаг, чтобы начисление выигрыша выполнилось один раз
-    let betsSettled = false;
+
+
 
     // Функция форматирования чисел для монет (в меню)
     function formatNumber(num) {
@@ -501,10 +494,6 @@
 
     // Позиция яблока
     let applePos = { x: 0, y: 0 };
-
-    // Глобальный объект для изображения яблока – теперь загружается один раз
-    let appleImage = new Image();
-    appleImage.src = 'https://www.pngkit.com/png/full/784-7843310_christmas-star-star-pixel-art.png';
 
     // Флаги игры
     let isGameRunning = false;
@@ -588,8 +577,8 @@
       timerTotal = 60;
       timerCurrent = 60;
       inviteLink = "";
-      betDeducted = { player1: false, player2: false };
-      betsSettled = false;
+
+
       if (waitingListener && roomId) {
         firebase.database().ref('snakeQueue/' + roomId + '/status').off('value', waitingListener);
         waitingListener = null;
@@ -643,28 +632,11 @@
       });
     }
 
-    // Универсальная функция для списания ставки у игрока
-    function deductBetForPlayer(player) {
-      const userRef = firebase.database().ref('users/' + window.currentUser.username);
-      return userRef.transaction(function(currentData) {
-        if (currentData && currentData.coins >= currentBet) {
-          currentData.coins -= currentBet;
-          return currentData;
-        }
-        return;
-      }).then(result => {
-        if (result.committed) {
-          betDeducted[player] = true;
-        }
-        return result;
-      });
-    }
-
     function showInsufficientModal() {
       document.getElementById('insufficientModal').style.display = 'flex';
     }
 
-    // Создание комнаты – списание для создателя происходит позже (после подключения второго игрока)
+    // Создание комнаты – списание для создателя происходит позже
     function createRoom(bet) {
       actuallyCreateRoom(bet);
     }
@@ -756,20 +728,17 @@
         .catch(err => console.error('Error searching rooms:', err));
     }
 
-    // Функция подключения к комнате (для player2)
     function joinRoom(roomKey) {
       firebase.database().ref('snakeQueue/' + roomKey).once('value').then(snapshot => {
         const room = snapshot.val();
         const bet = room.bet || 0;
         currentBet = bet;
         if (bet > 0) {
-          // Списываем монеты для player2
           deductUserCoins(bet).then(result => {
             if (!result.committed) {
               showInsufficientModal();
               return;
             } else {
-              betDeducted.player2 = true;
               proceedJoin(roomKey);
             }
           }).catch(err => {
@@ -818,12 +787,11 @@
           } catch (e) {
             console.error("Error reading opponent data: ", e);
           }
-          // Если текущий игрок – создатель, списываем его ставку, если ещё не выполнено
-          if (playerId === 'player1' && !betDeducted.player1) {
+          if (playerId === 'player1') {
             firebase.database().ref('snakeQueue/' + roomId + '/bet').once('value').then(snap => {
               const betValue = snap.val() || 0;
               if (betValue > 0) {
-                deductBetForPlayer('player1').then(result => {
+                deductUserCoins(betValue).then(result => {
                   if (!result.committed) {
                     showInsufficientModal();
                     cleanupRoom();
@@ -835,12 +803,18 @@
                 proceedWithOpponentFound();
               }
             });
+
+
+
+
+
+
           } else {
             proceedWithOpponentFound();
           }
         }
       });
-      
+
       oppListener = firebase.database().ref('snakeGames/' + roomId + '/players/' + opponentId)
         .on('value', (snapshot) => {
           const oppData = snapshot.val();
@@ -1088,14 +1062,16 @@
       endGame();
     }
 
-    // Функция распределения ставок – выполняется только один раз
+    // Функция распределения ставок:
+    // Если игрок выигрывает – его баланс увеличивается на 2×currentBet,
+    // если ничья – возвращается currentBet,
+    // проигравший не получает ничего.
     function settleBets() {
-      if (betsSettled) return;
-      betsSettled = true;
+
+
       if (currentBet > 0) {
-        const userRef = firebase.database().ref('users/' + window.currentUser.username);
         if (score > opponentScore) {
-          // Победитель получает банк (2×ставка)
+          const userRef = firebase.database().ref('users/' + window.currentUser.username);
           userRef.transaction(currentData => {
             if (currentData) {
               currentData.coins = (currentData.coins || 0) + currentBet * 2;
@@ -1104,7 +1080,7 @@
             return;
           });
         } else if (score === opponentScore) {
-          // Ничья – возвращается ставка
+          const userRef = firebase.database().ref('users/' + window.currentUser.username);
           userRef.transaction(currentData => {
             if (currentData) {
               currentData.coins = (currentData.coins || 0) + currentBet;
@@ -1116,7 +1092,7 @@
       }
     }
 
-    // В endGame() формируется итоговое сообщение
+    // В endGame() формируется итоговое сообщение: если игрок выиграл, пишется, что он выиграл 2×ставку, если проиграл – что проиграл свою ставку.
     function endGame() {
       stopLogicLoop();
       settleBets();
@@ -1165,22 +1141,19 @@
       drawMatrixGrid();
       const now = performance.now();
       const factor = Math.min((now - lastLogicUpdateTime) / LOGIC_INTERVAL, 1);
-      
-      // Используем глобальный appleImage вместо создания нового каждый кадр
-      if (appleImage.complete) {
+
+      let appleImg = new Image();
+      appleImg.src = 'https://www.pngkit.com/png/full/784-7843310_christmas-star-star-pixel-art.png';
+      if (appleImg.complete) {
         specialCtx.drawImage(
-          appleImage,
+          appleImg,
           GAME_AREA_X + applePos.x * gridSize,
           GAME_AREA_Y + applePos.y * gridSize,
           gridSize,
           gridSize
         );
-      } else {
-        // Фолбэк: отрисовка простого прямоугольника, если изображение не загружено
-        specialCtx.fillStyle = '#FF0000';
-        specialCtx.fillRect(GAME_AREA_X + applePos.x * gridSize, GAME_AREA_Y + applePos.y * gridSize, gridSize, gridSize);
       }
-      
+
       for (let i = 0; i < localSnake.length; i++) {
         const curr = localSnake[i];
         const prev = previousSnake[i] || curr;
@@ -1194,7 +1167,7 @@
         specialCtx.lineWidth = 2;
         specialCtx.strokeRect(x, y, gridSize, gridSize);
       }
-      
+
       const opponentFactor = Math.min((now - lastOpponentUpdateTime) / LOGIC_INTERVAL, 1);
       for (let i = 0; i < opponentSnake.length; i++) {
         const curr = opponentSnake[i];
@@ -1209,7 +1182,7 @@
         specialCtx.lineWidth = 2;
         specialCtx.strokeRect(x, y, gridSize, gridSize);
       }
-      
+
       specialCtx.fillStyle = '#00FF00';
       specialCtx.font = '12px "Press Start 2P", sans-serif';
       specialCtx.fillText(`Score: ${formatScore(score)}`, GAME_AREA_X + GAME_AREA_WIDTH - 140, GAME_AREA_Y - 30);
@@ -1496,7 +1469,7 @@
        21. ЗАПУСК ИГРЫ ПРИ ЗАГРУЗКЕ СТРАНИЦЫ
     ====================================== */
     window.addEventListener('load', () => {
-      const firebaseConfig = {
+     const firebaseConfig = {
   apiKey: "AIzaSyApxp0dHh0TK4nZVfOqloJ92dekjvjey3I",
   authDomain: "meta-glitch.firebaseapp.com",
   projectId: "meta-glitch",
@@ -1552,7 +1525,7 @@
     const languageStrings = {
       en: {
         landingTitle: "Special Snake PvP",
-        landingText: "Special Snake PvP is a real-time multiplayer snake game where two players compete in a one-minute match to collect more stars than their opponent. Control your snake using keyboard arrows or swipe gestures with the on-screen joystick on mobile devices. There are no collisions—winning is determined solely by who gathers the most stars. Players enter the room with a token bet; the winner gets double the bet, while a draw refunds the stake.",
+        landingText: "Welcome to Special Snake PvP – an exciting world of dynamic PvP battles where speed, strategy, and reflexes determine every fight! Control your unique snake in retro style, with striking graphics and atmospheric sound effects. Every second is a battle for survival: avoid collisions, collect bonuses, and outmaneuver your opponent in the arena maze. Play with friends or random opponents in real-time and prove that you are a true snake master!",
         homeBack: "Back",
         languageToggle: "RU",
         createRoomBtn: "Create Room",
@@ -1562,7 +1535,7 @@
         lose: "You Lose...",
         draw: "Draw",
         createRoomTitle: "Create Room",
-        createRoomHint: "Choose bet:",
+        createRoomHint: "Choose bet (in millions):",
         betUnit: " m",
         confirmCreateRoom: "Create",
         cancel: "Cancel",
@@ -1574,8 +1547,8 @@
         join: "Join"
       },
       ru: {
-        landingTitle: "Special Snake PvP",
-        landingText: "Special Snake PvP – это многопользовательская игра в реальном времени, где два игрока соревнуются на протяжении одной минуты за сбор большего количества звезд, чем соперник. Управляйте своей змеёй с помощью стрелок на клавиатуре или свайпов через джойстик на мобильном устройстве. Столкновений нет – победа определяется исключительно по количеству собранных звезд. Игроки входят в комнату со ставкой, победитель получает удвоенную ставку, а при ничьей ставка возвращается.",
+        landingTitle: "Спешл Снейк PvP",
+        landingText: "Добро пожаловать в Special Snake PvP – захватывающий мир динамичных PvP-сражений, где скорость, стратегия и рефлексы решают судьбу каждой битвы! Управляйте своей уникальной змеей в ретро-стилистике, с эффектной графикой и атмосферным звуковым сопровождением. Каждая секунда – это борьба за выживание: избегайте столкновений, собирайте бонусы и опережайте противника в лабиринте арены. Играйте с друзьями или случайными противниками в режиме реального времени и докажите, что вы – настоящий мастер змей!",
         homeBack: "Назад",
         languageToggle: "EN",
         createRoomBtn: "Создать рум",
@@ -1585,7 +1558,7 @@
         lose: "ты проиграл",
         draw: "Ничья",
         createRoomTitle: "Создать комнату",
-        createRoomHint: "Выберите ставку:",
+        createRoomHint: "Выберите ставку (в миллионах):",
         betUnit: " млн",
         confirmCreateRoom: "Создать",
         cancel: "Отмена",
@@ -1606,7 +1579,7 @@
       document.getElementById('createRoomBtn').textContent = languageStrings[currentLanguage].createRoomBtn;
       document.getElementById('searchRoomBtn').textContent = languageStrings[currentLanguage].searchRoomBtn;
       document.getElementById('playFreeBtn').textContent = languageStrings[currentLanguage].playFreeBtn;
-      
+
       if(document.getElementById('createRoomTitle'))
         document.getElementById('createRoomTitle').textContent = languageStrings[currentLanguage].createRoomTitle;
       if(document.getElementById('createRoomHint'))
@@ -1615,14 +1588,14 @@
         document.getElementById('confirmCreateRoomBtn').textContent = languageStrings[currentLanguage].confirmCreateRoom;
       if(document.getElementById('cancelCreateRoomBtn'))
         document.getElementById('cancelCreateRoomBtn').textContent = languageStrings[currentLanguage].cancel;
-      
+
       if(document.getElementById('searchRoomTitle'))
         document.getElementById('searchRoomTitle').textContent = languageStrings[currentLanguage].searchRoomTitle;
       if(document.getElementById('refreshRoomsBtn'))
         document.getElementById('refreshRoomsBtn').textContent = languageStrings[currentLanguage].refresh;
       if(document.getElementById('cancelSearchRoomBtn'))
         document.getElementById('cancelSearchRoomBtn').textContent = languageStrings[currentLanguage].back;
-      
+
       if(document.getElementById('betError'))
         document.getElementById('betError').textContent = languageStrings[currentLanguage].betError;
     }
