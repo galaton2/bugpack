@@ -234,7 +234,6 @@ main {
   margin: 60px 0 20px;
   padding: 20px;
   background-color: var(--container-bg);
-  
   border-radius: 4px;
 }
 
@@ -514,6 +513,7 @@ table tr.current-user {
   overflow: hidden;
   box-shadow: 0 0 10px var(--border-color);
   margin: 20px auto;
+  transition: all 3s; /* Добавлен переход для анимации */
 }
 
 .slice {
@@ -535,37 +535,37 @@ table tr.current-user {
 
 .slice1 {
   background: var(--accent-color);
-  color: #000000
+  color: #000000;
 }
 
 .slice2 {
   background: var(--secondary-accent);
   transform: translateX(-50%) rotate(60deg);
-  color: #000000
+  color: #000000;
 }
 
 .slice3 {
   background: var(--accent-color);
   transform: translateX(-50%) rotate(120deg);
-  color: #000000
+  color: #000000;
 }
 
 .slice4 {
   background: var(--secondary-accent);
   transform: translateX(-50%) rotate(180deg);
-  color: #000000
+  color: #000000;
 }
 
 .slice5 {
   background: var(--accent-color);
   transform: translateX(-50%) rotate(240deg);
-  color: #000000
+  color: #000000;
 }
 
 .slice6 {
   background: var(--secondary-accent);
   transform: translateX(-50%) rotate(300deg);
-  color: #000000
+  color: #000000;
 }
 
 .mid {
@@ -610,6 +610,7 @@ table tr.current-user {
   display: flex;
   height: 100%;
   align-items: center;
+  animation: none; /* Добавлено, как в старом коде */
 }
 
 .lootbox-prize {
