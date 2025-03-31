@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
   <!-- Подключение внешнего файла CSS, если нужно -->
-  <link id="themeStylesheet" rel="stylesheet" href="st2.css">
+  <link id="themeStylesheet" rel="stylesheet" href="st1.css">
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -34,21 +34,21 @@
     }
     /* Верхняя панель */
     #topBar {
-  position: fixed; /* или relative, если требуется */
-  top: 10;
-  left: -100px;
-  width: 100%;
-  margin: 100px;
-  height: 80px;
-z-index: 2100;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: linear-gradient(90deg, #ff007f, #007fff);
-  padding: 10px 20px;
-  box-shadow: 0 0 15px rgba(255, 0, 127, 0.5), 0 0 15px rgba(0, 127, 255, 0.5);
- 
-}
+      position: fixed; /* или relative, если требуется */
+      top: 10;
+      left: -100px;
+      width: 100%;
+      margin: 100px;
+      height: 80px;
+      z-index: 2100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(90deg, #ff007f, #007fff);
+      padding: 10px 20px;
+      box-shadow: 0 0 15px rgba(255, 0, 127, 0.5), 0 0 15px rgba(0, 127, 255, 0.5);
+    }
+
     #topBar button {
       font-family: 'Press Start 2P', sans-serif;
       font-size: 12px;
@@ -290,7 +290,7 @@ z-index: 2100;
     /* Кнопка Back во время ожидания */
     #searchBackBtn {
       position: absolute;
-      top: 10px;
+      top: 60px; /* Изменено: кнопка опущена на 50px вниз */
       left: 10px;
       font-family: 'Press Start 2P', sans-serif;
       font-size: 14px;
@@ -329,6 +329,13 @@ z-index: 2100;
       .refresh-button, .back-button {
         font-size: 10px;
         padding: 6px 10px;
+      }
+      /* Центрирование канваса на мобильных устройствах */
+      #specialGameCanvas {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
       }
     }
   </style>
@@ -441,10 +448,6 @@ z-index: 2100;
 
     // Глобальная переменная для хранения текущей ставки (в монетах)
     let currentBet = 0;
-
-
-
-
 
     // Функция форматирования чисел для монет (в меню)
     function formatNumber(num) {
@@ -584,7 +587,6 @@ z-index: 2100;
       timerTotal = 60;
       timerCurrent = 60;
       inviteLink = "";
-
 
       if (waitingListener && roomId) {
         firebase.database().ref('snakeQueue/' + roomId + '/status').off('value', waitingListener);
@@ -810,12 +812,6 @@ z-index: 2100;
                 proceedWithOpponentFound();
               }
             });
-
-
-
-
-
-
           } else {
             proceedWithOpponentFound();
           }
@@ -1074,8 +1070,6 @@ z-index: 2100;
     // если ничья – возвращается currentBet,
     // проигравший не получает ничего.
     function settleBets() {
-
-
       if (currentBet > 0) {
         if (score > opponentScore) {
           const userRef = firebase.database().ref('users/' + window.currentUser.username);
@@ -1476,15 +1470,15 @@ z-index: 2100;
        21. ЗАПУСК ИГРЫ ПРИ ЗАГРУЗКЕ СТРАНИЦЫ
     ====================================== */
     window.addEventListener('load', () => {
-     const firebaseConfig = {
-  apiKey: "AIzaSyApxp0dHh0TK4nZVfOqloJ92dekjvjey3I",
-  authDomain: "meta-glitch.firebaseapp.com",
-  projectId: "meta-glitch",
-  storageBucket: "meta-glitch.firebasestorage.app",
-  messagingSenderId: "186162879710",
-  appId: "1:186162879710:web:87975bd09681505be7364f",
-  measurementId: "G-1TXVH8MESD"
-};
+      const firebaseConfig = {
+        apiKey: "AIzaSyApxp0dHh0TK4nZVfOqloJ92dekjvjey3I",
+        authDomain: "meta-glitch.firebaseapp.com",
+        projectId: "meta-glitch",
+        storageBucket: "meta-glitch.firebasestorage.app",
+        messagingSenderId: "186162879710",
+        appId: "1:186162879710:web:87975bd09681505be7364f",
+        measurementId: "G-1TXVH8MESD"
+      };
       if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
       }
