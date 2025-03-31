@@ -713,13 +713,7 @@ table tr.current-user {
     width: 16px;
     height: 16px;
   }
-  .lootbox-container {
-    height: 120px;
-  }
-  .lootbox-prize {
-    width: 100px;
-    height: 100px;
-  }
+
   .modal,
   .endgame-modal {
     width: 90%;
