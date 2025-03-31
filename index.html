@@ -107,6 +107,10 @@
       opacity: 0;
       pointer-events: none;
     }
+    /* Новое правило для блюра: при наличии класса "blur-bg" у body, все дети, кроме навигации и модального окна freeSpin, будут заблюрены */
+    body.blur-bg > *:not(nav):not(#freeSpinModalBackdrop) {
+      filter: blur(5px);
+    }
   </style>
 
   <!-- Telegram Web App API и gifler -->
@@ -120,9 +124,6 @@
 <body>
   <!-- Header -->
   <header>
-     
-  
- 
     <div class="balances">
       <span>
         <img src="https://raw.githubusercontent.com/qnexst/404token/main/ticket.png" alt="Tickets" width="20"/>
@@ -355,6 +356,15 @@
     </div>
   </div>
 
+  <!-- Free Spin Modal -->
+  <div class="modal-backdrop" id="freeSpinModalBackdrop">
+    <div class="modal">
+      <h2>Free Spin Available!</h2>
+      <p>Claim your free spin now and win tickets on the Wheel of Fortune.</p>
+      <button id="freeSpinButton" onclick="handleFreeSpinClick()">Spin Now</button>
+    </div>
+  </div>
+
   <!-- Season Info Modal -->
   <div class="modal-backdrop" id="seasonModalBackdrop">
     <div class="modal modal-season">
@@ -519,6 +529,7 @@
     };
     let gameInProgress = false;
     let isSpinning = false;
+    let freeSpinModalShown = false;
 
     if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
       currentUser = tg.initDataUnsafe.user;
@@ -559,6 +570,11 @@
         updateTopBar();
         updateSpinButton();
         updateCaseCount();
+        // Если бесплатный спин доступен и модальное окно ещё не показывалось, показываем его
+        if (!freeSpinModalShown && (Date.now() - (localUserData.lastSpinTime || 0) >= 24 * 60 * 60 * 1000)) {
+           showFreeSpinModal();
+           freeSpinModalShown = true;
+        }
       });
     }
 
@@ -608,7 +624,21 @@
     }
 
     /* ----------------------------------------------
-       7. Game Info Modal
+       7. Free Spin Modal functions
+    ---------------------------------------------- */
+    function showFreeSpinModal() {
+      document.body.classList.add('blur-bg');
+      document.getElementById('freeSpinModalBackdrop').classList.add('active');
+    }
+    function handleFreeSpinClick() {
+      document.body.classList.remove('blur-bg');
+      document.getElementById('freeSpinModalBackdrop').classList.remove('active');
+      // Переход в секцию Tickets
+      showSection('ticketsSection');
+    }
+
+    /* ----------------------------------------------
+       8. Game Info Modal
     ---------------------------------------------- */
     function openGameInfoModal(gameData) {
       document.getElementById('gameInfoImg').src = gameData.img;
@@ -627,7 +657,7 @@
     }
 
     /* ----------------------------------------------
-       8. Start Game
+       9. Start Game
     ---------------------------------------------- */
     let currentGame = null;
     function handleStartGame(gameName, ticketCost) {
@@ -672,7 +702,7 @@
     }
 
     /* ----------------------------------------------
-       9. End Game Modal
+       10. End Game Modal
     ---------------------------------------------- */
     function showEndGameModal(title, message) {
       document.getElementById('endgameTitle').textContent = "Result";
@@ -698,7 +728,7 @@
     }
 
     /* ----------------------------------------------
-       10. Wheel of Fortune / Tickets
+       11. Wheel of Fortune / Tickets
     ---------------------------------------------- */
     let spinDuration = 4000;
     function spinWheel() {
@@ -764,7 +794,7 @@
     setInterval(updateSpinButton, 1000);
 
     /* ----------------------------------------------
-       11. Leaderboard
+       12. Leaderboard
     ---------------------------------------------- */
     let leaderboardRef = db.ref('users');
     leaderboardRef.on('value', snapshot => {
@@ -821,14 +851,14 @@
     }
 
     /* ----------------------------------------------
-       12. Buy Tickets
+       13. Buy Tickets
     ---------------------------------------------- */
     function buyTickets() {
       window.location.href = 'buyticket.html';
     }
 
     /* ----------------------------------------------
-       13. Lootbox in Cyber Case Section
+       14. Lootbox in Cyber Case Section
     ---------------------------------------------- */
     const lootboxPrizes = [
       { name: '3 tickets', image: 'https://raw.githubusercontent.com/qnexst/404token/main/ticket.png', chance: 10 },
@@ -1033,7 +1063,7 @@
     }
 
     /* ----------------------------------------------
-       14. Предотвращение нежелательного скроллинга на iOS
+       15. Предотвращение нежелательного скроллинга на iOS
        Для мини-приложения Telegram мы запрещаем стандартное поведение touchmove 
        вне области с классом "scrollable", чтобы избежать эффекта "отскока" и случайного закрытия приложения.
     ---------------------------------------------- */
