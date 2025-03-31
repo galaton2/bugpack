@@ -606,11 +606,12 @@ table tr.current-user {
   box-shadow: 0 0 12px var(--secondary-accent);
 }
 
+
 .lootbox-roulette {
   display: flex;
   height: 100%;
   align-items: center;
-  animation: none; /* Добавлено, как в старом коде */
+  animation: none;
 }
 
 .lootbox-prize {
@@ -618,22 +619,23 @@ table tr.current-user {
   width: 120px;
   height: 120px;
   margin: 0 8px;
-  background: var(--secondary-accent);
+  background: #06C1DE;
   border-radius: 6px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 0 5px var(--border-color);
+  box-shadow: 0 4px #009bad;
 }
 
 .lootbox-prize img {
   width: 60px;
   height: 60px;
+  object-fit: contain;
 }
 
 .lootbox-prize span {
-  color: var(--primary-color);
+  color: #000;
   font-size: 11px;
   margin-top: 6px;
   text-align: center;
@@ -645,11 +647,12 @@ table tr.current-user {
   bottom: 0;
   left: 50%;
   width: 3px;
-  background: var(--border-color);
+  background: rgba(255,255,255,0.7);
   transform: translateX(-50%);
   z-index: 2;
-  box-shadow: 0 0 8px var(--border-color);
+  box-shadow: 0 0 8px #fff;
 }
+
 
 #lootboxSpinBtn {
   display: block;
