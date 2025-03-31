@@ -315,9 +315,12 @@ nav {
   left: 0;
   width: 100%;
   padding: 10px 0;
-  background: var(--container-bg);
+
   border-top: 2px solid var(--border-color);
   z-index: 1000;
+   backdrop-filter: blur(10px); /* значение 10px можно менять на более или менее размытое */
+  -webkit-backdrop-filter: blur(10px); /* для поддержки в браузерах WebKit */
+
 }
 
 nav button {
