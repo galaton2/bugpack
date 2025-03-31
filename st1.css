@@ -26,7 +26,7 @@ html, body {
   height: 100%;
   /* Разрешаем прокрутку */
   overflow: auto;
-  background: linear-gradient(135deg, #000, #000000);
+  background: linear-gradient(135deg, #100164, #5f0250);
   font-family: var(--font-body);
   color: var(--primary-color);
 }
@@ -36,7 +36,7 @@ h1, h2, h3, h4 {
   font-family: var(--font-title);
   text-transform: uppercase;
   color: var(--accent-color);
-  text-shadow: 0 0 5px var(--accent-color);
+ 
   /* Убрана анимация глитча */
 }
 
@@ -173,7 +173,7 @@ header {
   top: 0;
   left: 0;
   width: 100%;
-  height: 120px;
+  height: 100px;
   padding: 12px;
   background: var(--container-bg);
   border-bottom: 2px solid var(--border-color);
@@ -189,6 +189,7 @@ header {
   display: flex;
   align-items: center;
   gap: 10px;
+  margin-top: 30px;
 }
 
 .user-info img {
@@ -204,7 +205,7 @@ header {
   display: flex;
   gap: 16px;
   align-items: center;
-  margin-top: 40px;
+  margin-top: 50px;
 }
 
 .balances span {
@@ -376,7 +377,7 @@ nav button img {
 .modal h2 {
   margin-bottom: 10px;
   font-size: 14px;
-  text-shadow: 0 0 5px var(--border-color);
+ 
 }
 
 .modal p {
