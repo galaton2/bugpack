@@ -600,42 +600,45 @@ table tr.current-user {
   height: 160px;
   overflow: hidden;
   margin: 60px auto;
-  border: 3px solid var(--secondary-accent);
+  border: 3px solid #06C1DE;
   border-radius: 8px;
-  background: rgba(0, 0, 0, 0.2); /* Используем полупрозрачный фон, как в старом коде */
-  box-shadow: 0 0 12px var(--secondary-accent);
+  background: rgba(0,0,0,0.2);
+  box-shadow: 0 0 12px #06C1DE;
+}
+
+#lootbox h2 {
+  margin-top: 100px;
 }
 
 .lootbox-roulette {
   display: flex;
   height: 100%;
   align-items: center;
-  animation: none; /* Оставляем, как было в старом коде */
+  animation: none;
 }
 
 .lootbox-prize {
-  position: relative;
-  z-index: 3; /* Гарантирует, что призы будут поверх прочих элементов */
   flex: none;
   width: 120px;
   height: 120px;
   margin: 0 8px;
-  background: var(--secondary-accent);
+  background: #06C1DE;
   border-radius: 6px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 0 5px var(--border-color);
+  box-shadow: 0 4px #009bad;
 }
 
 .lootbox-prize img {
   width: 60px;
   height: 60px;
+  object-fit: contain;
 }
 
 .lootbox-prize span {
-  color: var(--primary-color);
+  color: #000;
   font-size: 11px;
   margin-top: 6px;
   text-align: center;
@@ -647,10 +650,10 @@ table tr.current-user {
   bottom: 0;
   left: 50%;
   width: 3px;
-  background: var(--border-color);
+  background: rgba(255,255,255,0.7);
   transform: translateX(-50%);
   z-index: 2;
-  box-shadow: 0 0 8px var(--border-color);
+  box-shadow: 0 0 8px #fff;
 }
 
 #lootboxSpinBtn {
@@ -660,9 +663,6 @@ table tr.current-user {
   padding: 10px;
   font-size: 12px;
   cursor: pointer;
-  background: #222;
-  border: 2px solid var(--border-color);
-  color: var(--primary-color);
 }
 
 .lootbox-buttons {
@@ -673,7 +673,6 @@ table tr.current-user {
   gap: 10px;
   margin-top: 80px;
 }
-
 /* ========= Responsive Media Queries ========= */
 
 /* Для планшетов и небольших экранов */
