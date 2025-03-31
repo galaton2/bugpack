@@ -600,12 +600,15 @@ table tr.current-user {
   height: 160px;
   overflow: hidden;
   margin: 60px auto;
-  border: 3px solid var(--secondary-accent);
+  border: 3px solid #06C1DE;
   border-radius: 8px;
-  background: var(--bg-color);
-  box-shadow: 0 0 12px var(--secondary-accent);
+  background: rgba(0,0,0,0.2);
+  box-shadow: 0 0 12px #06C1DE;
 }
 
+#lootbox h2 {
+  margin-top: 100px;
+}
 
 .lootbox-roulette {
   display: flex;
@@ -652,7 +655,6 @@ table tr.current-user {
   z-index: 2;
   box-shadow: 0 0 8px #fff;
 }
-
 
 #lootboxSpinBtn {
   display: block;
@@ -717,13 +719,7 @@ table tr.current-user {
     width: 16px;
     height: 16px;
   }
-  .lootbox-container {
-    height: 120px;
-  }
-  .lootbox-prize {
-    width: 100px;
-    height: 100px;
-  }
+ 
   .modal,
   .endgame-modal {
     width: 90%;
