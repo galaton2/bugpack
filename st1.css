@@ -13,9 +13,11 @@
   --accent-color: #cc00cc;       /* неоновый розовый/пурпурный, темнее */
   --secondary-accent: #ccc200;   /* неоновый голубой, темнее */
   --container-bg: rgb(0, 12, 26);
+  --lootbox-color: #31005c;
   --border-color: #ccb100;
   --font-body: 'Courier New', monospace;
   --font-title: 'Press Start 2P', monospace;
+  
 }
 
 /* ========= Общие стили для html и body ========= */
@@ -617,7 +619,7 @@ table tr.current-user {
   width: 120px;
   height: 120px;
   margin: 0 8px;
-  background: var(--secondary-accent);
+  background: var(--lootbox-color);
   border-radius: 6px;
   display: flex;
   flex-direction: column;
