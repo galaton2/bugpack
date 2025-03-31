@@ -34,14 +34,21 @@
     }
     /* Верхняя панель */
     #topBar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: linear-gradient(90deg, #ff007f, #007fff);
-      padding: 10px 20px;
-      box-shadow: 0 0 15px rgba(255, 0, 127, 0.5), 0 0 15px rgba(0, 127, 255, 0.5);
-      z-index: 2100;
-    }
+  position: fixed; /* или relative, если требуется */
+  top: 10;
+  left: -100px;
+  width: 100%;
+  margin: 100px;
+  height: 80px;
+z-index: 2100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(90deg, #ff007f, #007fff);
+  padding: 10px 20px;
+  box-shadow: 0 0 15px rgba(255, 0, 127, 0.5), 0 0 15px rgba(0, 127, 255, 0.5);
+ 
+}
     #topBar button {
       font-family: 'Press Start 2P', sans-serif;
       font-size: 12px;
