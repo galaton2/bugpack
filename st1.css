@@ -8,12 +8,12 @@
 
 /* ========= Настройки корневых переменных ========= */
 :root {
-  --bg-color: #000;
+  --bg-color: #005d9c;
   --primary-color: #0c0;        /* матричный зелёный, чуть темнее */
   --accent-color: #cc00cc;       /* неоновый розовый/пурпурный, темнее */
-  --secondary-accent: #00cccc;   /* неоновый голубой, темнее */
-  --container-bg: rgba(0, 0, 0, 0.85);
-  --border-color: #cc00cc;
+  --secondary-accent: #ccc200;   /* неоновый голубой, темнее */
+  --container-bg: rgb(0, 12, 26);
+  --border-color: #ccb100;
   --font-body: 'Courier New', monospace;
   --font-title: 'Press Start 2P', monospace;
 }
