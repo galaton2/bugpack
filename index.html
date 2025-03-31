@@ -21,24 +21,19 @@
   <!-- Additional CSS for Loot Box block -->
   <style>
     html, body {
-  overscroll-behavior: none;
- 
-}
-
-body {
-  padding-top: env(safe-area-inset-top);
-}
-
-header {
-  padding-top: env(safe-area-inset-top);
-}
-
-.scrollable {
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
-}
-
+      overscroll-behavior: none;
+    }
+    body {
+      padding-top: env(safe-area-inset-top);
+    }
+    header {
+      padding-top: env(safe-area-inset-top);
+    }
+    .scrollable {
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+    }
     .case-container {
       flex-direction: column;
       align-items: center;
@@ -481,14 +476,14 @@ header {
        1. Firebase Initialization
     ---------------------------------------------- */
     const firebaseConfig = {
-  apiKey: "AIzaSyApxp0dHh0TK4nZVfOqloJ92dekjvjey3I",
-  authDomain: "meta-glitch.firebaseapp.com",
-  projectId: "meta-glitch",
-  storageBucket: "meta-glitch.firebasestorage.app",
-  messagingSenderId: "186162879710",
-  appId: "1:186162879710:web:87975bd09681505be7364f",
-  measurementId: "G-1TXVH8MESD"
-};
+      apiKey: "AIzaSyApxp0dHh0TK4nZVfOqloJ92dekjvjey3I",
+      authDomain: "meta-glitch.firebaseapp.com",
+      projectId: "meta-glitch",
+      storageBucket: "meta-glitch.firebasestorage.app",
+      messagingSenderId: "186162879710",
+      appId: "1:186162879710:web:87975bd09681505be7364f",
+      measurementId: "G-1TXVH8MESD"
+    };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
@@ -496,7 +491,13 @@ header {
        2. Telegram Web App
     ---------------------------------------------- */
     const tg = window.Telegram.WebApp;
-    tg.expand();
+    // Если поддерживается новый метод, сразу запрашиваем полноэкранный режим
+    if (typeof tg.requestFullscreen === 'function') {
+      tg.requestFullscreen();
+    } else {
+      // Альтернативно, вызываем старый метод expand() если requestFullscreen недоступен
+      tg.expand();
+    }
 
     /* ----------------------------------------------
        3. Global Variables & User Data
@@ -827,13 +828,13 @@ header {
        13. Lootbox in Cyber Case Section
     ---------------------------------------------- */
     const lootboxPrizes = [
-       { name: '3 tickets', image: 'https://raw.githubusercontent.com/qnexst/404token/main/ticket.png', chance: 10 },
+      { name: '3 tickets', image: 'https://raw.githubusercontent.com/qnexst/404token/main/ticket.png', chance: 10 },
       { name: '5 tickets', image: 'https://raw.githubusercontent.com/qnexst/404token/main/ticket.png', chance: 5 },
       { name: 'One case', image: 'https://raw.githubusercontent.com/qnexst/404token/main/case.png', chance: 5 },
       { name: '100 points', image: 'https://raw.githubusercontent.com/qnexst/404token/main/star.png', chance: 10 },
       { name: '500 points', image: 'https://raw.githubusercontent.com/qnexst/404token/main/star.png', chance: 5 },
       { name: '1M tokens', image: 'https://raw.githubusercontent.com/qnexst/404token/main/token.png', chance: 1 },
-       { name: '3M tokens', image: 'https://raw.githubusercontent.com/qnexst/404token/main/token.png', chance: 0.5 },
+      { name: '3M tokens', image: 'https://raw.githubusercontent.com/qnexst/404token/main/token.png', chance: 0.5 },
       { name: '5M tokens', image: 'https://raw.githubusercontent.com/qnexst/404token/main/token.png', chance: 0.2 },
       { name: 'NFT Special', image: 'https://img.icons8.com/color/48/nft.png', chance: 0.5 },
       { name: 'NFT Legendary', image: 'https://img.icons8.com/color/48/nft.png', chance: 1 },
