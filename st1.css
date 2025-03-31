@@ -293,7 +293,6 @@ main {
   width: 100%;
   height: auto;
   margin-bottom: 6px;
-  /* Убраны эффекты для изображений */
 }
 
 .game-card p,
@@ -506,14 +505,13 @@ table tr.current-user {
 .wheel {
   width: 250px;
   height: 250px;
-  /* Сделали фон чуть темнее */
   background: #111;
   position: relative;
   border-radius: 50%;
   overflow: hidden;
   box-shadow: 0 0 10px var(--border-color);
   margin: 20px auto;
-  transition: all 3s; /* Добавлен переход для анимации */
+  transition: all 3s;
 }
 
 .slice {
@@ -535,37 +533,37 @@ table tr.current-user {
 
 .slice1 {
   background: var(--accent-color);
-  color: #000000;
+  color: #000;
 }
 
 .slice2 {
   background: var(--secondary-accent);
   transform: translateX(-50%) rotate(60deg);
-  color: #000000;
+  color: #000;
 }
 
 .slice3 {
   background: var(--accent-color);
   transform: translateX(-50%) rotate(120deg);
-  color: #000000;
+  color: #000;
 }
 
 .slice4 {
   background: var(--secondary-accent);
   transform: translateX(-50%) rotate(180deg);
-  color: #000000;
+  color: #000;
 }
 
 .slice5 {
   background: var(--accent-color);
   transform: translateX(-50%) rotate(240deg);
-  color: #000000;
+  color: #000;
 }
 
 .slice6 {
   background: var(--secondary-accent);
   transform: translateX(-50%) rotate(300deg);
-  color: #000000;
+  color: #000;
 }
 
 .mid {
@@ -600,16 +598,13 @@ table tr.current-user {
   height: 160px;
   overflow: hidden;
   margin: 60px auto;
-  border: 3px solid #06C1DE;
+  border: 3px solid var(--secondary-accent);
   border-radius: 8px;
   background: rgba(0,0,0,0.2);
-  box-shadow: 0 0 12px #06C1DE;
+  box-shadow: 0 0 12px var(--secondary-accent);
 }
 
-#lootbox h2 {
-  margin-top: 100px;
-}
-
+/* Важно: здесь возвращаем поведение как в старом коде */
 .lootbox-roulette {
   display: flex;
   height: 100%;
@@ -622,23 +617,22 @@ table tr.current-user {
   width: 120px;
   height: 120px;
   margin: 0 8px;
-  background: #06C1DE;
+  background: var(--secondary-accent);
   border-radius: 6px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 4px #009bad;
+  box-shadow: 0 0 5px var(--border-color);
 }
 
 .lootbox-prize img {
   width: 60px;
   height: 60px;
-  object-fit: contain;
 }
 
 .lootbox-prize span {
-  color: #000;
+  color: var(--primary-color);
   font-size: 11px;
   margin-top: 6px;
   text-align: center;
@@ -650,10 +644,10 @@ table tr.current-user {
   bottom: 0;
   left: 50%;
   width: 3px;
-  background: rgba(255,255,255,0.7);
+  background: var(--border-color);
   transform: translateX(-50%);
   z-index: 2;
-  box-shadow: 0 0 8px #fff;
+  box-shadow: 0 0 8px var(--border-color);
 }
 
 #lootboxSpinBtn {
@@ -663,6 +657,9 @@ table tr.current-user {
   padding: 10px;
   font-size: 12px;
   cursor: pointer;
+  background: #222;
+  border: 2px solid var(--border-color);
+  color: var(--primary-color);
 }
 
 .lootbox-buttons {
@@ -673,6 +670,7 @@ table tr.current-user {
   gap: 10px;
   margin-top: 80px;
 }
+
 /* ========= Responsive Media Queries ========= */
 
 /* Для планшетов и небольших экранов */
@@ -753,4 +751,3 @@ table tr.current-user {
     height: 50px;
   }
 }
-
