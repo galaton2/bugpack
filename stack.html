@@ -2,7 +2,6 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <!-- Для мобильных устройств -->
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
   <title>Floppy Bird 8-bit Retro</title>
 
@@ -18,7 +17,6 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
-    /* Базовые стили, фон в стиле "8-bit" */
     html, body {
       margin: 0;
       padding: 0;
@@ -29,7 +27,6 @@
       font-family: 'Press Start 2P', monospace;
       color: #fff;
     }
-    /* Общие вспомогательные классы */
     .pixel-border {
       border: 4px solid #0ff;
       box-sizing: border-box;
@@ -47,9 +44,9 @@
     .pixel-button:active {
       filter: brightness(0.8);
     }
-    /* Шапка (header) */
     #header {
       position: absolute;
+      margin-top: 50px;
       top: 0;
       left: 0;
       width: 100%;
@@ -80,7 +77,6 @@
       width: 16px;
       height: 16px;
     }
-    /* Кнопка Back */
     #backContainer {
       position: absolute;
       top: 60px;
@@ -95,17 +91,16 @@
       cursor: pointer;
       font-family: 'Press Start 2P', monospace;
       border: 4px solid #ff0;
+      margin-top: 50px;
     }
     #backBtn:active {
       filter: brightness(0.8);
     }
-    /* Обёртка для всей игры */
     #gameWrapper {
       position: relative;
       width: 100%;
       height: 100%;
     }
-    /* Кнопка Start (видна до начала игры) */
     #startBtn {
       position: absolute;
       z-index: 10;
@@ -113,7 +108,6 @@
       left: 50%;
       transform: translate(-50%, -50%);
     }
-    /* Таймер-бар (игровой) */
     #timerBar {
       position: absolute;
       top: 60px;
@@ -132,12 +126,10 @@
       width: 100%;
       background: #0ff;
     }
-    /* Стили для канваса Floppy Bird */
     #gameCanvas {
       display: none;
       margin: 0 auto;
     }
-    /* Модальное окно (ошибки, game over) */
     .modal-backdrop {
       position: absolute;
       top: 0;
@@ -209,7 +201,7 @@
 
   <!-- Обёртка для игры -->
   <div id="gameWrapper">
-    <!-- Кнопка Start -->
+    <!-- Кнопка Start (видна до начала игры) -->
     <button id="startBtn" class="pixel-button" onclick="startFlappyBird()">
       START (1 Ticket)
     </button>
@@ -242,9 +234,9 @@
   </div>
 
   <script>
-    /* ------------------------------------------------
+    /* -------------------------------------------
        1. Инициализация Firebase и Telegram
-    ------------------------------------------------ */
+    ------------------------------------------- */
     const firebaseConfig = {
       apiKey: "AIzaSyApxp0dHh0TK4nZVfOqloJ92dekjvjey3I",
       authDomain: "meta-glitch.firebaseapp.com",
@@ -265,10 +257,7 @@
 
     let currentUser = null;
     let userRef = null;
-    let localUserData = {
-      tickets: 0,
-      points: 0
-    };
+    let localUserData = { tickets: 0, points: 0 };
 
     if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
       currentUser = tg.initDataUnsafe.user;
@@ -282,10 +271,7 @@
 
     userRef.once('value').then(snapshot => {
       if (!snapshot.exists()) {
-        userRef.set({
-          tickets: 5,
-          points: 0
-        });
+        userRef.set({ tickets: 5, points: 0 });
       }
     }).catch(err => {
       showErrorModal(404, "Firebase недоступен: " + err.message);
@@ -318,11 +304,10 @@
       document.getElementById('errorModal').classList.remove('active');
     }
 
-    /* ------------------------------------------------
-       2. Игра Floppy Bird с 3-секундным обратным отсчётом
-    ------------------------------------------------ */
+    /* -------------------------------------------
+       2. Игра Floppy Bird с time-based логикой
+    ------------------------------------------- */
     function startFlappyBird() {
-      // Проверка наличия билетов
       if (localUserData.tickets < 1) {
         showErrorModal(402, "Недостаточно билетов!");
         return;
@@ -347,58 +332,65 @@
       const img = new Image();
       img.src = "https://i.ibb.co/Q9yv5Jk/flappy-bird-set.png";
 
-      // Переменные игры
+      // Глобальные переменные игры
       let gameState = "countdown"; // Возможные состояния: "countdown", "playing", "ended"
-      let countdown = 3; // Обратный отсчёт в секундах
-      let timerInterval = null; // Для игрового таймера (120 сек.)
-      let index = 0;
+      let countdown = 3;
+      let timerInterval = null;
       let currentScore = 0;
-      const gravity = 0.3;
-      const speed = 2.5;
-      const size = [51, 36];
-      const jump = -8;
+
+      // Константы для time-based логики (единицы: px/сек, px/сек²)
+      const pipeSpeed = 150;         // Скорость труб
+      const backgroundSpeed = pipeSpeed / 2; // Скорость прокрутки фона
+      const gravity = 500;           // Ускорение гравитации
+      const jumpSpeed = -350;        // Начальная скорость прыжка
+      const birdSize = [51, 36];
       const cTenth = canvas.width / 10;
-      let flight;
-      let flyHeight;
-      let pipes = [];
       const pipeWidth = 78;
       const pipeGap = 270;
-      const pipeLoc = () => (Math.random() * ((canvas.height - (pipeGap + pipeWidth)) - pipeWidth)) + pipeWidth;
 
-      // Инициализация игровых переменных
+      let flight = jumpSpeed;
+      let flyHeight = (canvas.height / 2) - (birdSize[1] / 2);
+      let pipes = [];
+      let backgroundOffset = 0;
+      let lastTime = null; // Для вычисления delta времени
+
+      // Функция для генерации случайного положения трубы (верхняя труба)
+      const pipeLoc = () => Math.random() * ((canvas.height - (pipeGap + pipeWidth)) - pipeWidth) + pipeWidth;
+
+      // Инициализация переменных игры
       function setup() {
         currentScore = 0;
-        flight = jump;
-        flyHeight = (canvas.height / 2) - (size[1] / 2);
+        flight = jumpSpeed;
+        flyHeight = (canvas.height / 2) - (birdSize[1] / 2);
         pipes = Array(3).fill().map((_, i) => [canvas.width + (i * (pipeGap + pipeWidth)), pipeLoc()]);
       }
       setup();
 
-      // Добавляем обработчик клика для прыжка во время игры
+      // Обработчик клика для прыжка
       canvas.addEventListener('click', function() {
         if (gameState === "playing") {
-          flight = jump;
+          flight = jumpSpeed;
         }
       });
 
-      // Обратный отсчёт: каждую секунду уменьшаем значение
+      // Обратный отсчёт до начала игры
       const countdownInterval = setInterval(() => {
         countdown--;
         if (countdown <= 0) {
           clearInterval(countdownInterval);
           gameState = "playing";
-          startTimer(); // Запускаем игровой таймер (120 сек.)
+          startTimer(); // Запуск игрового таймера (120 сек.)
         }
       }, 1000);
 
-      // Функция запуска игрового таймера (2 минуты)
+      // Игровой таймер (2 минуты)
       function startTimer() {
         const totalTime = 120;
         let timeLeft = totalTime;
         document.getElementById('timerBar').style.display = 'block';
         timerInterval = setInterval(() => {
           timeLeft--;
-          document.getElementById('timerFill').style.width = (timeLeft / totalTime * 100) + '%';
+          document.getElementById('timerFill').style.width = ((timeLeft / totalTime) * 100) + '%';
           if (timeLeft <= 0) {
             clearInterval(timerInterval);
             endGameDueToTime();
@@ -424,10 +416,14 @@
         updateHeader();
       }
 
-      // Основной цикл отрисовки
-      function render() {
+      // Основной цикл игры с учётом delta времени
+      function render(timestamp) {
+        if (!lastTime) lastTime = timestamp;
+        const delta = (timestamp - lastTime) / 1000; // Преобразуем мс в секунды
+        lastTime = timestamp;
+
         if (gameState === "countdown") {
-          // Рисуем черный фон с большим числом (отсчёт)
+          // Отрисовка экрана обратного отсчёта
           ctx.fillStyle = "black";
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           ctx.font = "48px 'Press Start 2P'";
@@ -435,20 +431,19 @@
           ctx.textAlign = "center";
           ctx.fillText(countdown, canvas.width / 2, canvas.height / 2);
         } else if (gameState === "playing") {
-          index++;
-
-          // Рисуем движущийся фон
+          // Обновляем смещение фона
+          backgroundOffset = (backgroundOffset + backgroundSpeed * delta) % canvas.width;
+          // Рисуем два изображения для плавной прокрутки фона
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height,
-                        -((index * (speed / 2)) % canvas.width) + canvas.width, 0,
-                        canvas.width, canvas.height);
+                        canvas.width - backgroundOffset, 0, canvas.width, canvas.height);
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height,
-                        -(index * (speed / 2)) % canvas.width, 0,
-                        canvas.width, canvas.height);
+                        -backgroundOffset, 0, canvas.width, canvas.height);
 
           // Обновляем и отрисовываем трубы
           let collisionDetected = false;
           for (let i = 0; i < pipes.length; i++) {
-            pipes[i][0] -= speed;
+            pipes[i][0] -= pipeSpeed * delta;
+
             // Верхняя труба
             ctx.drawImage(img, 432, 588 - pipes[i][1], pipeWidth, pipes[i][1],
                           pipes[i][0], 0, pipeWidth, pipes[i][1]);
@@ -465,18 +460,19 @@
               i--;
               continue;
             }
-            // Проверка столкновения
+
+            // Проверка столкновения с трубой
             if (
-              pipes[i][0] <= cTenth + size[0] &&
+              pipes[i][0] <= cTenth + birdSize[0] &&
               pipes[i][0] + pipeWidth >= cTenth &&
-              (pipes[i][1] > flyHeight || pipes[i][1] + pipeGap < flyHeight + size[1])
+              (pipes[i][1] > flyHeight || pipes[i][1] + pipeGap < flyHeight + birdSize[1])
             ) {
               collisionDetected = true;
             }
           }
 
-          // Если птица коснулась земли
-          if (flyHeight >= canvas.height - size[1]) {
+          // Проверка столкновения с землёй
+          if (flyHeight >= canvas.height - birdSize[1]) {
             collisionDetected = true;
           }
 
@@ -491,11 +487,14 @@
             return;
           }
 
-          // Отрисовываем птицу
-          ctx.drawImage(img, 432, Math.floor((index % 9) / 3) * size[1], ...size,
-                        cTenth, flyHeight, ...size);
-          flight += gravity;
-          flyHeight = Math.min(flyHeight + flight, canvas.height - size[1]);
+          // Обновляем физику птицы
+          flight += gravity * delta;
+          flyHeight = Math.min(flyHeight + flight * delta, canvas.height - birdSize[1]);
+
+          // Отрисовываем птицу (анимация по кадрам)
+          const frameIndex = Math.floor((timestamp / 100) % 3);
+          ctx.drawImage(img, 432, frameIndex * birdSize[1], birdSize[0], birdSize[1],
+                        cTenth, flyHeight, birdSize[0], birdSize[1]);
 
           // Отрисовка счета
           ctx.font = "16px 'Press Start 2P'";
@@ -506,7 +505,9 @@
         window.requestAnimationFrame(render);
       }
 
-      img.onload = render;
+      img.onload = () => {
+        window.requestAnimationFrame(render);
+      };
     }
   </script>
 </body>
