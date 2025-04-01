@@ -126,11 +126,10 @@
       width: 100%;
       background: #0ff;
     }
-   canvas {
-  display: block;
-  margin: 0 auto;
-}
-
+    canvas {
+      display: block;
+      margin: 0 auto;
+    }
     .modal-backdrop {
       position: absolute;
       top: 0;
@@ -334,16 +333,14 @@
       img.src = "https://i.ibb.co/Q9yv5Jk/flappy-bird-set.png";
 
       // Глобальные переменные игры
-      let gameState = "countdown"; // Возможные состояния: "countdown", "playing", "ended"
-      let countdown = 3;
-      let timerInterval = null;
+      let gameState = "waiting"; // Состояния: "waiting", "playing", "ended"
       let currentScore = 0;
 
       // Константы для time-based логики (единицы: px/сек, px/сек²)
-      const pipeSpeed = 200;         // Скорость труб
-      const backgroundSpeed = pipeSpeed / 3; // Скорость прокрутки фона
-      const gravity = 500;           // Ускорение гравитации
-      const jumpSpeed = -350;        // Начальная скорость прыжка
+      const pipeSpeed = 300;         // увеличенная скорость труб (было 200)
+      const backgroundSpeed = pipeSpeed / 3; // увеличенная скорость фона
+      const gravity = 750;           // увеличенное ускорение гравитации (было 500)
+      const jumpSpeed = -525;        // увеличенная начальная скорость прыжка (было -350)
       const birdSize = [51, 36];
       const cTenth = canvas.width / 10;
       const pipeWidth = 78;
@@ -367,24 +364,18 @@
       }
       setup();
 
-      // Обработчик клика для прыжка
+      // Обработчик клика для начала игры или прыжка
       canvas.addEventListener('click', function() {
-        if (gameState === "playing") {
+        if (gameState === "waiting") {
+          gameState = "playing";
+          startTimer();
+        } else if (gameState === "playing") {
           flight = jumpSpeed;
         }
       });
 
-      // Обратный отсчёт до начала игры
-      const countdownInterval = setInterval(() => {
-        countdown--;
-        if (countdown <= 0) {
-          clearInterval(countdownInterval);
-          gameState = "playing";
-          startTimer(); // Запуск игрового таймера (120 сек.)
-        }
-      }, 1000);
-
       // Игровой таймер (2 минуты)
+      let timerInterval = null;
       function startTimer() {
         const totalTime = 120;
         let timeLeft = totalTime;
@@ -423,14 +414,33 @@
         const delta = (timestamp - lastTime) / 1000; // Преобразуем мс в секунды
         lastTime = timestamp;
 
-        if (gameState === "countdown") {
-          // Отрисовка экрана обратного отсчёта
+        if (gameState === "waiting") {
+          // Отрисовка статичного экрана с приглашением начать игру
           ctx.fillStyle = "black";
           ctx.fillRect(0, 0, canvas.width, canvas.height);
-          ctx.font = "48px 'Press Start 2P'";
+          // Рисуем фон статично
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height,
+                        0, 0, canvas.width, canvas.height);
+          // Рисуем трубы в начальном положении
+          for (let i = 0; i < pipes.length; i++) {
+            // Верхняя труба
+            ctx.drawImage(img, 432, 588 - pipes[i][1], pipeWidth, pipes[i][1],
+                          pipes[i][0], 0, pipeWidth, pipes[i][1]);
+            // Нижняя труба
+            ctx.drawImage(img, 432 + pipeWidth, 108, pipeWidth, canvas.height - pipes[i][1] + pipeGap,
+                          pipes[i][0], pipes[i][1] + pipeGap, pipeWidth, canvas.height - pipes[i][1] + pipeGap);
+          }
+          // Рисуем птицу статично
+          const frameIndex = 0;
+          ctx.drawImage(img, 432, frameIndex * birdSize[1], birdSize[0], birdSize[1],
+                        cTenth, flyHeight, birdSize[0], birdSize[1]);
+          // Текст приглашения
+          ctx.font = "24px 'Press Start 2P'";
           ctx.fillStyle = "#fff";
           ctx.textAlign = "center";
-          ctx.fillText(countdown, canvas.width / 2, canvas.height / 2);
+          ctx.fillText("TAP TO START", canvas.width / 2, canvas.height / 2);
+          window.requestAnimationFrame(render);
+          return;
         } else if (gameState === "playing") {
           // Обновляем смещение фона
           backgroundOffset = (backgroundOffset + backgroundSpeed * delta) % canvas.width;
