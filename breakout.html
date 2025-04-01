@@ -483,11 +483,13 @@
       ctx.closePath();
     }
 
-    function drawScore() {
-      ctx.font = "14px 'Press Start 2P', monospace";
-      ctx.fillStyle = "#fff";
-      ctx.fillText("Score: " + score, 10, 30);
-    }
+   function drawScore() {
+  ctx.font = "14px 'Press Start 2P', monospace";
+  ctx.fillStyle = "#fff";
+  ctx.textAlign = "center"; // центрируем по горизонтали
+  ctx.fillText("Score: " + score, canvas.width / 2, 40); // y увеличен на 10 пикселей
+}
+
 
     /* ------------------------------------------------
        8. Логика столкновений
