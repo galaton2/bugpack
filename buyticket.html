@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TON ticket Deposit</title>
+  <title>TON Ticket Deposit</title>
 
   <!-- Telegram Web App API -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -12,262 +12,103 @@
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <!-- Для работы с ячейками TON: добавьте библиотеку TON SDK (пример для браузера) -->
+  <script src="https://unpkg.com/@ton/ton@latest/dist/ton.js"></script>
 
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
   <style>
     /* ======= Basic resets and styles ======= */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    html, body {
-      width: 100%;
-      height: 100%;
-      background-color: #0e162e;
-      color: #e0e0e0;
-      font-family: sans-serif;
-      overflow-x: hidden;
-    }
-    body {
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* ======= Top Navigation Bar ======= */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; background-color: #0e162e; color: #e0e0e0; font-family: sans-serif; overflow-x: hidden; }
+    body { display: flex; flex-direction: column; }
+    /* Top Navigation Bar */
     #topBar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 50px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 15px;
-      background: rgba(14,22,46,0.85);
-      backdrop-filter: blur(8px);
-      z-index: 1000;
-      margin-top: 100px;
+      position: fixed; top: 0; left: 0; width: 100%; height: 50px;
+      display: flex; align-items: center; justify-content: space-between; padding: 0 15px;
+      background: rgba(14,22,46,0.85); backdrop-filter: blur(8px); z-index: 1000; margin-top: 100px;
     }
     #topBar button.action-btn {
-      background: linear-gradient(135deg, #bb86fc, #29b6f6);
-      border: none;
-      border-radius: 8px;
-      padding: 8px 16px;
-      color: #ffffff;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 14px;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
+      background: linear-gradient(135deg, #bb86fc, #29b6f6); border: none; border-radius: 8px;
+      padding: 8px 16px; color: #ffffff; font-family: 'Press Start 2P', monospace; font-size: 14px;
+      cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
     }
-    #topBar button.action-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-    }
+    #topBar button.action-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
     #connect button {
-      background: linear-gradient(135deg, #bb86fc, #29b6f6) !important;
-      border: none !important;
-      border-radius: 8px !important;
-      padding: 8px 16px !important;
-      color: #ffffff !important;
-      font-family: 'Press Start 2P', monospace !important;
-      font-size: 14px !important;
-      cursor: pointer !important;
-      transition: transform 0.2s, box-shadow 0.2s !important;
+      background: linear-gradient(135deg, #bb86fc, #29b6f6) !important; border: none !important;
+      border-radius: 8px !important; padding: 8px 16px !important; color: #ffffff !important;
+      font-family: 'Press Start 2P', monospace !important; font-size: 14px !important;
+      cursor: pointer !important; transition: transform 0.2s, box-shadow 0.2s !important;
     }
-    #connect button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-    }
-
-    /* ======= Main Container ======= */
+    #connect button:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+    /* Main Container */
     .container {
-      margin-top: 150px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      animation: appear 0.5s ease forwards;
-      min-height: calc(100vh - 60px);
+      margin-top: 150px; padding: 20px; display: flex; flex-direction: column; align-items: center;
+      animation: appear 0.5s ease forwards; min-height: calc(100vh - 60px);
     }
-    @keyframes appear {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ======= Balance Block ======= */
-    .balance-block {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-bottom: 40px;
-    }
-    .username {
-      font-family: 'Press Start 2P', monospace;
-      color: #bb86fc;
-      font-size: 16px;
-      margin-bottom: 5px;
-    }
-    .tickets-count {
-      font-size: 28px;
-      font-weight: bold;
-      color: #ffffff;
-      margin-bottom: 10px;
-    }
-    .balance-block img {
-      width: 24px;
-      height: 24px;
-    }
-
-    /* ======= Slider and Input Block ======= */
+    @keyframes appear { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    /* Balance Block */
+    .balance-block { display: flex; flex-direction: column; align-items: center; margin-bottom: 40px; }
+    .username { font-family: 'Press Start 2P', monospace; color: #bb86fc; font-size: 16px; margin-bottom: 5px; }
+    .tickets-count { font-size: 28px; font-weight: bold; color: #ffffff; margin-bottom: 10px; }
+    .balance-block img { width: 24px; height: 24px; }
+    /* Slider and Input Block */
     .slider-block {
-      width: 100%;
-      max-width: 400px;
-      background: rgba(255, 255, 255, 0.05);
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 15px;
-      margin-bottom: 20px;
+      width: 100%; max-width: 400px; background: rgba(255, 255, 255, 0.05); padding: 20px;
+      border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); display: flex; flex-direction: column;
+      align-items: center; gap: 15px; margin-bottom: 20px;
     }
-    .slider-title {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 16px;
-      color: #bb86fc;
-      text-align: center;
-    }
-    .slider-row {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: space-around;
-    }
+    .slider-title { font-family: 'Press Start 2P', monospace; font-size: 16px; color: #bb86fc; text-align: center; }
+    .slider-row { width: 100%; display: flex; align-items: center; justify-content: space-around; }
     input[type="range"] {
-      -webkit-appearance: none;
-      width: 60%;
-      height: 8px;
-      background: linear-gradient(90deg, #bb86fc, #29b6f6);
-      border-radius: 5px;
-      outline: none;
+      -webkit-appearance: none; width: 60%; height: 8px;
+      background: linear-gradient(90deg, #bb86fc, #29b6f6); border-radius: 5px; outline: none;
     }
     input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 20px;
-      height: 20px;
-      background: #ffffff;
-      border-radius: 50%;
-      border: 2px solid #29b6f6;
-      cursor: pointer;
+      -webkit-appearance: none; width: 20px; height: 20px;
+      background: #ffffff; border-radius: 50%; border: 2px solid #29b6f6; cursor: pointer;
     }
     #ticketInput {
-      width: 70px;
-      text-align: center;
-      font-size: 16px;
-      border: 1px solid #29b6f6;
-      border-radius: 8px;
-      padding: 6px;
-      color: #ffffff;
-      background-color: transparent;
+      width: 70px; text-align: center; font-size: 16px; border: 1px solid #29b6f6;
+      border-radius: 8px; padding: 6px; color: #ffffff; background-color: transparent;
     }
-    #ticketInput:focus {
-      outline: none;
-      box-shadow: 0 0 5px #bb86fc;
-    }
-    #priceDisplay {
-      font-size: 14px;
-      color: #ffffff;
-    }
-
-    /* ======= Action Button (для остальных кнопок на странице) ======= */
+    #ticketInput:focus { outline: none; box-shadow: 0 0 5px #bb86fc; }
+    #priceDisplay { font-size: 14px; color: #ffffff; }
+    /* Action Button */
     button.action-btn {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 14px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      background: linear-gradient(135deg, #bb86fc, #29b6f6);
-      border: none;
-      border-radius: 8px;
-      padding: 10px 20px;
-      color: #ffffff;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-      margin-top: 10px;
+      font-family: 'Press Start 2P', monospace; font-size: 14px; text-transform: uppercase;
+      letter-spacing: 1px; background: linear-gradient(135deg, #bb86fc, #29b6f6); border: none;
+      border-radius: 8px; padding: 10px 20px; color: #ffffff; box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; margin-top: 10px;
     }
-    button.action-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 12px rgba(0,0,0,0.3);
-    }
-    button.action-btn:active {
-      transform: translateY(0);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-    }
-
-    /* ======= Modal Window ======= */
+    button.action-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.3); }
+    button.action-btn:active { transform: translateY(0); box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+    /* Modal Window */
     #notificationModal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0,0,0,0.5);
-      z-index: 2000;
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.5); z-index: 2000;
     }
     .modal-content {
-      background: rgba(14,22,46,0.95);
-      padding: 20px;
-      border-radius: 10px;
-      text-align: center;
-      width: 80%;
-      max-width: 360px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+      background: rgba(14,22,46,0.95); padding: 20px; border-radius: 10px; text-align: center;
+      width: 80%; max-width: 360px; box-shadow: 0 4px 8px rgba(0,0,0,0.4);
     }
-    .modal-content p {
-      font-size: 14px;
-      color: #e0e0e0;
-      margin-bottom: 16px;
-    }
-
-    /* ======= Responsive Styles for Mobile ======= */
+    .modal-content p { font-size: 14px; color: #e0e0e0; margin-bottom: 16px; }
+    /* Responsive */
     @media (max-width: 480px) {
-      .slider-block {
-        padding: 15px;
-      }
-      .slider-title {
-        font-size: 14px;
-      }
-      .tickets-count {
-        font-size: 24px;
-      }
-      button.action-btn {
-        padding: 8px 16px;
-        font-size: 12px;
-      }
-      #ticketInput {
-        width: 60px;
-        font-size: 14px;
-      }
+      .slider-block { padding: 15px; }
+      .slider-title { font-size: 14px; }
+      .tickets-count { font-size: 24px; }
+      button.action-btn { padding: 8px 16px; font-size: 12px; }
+      #ticketInput { width: 60px; font-size: 14px; }
     }
   </style>
 </head>
 <body>
-  <!-- Top Navigation Bar: "Back", "Language Switch" and TonConnect -->
+  <!-- Top Navigation Bar: Back, Language Switch and TonConnect -->
   <div id="topBar">
-    <button id="backButton" class="action-btn" onclick="goBack()" aria-label="Back">
-      &#8592;
-    </button>
-    <button id="langSwitchBtn" class="action-btn" onclick="toggleLanguage()" aria-label="Switch Language">
-      RU
-    </button>
+    <button id="backButton" class="action-btn" onclick="goBack()" aria-label="Back">&#8592;</button>
+    <button id="langSwitchBtn" class="action-btn" onclick="toggleLanguage()" aria-label="Switch Language">RU</button>
     <div id="connect"></div>
   </div>
 
@@ -288,9 +129,7 @@
         <input type="number" id="ticketInput" min="5" max="30" step="5" value="5" oninput="onTicketInputChange()" aria-label="Number of tickets" />
       </div>
       <div id="priceDisplay">Price: 0.5 TON</div>
-      <button class="action-btn" id="depositBtn" onclick="makeDeposit()" aria-label="Buy Tickets">
-        Buy Tickets
-      </button>
+      <button class="action-btn" id="depositBtn" onclick="makeDeposit()" aria-label="Buy Tickets">Buy Tickets</button>
     </div>
   </div>
 
@@ -411,7 +250,7 @@
     }
 
     /* --------------------------------------------------
-       7. TonConnect UI
+       7. TonConnect UI Initialization
     -------------------------------------------------- */
     const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
       manifestUrl: 'https://fixglitch.xyz/tonconnect-manifest.json',
@@ -447,6 +286,7 @@
     function showModal(message) {
       document.getElementById('modalMessage').textContent = message;
       document.getElementById('notificationModal').style.display = 'flex';
+      // Скрываем кнопку OK во время загрузки
       document.getElementById('modalOkButton').style.display = 'none';
     }
     function closeModal() {
@@ -454,25 +294,7 @@
     }
 
     /* --------------------------------------------------
-       10. Helpers to build comment in HEX
-    -------------------------------------------------- */
-    // Функция возвращает HEX-представление любой строки
-    function strToHex(str) {
-      const encoder = new TextEncoder();
-      const data = encoder.encode(str);
-      return Array.from(data, byte => byte.toString(16).padStart(2, '0')).join('');
-    }
-
-    // Генерируем комментарий: последние 3 символа username + 2 рандомные цифры
-    function generateComment(username) {
-      const lastThree = username.slice(-3); // берём последние 3 символа, если меньше - берём всё, что есть
-      const randomNum = Math.floor(Math.random() * 100); // 0..99
-      const twoDigits = String(randomNum).padStart(2, '0'); // обязательно 2 цифры
-      return lastThree + twoDigits; // итоговая строка
-    }
-
-    /* --------------------------------------------------
-       11. Send Transaction (makeDeposit) with Loading + comment
+       10. Send Transaction (makeDeposit) with Comment Payload
     -------------------------------------------------- */
     async function makeDeposit() {
       if (!currentUsername || !userRef) {
@@ -480,27 +302,38 @@
         document.getElementById('modalOkButton').style.display = 'block';
         return;
       }
+      // Получаем количество билетов
       const val = parseInt(document.getElementById('ticketInput').value, 10);
       const ticketCount = isNaN(val) ? 5 : val;
+      // Расчет суммы в нанотоннах (0.1 TON за билет)
       const nanoAmount = (ticketCount * 0.1 * 1e9).toString();
 
-      // Генерируем «комментарий»
-      const commentString = generateComment(currentUsername);
-      // Переводим его в hex. Для TonConnect payload указываем в 0x-hex-формате.
-      const hexComment = "0x" + strToHex(commentString);
+      // Формирование комментария:
+      // Берем 3 последних символа Telegram username и добавляем 2 случайные цифры
+      const usernamePart = currentUsername.slice(-3);
+      const randomTwoDigits = Math.floor(10 + Math.random() * 90).toString();
+      const commentText = usernamePart + randomTwoDigits;
 
+      // Создаем ячейку с payload, где:
+      // 1. 32 бита нулей (указывают на текстовый комментарий)
+      // 2. Текст комментария
+      const commentCell = ton.BeginCell()
+          .storeUint(0, 32)               // 32 бита нулей
+          .storeStringTail(commentText)   // Текст комментария
+          .endCell();
+      const payloadBase64 = commentCell.toBoc().toString('base64');
+
+      // Формируем объект транзакции
       const transaction = {
-        validUntil: Math.round(Date.now() / 1000) + 60,
-        messages: [
-          {
-            address: 'UQBRiESLIYaCIL6q9s9frfp3ZGz2Yp29FBycV0GIRZdeY9zP',
-            amount: nanoAmount,
-            payload: hexComment  // Комментарий
-          }
-        ]
+        validUntil: Math.floor(Date.now() / 1000) + 60,
+        messages: [{
+          address: 'UQBRiESLIYaCIL6q9s9frfp3ZGz2Yp29FBycV0GIRZdeY9zP', // Адрес получателя
+          amount: nanoAmount,
+          payload: payloadBase64
+        }]
       };
 
-      // Показываем окно загрузки
+      // Показываем окно загрузки с сообщением "Checking payment..." / "Проверяем платеж..."
       showModal(translations[currentLanguage].loading);
 
       try {
@@ -513,6 +346,7 @@
           const price = (ticketCount * 0.1).toFixed(1);
           document.getElementById('modalMessage').textContent = translations[currentLanguage].depositSuccess(ticketCount, price);
           document.getElementById('modalOkButton').style.display = 'block';
+          console.log('Транзакция выполнена. Комментарий:', commentText);
         }, 15000);
       } catch (err) {
         // При ошибке через 5 секунд обновляем сообщение и отображаем кнопку OK
@@ -525,3 +359,4 @@
   </script>
 </body>
 </html>
+
