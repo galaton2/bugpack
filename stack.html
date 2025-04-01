@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
-  <title>Floppy Bird 8-bit Retro</title>
+  <title>Flappy Bird 8-bit Retro</title>
 
   <!-- Font: Press Start 2P -->
   <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -126,10 +126,11 @@
       width: 100%;
       background: #0ff;
     }
-    #gameCanvas {
-      display: none;
-      margin: 0 auto;
-    }
+   canvas {
+  display: block;
+  margin: 0 auto;
+}
+
     .modal-backdrop {
       position: absolute;
       top: 0;
@@ -339,8 +340,8 @@
       let currentScore = 0;
 
       // Константы для time-based логики (единицы: px/сек, px/сек²)
-      const pipeSpeed = 150;         // Скорость труб
-      const backgroundSpeed = pipeSpeed / 2; // Скорость прокрутки фона
+      const pipeSpeed = 200;         // Скорость труб
+      const backgroundSpeed = pipeSpeed / 3; // Скорость прокрутки фона
       const gravity = 500;           // Ускорение гравитации
       const jumpSpeed = -350;        // Начальная скорость прыжка
       const birdSize = [51, 36];
