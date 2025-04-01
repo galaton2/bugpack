@@ -300,7 +300,7 @@
   <div id="notificationModal">
     <div class="modal-content">
       <p id="modalMessage"></p>
-      <button class="action-btn" onclick="closeModal()">OK</button>
+      <button class="action-btn" id="modalOkButton" onclick="closeModal()" style="display:none;">OK</button>
     </div>
   </div>
 
@@ -318,7 +318,8 @@
         depositSuccess: (tickets, price) => `Успешная покупка: ${tickets} билетов за ${price} TON!`,
         depositError: "Транзакция отклонена или произошла ошибка.",
         userError: "Ошибка: пользователь Telegram не определён!",
-        userNotAuthorized: "Не авторизован в Telegram"
+        userNotAuthorized: "Не авторизован в Telegram",
+        loading: "Проверяем платеж..."
       },
       en: {
         back: "Back",
@@ -328,7 +329,8 @@
         depositSuccess: (tickets, price) => `Successfully purchased ${tickets} tickets for ${price} TON!`,
         depositError: "Transaction was declined or an error occurred.",
         userError: "Error: Telegram user is not defined!",
-        userNotAuthorized: "Not authorized in Telegram"
+        userNotAuthorized: "Not authorized in Telegram",
+        loading: "Checking payment..."
       }
     };
 
@@ -354,37 +356,20 @@
     let userRef = null;
     let localTickets = 0;
 
-
-
     /* --------------------------------------------------
        3. Firebase Initialization
     -------------------------------------------------- */
     const firebaseConfig = {
-  apiKey: "AIzaSyApxp0dHh0TK4nZVfOqloJ92dekjvjey3I",
-  authDomain: "meta-glitch.firebaseapp.com",
-  projectId: "meta-glitch",
-  storageBucket: "meta-glitch.firebasestorage.app",
-  messagingSenderId: "186162879710",
-  appId: "1:186162879710:web:87975bd09681505be7364f",
-  measurementId: "G-1TXVH8MESD"
-};
+      apiKey: "AIzaSyApxp0dHh0TK4nZVfOqloJ92dekjvjey3I",
+      authDomain: "meta-glitch.firebaseapp.com",
+      projectId: "meta-glitch",
+      storageBucket: "meta-glitch.firebasestorage.app",
+      messagingSenderId: "186162879710",
+      appId: "1:186162879710:web:87975bd09681505be7364f",
+      measurementId: "G-1TXVH8MESD"
+    };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     /* --------------------------------------------------
        4. Check Telegram User
@@ -397,17 +382,10 @@
         userRef.once('value', snapshot => {
           if (!snapshot.exists()) {
             userRef.set({
-
               tickets: 0,
               points: 0,
               lastSpinTime: 0
-
-
-
             });
-
-
-
           }
         });
         userRef.on('value', snapshot => {
@@ -471,17 +449,20 @@
     function showModal(message) {
       document.getElementById('modalMessage').textContent = message;
       document.getElementById('notificationModal').style.display = 'flex';
+      // Скрываем кнопку OK во время загрузки
+      document.getElementById('modalOkButton').style.display = 'none';
     }
     function closeModal() {
       document.getElementById('notificationModal').style.display = 'none';
     }
 
     /* --------------------------------------------------
-       10. Send Transaction (makeDeposit)
+       10. Send Transaction (makeDeposit) with Loading
     -------------------------------------------------- */
     async function makeDeposit() {
       if (!currentUsername || !userRef) {
         showModal(translations[currentLanguage].userError);
+        document.getElementById('modalOkButton').style.display = 'block';
         return;
       }
       const val = parseInt(document.getElementById('ticketInput').value, 10);
@@ -496,17 +477,27 @@
           }
         ]
       };
+
+      // Показываем окно загрузки с сообщением "Checking payment..." / "Проверяем платеж..."
+      showModal(translations[currentLanguage].loading);
+
       try {
-
         await tonConnectUI.sendTransaction(transaction);
-        localTickets += ticketCount;
-        updateTicketsDisplay(localTickets);
-        userRef.update({ tickets: localTickets });
-
-        const price = (ticketCount * 0.1).toFixed(1);
-        showModal(translations[currentLanguage].depositSuccess(ticketCount, price));
+        // При успешной транзакции через 15 секунд обновляем сообщение и отображаем кнопку OK
+        setTimeout(() => {
+          localTickets += ticketCount;
+          updateTicketsDisplay(localTickets);
+          userRef.update({ tickets: localTickets });
+          const price = (ticketCount * 0.1).toFixed(1);
+          document.getElementById('modalMessage').textContent = translations[currentLanguage].depositSuccess(ticketCount, price);
+          document.getElementById('modalOkButton').style.display = 'block';
+        }, 15000);
       } catch (err) {
-        showModal(translations[currentLanguage].depositError);
+        // При ошибке через 5 секунд обновляем сообщение и отображаем кнопку OK
+        setTimeout(() => {
+          document.getElementById('modalMessage').textContent = translations[currentLanguage].depositError;
+          document.getElementById('modalOkButton').style.display = 'block';
+        }, 5000);
       }
     }
   </script>
