@@ -250,27 +250,27 @@
         <div class="wheel" id="wheel">
           <div class="slice slice1">
             <img width="24" height="32" src="https://raw.githubusercontent.com/qnexst/404token/main/ticket.png" alt="ticket"/>
-            <span>2</span>
+            <span>5</span>
           </div>
           <div class="slice slice2">
             <img width="24" height="32" src="https://raw.githubusercontent.com/qnexst/404token/main/ticket.png" alt="ticket"/>
-            <span>5</span>
+            <span>8</span>
           </div>
           <div class="slice slice3">
             <img width="24" height="32" src="https://raw.githubusercontent.com/qnexst/404token/main/ticket.png" alt="ticket"/>
-            <span>8</span>
+            <span>11</span>
           </div>
           <div class="slice slice4">
             <img width="24" height="32" src="https://raw.githubusercontent.com/qnexst/404token/main/ticket.png" alt="ticket"/>
-            <span>10</span>
+            <span>14</span>
           </div>
           <div class="slice slice5">
             <img width="24" height="32" src="https://raw.githubusercontent.com/qnexst/404token/main/ticket.png" alt="ticket"/>
-            <span>13</span>
+            <span>17</span>
           </div>
           <div class="slice slice6">
             <img width="24" height="32" src="https://raw.githubusercontent.com/qnexst/404token/main/ticket.png" alt="ticket"/>
-            <span>15</span>
+            <span>20</span>
           </div>
         </div>
         <div class="wheel-pointer"></div>
@@ -393,7 +393,7 @@
         - NFT Red (1%) – Special<br>
         - NFT Yellow (2%) – Legendary<br>
         - NFT Green (3%) – Rare<br>
-        - 1000 points (2%)
+        
       </p>
       <button class="close-modal" onclick="closeLootBoxInfoModal()">Close</button>
     </div>
@@ -748,17 +748,17 @@
         let finalDeg = randomRotation % 360;
         let wonTickets = 0;
         if (finalDeg < 60) {
-          wonTickets = 2;
-        } else if (finalDeg < 120) {
           wonTickets = 5;
-        } else if (finalDeg < 180) {
+        } else if (finalDeg < 120) {
           wonTickets = 8;
+        } else if (finalDeg < 180) {
+          wonTickets = 11;
         } else if (finalDeg < 240) {
-          wonTickets = 10;
+          wonTickets = 14;
         } else if (finalDeg < 300) {
-          wonTickets = 13;
+          wonTickets = 17;
         } else {
-          wonTickets = 15;
+          wonTickets = 20;
         }
         localUserData.tickets += wonTickets;
         updateTopBar();
