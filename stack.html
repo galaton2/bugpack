@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
@@ -13,7 +13,7 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
-  <!-- Telegram Web App API (если требуется) -->
+  <!-- Telegram Web App API (if needed) -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
@@ -107,7 +107,7 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-        font-size: 12px;
+      font-size: 12px;
       padding: 10px 20px;
       background: #0ff;
       color: #000;
@@ -135,10 +135,9 @@
       background: #0ff;
     }
 
-#gameCanvas {
-  margin-top: 30px;
-}
-
+    #gameCanvas {
+      margin-top: 30px;
+    }
     
     .modal-backdrop {
       position: absolute;
@@ -189,7 +188,7 @@
   </style>
 </head>
 <body>
-  <!-- Header с информацией -->
+  <!-- Header with Information -->
   <div id="header" class="pixel-border">
     <div id="info">
       <span id="username">@User</span>
@@ -204,29 +203,27 @@
     </div>
   </div>
 
-  <!-- Кнопка Back -->
+  <!-- Back Button -->
   <div id="backContainer">
     <button id="backBtn" onclick="goBack()">Back</button>
   </div>
 
-  <!-- Обёртка для игры -->
+  <!-- Game Wrapper -->
   <div id="gameWrapper">
-    <!-- Кнопка Start (видна до начала игры) -->
+    <!-- Start Button (visible before game starts) -->
     <button id="startBtn" class="pixel-button" onclick="startFlappyBird()">
       START (1 Ticket)
     </button>
     
-    <!-- Таймер-бар (игровой) -->
+    <!-- Game Timer Bar -->
     <div id="timerBar">
       <div id="timerFill"></div>
     </div>
     
-    <!-- Канвас для Floppy Bird -->
-<canvas id="gameCanvas" width="431" height="768" style="position: relative; top: 30px;"></canvas>
+    <!-- Canvas for Flappy Bird -->
+    <canvas id="gameCanvas" width="431" height="768" style="position: relative; top: 30px;"></canvas>
 
-
-    
-    <!-- Модальное окно окончания игры -->
+    <!-- Game Over Modal -->
     <div id="endModal" class="modal-backdrop">
       <div class="modal pixel-border">
         <h2 id="endTitle">Game Over!</h2>
@@ -235,7 +232,7 @@
       </div>
     </div>
     
-    <!-- Модальное окно для ошибок -->
+    <!-- Error Modal -->
     <div id="errorModal" class="modal-backdrop">
       <div class="modal pixel-border">
         <h2 id="errorCodeTitle">Error</h2>
@@ -247,7 +244,7 @@
 
   <script>
     /* -------------------------------------------
-       1. Инициализация Firebase и Telegram
+       1. Firebase and Telegram Initialization
     ------------------------------------------- */
     const firebaseConfig = {
       apiKey: "AIzaSyApxp0dHh0TK4nZVfOqloJ92dekjvjey3I",
@@ -286,7 +283,7 @@
         userRef.set({ tickets: 5, points: 0 });
       }
     }).catch(err => {
-      showErrorModal(404, "Firebase недоступен: " + err.message);
+      showErrorModal(404, "Firebase unavailable: " + err.message);
     });
 
     userRef.on('value', snapshot => {
@@ -295,7 +292,7 @@
       localUserData.points  = data.points  || 0;
       updateHeader();
     }, (error) => {
-      showErrorModal(404, "Ошибка чтения из БД: " + error.message);
+      showErrorModal(404, "Database read error: " + error.message);
     });
 
     function updateHeader() {
@@ -317,26 +314,26 @@
     }
 
     /* -------------------------------------------
-       2. Игра Floppy Bird с time-based логикой
+       2. Flappy Bird Game with Time-Based Logic
     ------------------------------------------- */
     function startFlappyBird() {
       if (localUserData.tickets < 1) {
-        showErrorModal(402, "Недостаточно билетов!");
+        showErrorModal(402, "Not enough tickets!");
         return;
       }
-      // Списываем билет
+      // Deduct a ticket
       localUserData.tickets--;
       if (userRef) {
         userRef.update({ tickets: localUserData.tickets });
       }
       updateHeader();
 
-      // Скрываем элементы интерфейса
+      // Hide UI elements
       document.getElementById('header').style.display = 'none';
       document.getElementById('backContainer').style.display = 'none';
       document.getElementById('startBtn').style.display = 'none';
 
-      // Показываем канвас
+      // Show the canvas
       const canvas = document.getElementById('gameCanvas');
       canvas.style.display = 'block';
       const ctx = canvas.getContext('2d');
@@ -344,15 +341,15 @@
       const img = new Image();
       img.src = "https://i.ibb.co/Q9yv5Jk/flappy-bird-set.png";
 
-      // Глобальные переменные игры
-      let gameState = "waiting"; // Состояния: "waiting", "playing", "ended"
+      // Global game variables
+      let gameState = "waiting"; // States: "waiting", "playing", "ended"
       let currentScore = 0;
 
-      // Константы для time-based логики (единицы: px/сек, px/сек²)
-      const pipeSpeed = 300;         // увеличенная скорость труб (было 200)
-      const backgroundSpeed = pipeSpeed / 3; // увеличенная скорость фона
-      const gravity = 1500;           // увеличенное ускорение гравитации (было 500)
-      const jumpSpeed = -425;        // увеличенная начальная скорость прыжка (было -350)
+      // Constants for time-based logic (units: px/sec, px/sec²)
+      const pipeSpeed = 300;         // increased pipe speed
+      const backgroundSpeed = pipeSpeed / 3; // increased background speed
+      const gravity = 1500;          // increased gravity
+      const jumpSpeed = -425;        // increased jump speed
       const birdSize = [51, 36];
       const cTenth = canvas.width / 10;
       const pipeWidth = 78;
@@ -362,12 +359,12 @@
       let flyHeight = (canvas.height / 2) - (birdSize[1] / 2);
       let pipes = [];
       let backgroundOffset = 0;
-      let lastTime = null; // Для вычисления delta времени
+      let lastTime = null; // For delta time calculation
 
-      // Функция для генерации случайного положения трубы (верхняя труба)
+      // Function to generate a random pipe position (upper pipe)
       const pipeLoc = () => Math.random() * ((canvas.height - (pipeGap + pipeWidth)) - pipeWidth) + pipeWidth;
 
-      // Инициализация переменных игры
+      // Initialize game variables
       function setup() {
         currentScore = 0;
         flight = jumpSpeed;
@@ -376,7 +373,7 @@
       }
       setup();
 
-      // Обработчик клика для начала игры или прыжка
+      // Click handler to start the game or jump
       canvas.addEventListener('click', function() {
         if (gameState === "waiting") {
           gameState = "playing";
@@ -386,7 +383,7 @@
         }
       });
 
-      // Игровой таймер (2 минуты)
+      // Game timer (2 minutes)
       let timerInterval = null;
       function startTimer() {
         const totalTime = 120;
@@ -420,33 +417,33 @@
         updateHeader();
       }
 
-      // Основной цикл игры с учётом delta времени
+      // Main game loop with delta time
       function render(timestamp) {
         if (!lastTime) lastTime = timestamp;
-        const delta = (timestamp - lastTime) / 1000; // Преобразуем мс в секунды
+        const delta = (timestamp - lastTime) / 1000; // Convert ms to seconds
         lastTime = timestamp;
 
         if (gameState === "waiting") {
-          // Отрисовка статичного экрана с приглашением начать игру
+          // Render static screen with prompt to start the game
           ctx.fillStyle = "black";
           ctx.fillRect(0, 0, canvas.width, canvas.height);
-          // Рисуем фон статично
+          // Draw static background
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height,
                         0, 0, canvas.width, canvas.height);
-          // Рисуем трубы в начальном положении
+          // Draw pipes in initial positions
           for (let i = 0; i < pipes.length; i++) {
-            // Верхняя труба
+            // Upper pipe
             ctx.drawImage(img, 432, 588 - pipes[i][1], pipeWidth, pipes[i][1],
                           pipes[i][0], 0, pipeWidth, pipes[i][1]);
-            // Нижняя труба
+            // Lower pipe
             ctx.drawImage(img, 432 + pipeWidth, 108, pipeWidth, canvas.height - pipes[i][1] + pipeGap,
                           pipes[i][0], pipes[i][1] + pipeGap, pipeWidth, canvas.height - pipes[i][1] + pipeGap);
           }
-          // Рисуем птицу статично
+          // Draw bird statically
           const frameIndex = 0;
           ctx.drawImage(img, 432, frameIndex * birdSize[1], birdSize[0], birdSize[1],
                         cTenth, flyHeight, birdSize[0], birdSize[1]);
-          // Текст приглашения
+          // Prompt text
           ctx.font = "24px 'Press Start 2P'";
           ctx.fillStyle = "#fff";
           ctx.textAlign = "center";
@@ -454,27 +451,27 @@
           window.requestAnimationFrame(render);
           return;
         } else if (gameState === "playing") {
-          // Обновляем смещение фона
+          // Update background offset
           backgroundOffset = (backgroundOffset + backgroundSpeed * delta) % canvas.width;
-          // Рисуем два изображения для плавной прокрутки фона
+          // Draw two images for smooth background scrolling
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height,
                         canvas.width - backgroundOffset, 0, canvas.width, canvas.height);
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height,
                         -backgroundOffset, 0, canvas.width, canvas.height);
 
-          // Обновляем и отрисовываем трубы
+          // Update and draw pipes
           let collisionDetected = false;
           for (let i = 0; i < pipes.length; i++) {
             pipes[i][0] -= pipeSpeed * delta;
 
-            // Верхняя труба
+            // Upper pipe
             ctx.drawImage(img, 432, 588 - pipes[i][1], pipeWidth, pipes[i][1],
                           pipes[i][0], 0, pipeWidth, pipes[i][1]);
-            // Нижняя труба
+            // Lower pipe
             ctx.drawImage(img, 432 + pipeWidth, 108, pipeWidth, canvas.height - pipes[i][1] + pipeGap,
                           pipes[i][0], pipes[i][1] + pipeGap, pipeWidth, canvas.height - pipes[i][1] + pipeGap);
 
-            // Если труба ушла за экран, удаляем её и добавляем новую
+            // If a pipe goes off-screen, remove it and add a new one
             if (pipes[i][0] <= -pipeWidth) {
               currentScore++;
               pipes.shift();
@@ -484,7 +481,7 @@
               continue;
             }
 
-            // Проверка столкновения с трубой
+            // Pipe collision detection
             if (
               pipes[i][0] <= cTenth + birdSize[0] &&
               pipes[i][0] + pipeWidth >= cTenth &&
@@ -494,7 +491,7 @@
             }
           }
 
-          // Проверка столкновения с землёй
+          // Ground collision detection
           if (flyHeight >= canvas.height - birdSize[1]) {
             collisionDetected = true;
           }
@@ -510,20 +507,20 @@
             return;
           }
 
-          // Обновляем физику птицы
+          // Update bird physics
           flight += gravity * delta;
           flyHeight = Math.min(flyHeight + flight * delta, canvas.height - birdSize[1]);
 
-          // Отрисовываем птицу (анимация по кадрам)
+          // Draw bird (frame animation)
           const frameIndex = Math.floor((timestamp / 100) % 3);
           ctx.drawImage(img, 432, frameIndex * birdSize[1], birdSize[0], birdSize[1],
                         cTenth, flyHeight, birdSize[0], birdSize[1]);
 
-          // Отрисовка счета
+          // Render counter only (centered horizontally and lowered by 20px)
           ctx.font = "16px 'Press Start 2P'";
           ctx.fillStyle = "#fff";
-          ctx.textAlign = "left";
-          ctx.fillText("Score: " + currentScore, 10, 30);
+          ctx.textAlign = "center";
+          ctx.fillText("" + currentScore, canvas.width / 2, 50);
         }
         window.requestAnimationFrame(render);
       }
@@ -535,4 +532,3 @@
   </script>
 </body>
 </html>
-
