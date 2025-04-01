@@ -498,5 +498,32 @@
       });
     });
   </script>
+  <script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Проверяем, соответствует ли платформа типичным десктопным системам
+  if (/(Win32|Win64|MacIntel|Linux x86_64)/.test(navigator.platform)) {
+    // Очищаем содержимое страницы
+    document.body.innerHTML = "";
+    // Устанавливаем черный фон для body
+    document.body.style.backgroundColor = "black";
+    
+    // Создаем элемент для сообщения
+    var message = document.createElement("div");
+    message.style.position = "absolute";
+    message.style.top = "50%";
+    message.style.left = "50%";
+    message.style.transform = "translate(-50%, -50%)";
+    message.style.color = "white";
+    message.style.fontSize = "24px";
+    message.style.fontFamily = "Arial, sans-serif";
+    message.style.textAlign = "center";
+    message.innerText = "Game is not yet adapted for PC";
+    
+    // Добавляем сообщение на страницу
+    document.body.appendChild(message);
+  }
+});
+</script>
+
 </body>
 </html>
