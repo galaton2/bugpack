@@ -64,20 +64,22 @@
     /* Header с информацией о пользователе */
     #header {
       position: absolute;
+      margin-top: 25px;
       top: 0;
       left: 0;
       width: 100%;
       height: 50px;
-      background: #6d4fba;
+      background: #6600cc;
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 1000;
+      border-bottom: 4px solid #0ff;
     }
     #info {
       display: flex;
       gap: 20px;
-      font-size: 10px;
+      font-size: 12px;
       color: #fff;
       align-items: center;
     }
@@ -93,23 +95,39 @@
       width: 16px;
       height: 16px;
     }
-    /* Кнопка Back */
     #backContainer {
       position: absolute;
-      top: 50px;
+      top: 60px;
       left: 10px;
       z-index: 1000;
     }
     #backBtn {
       font-size: 10px;
-      padding: 5px 10px;
-      background: #06B6D1;
-      color: #262626;
-      border: none;
-      border-radius: 4px;
+      padding: 6px 12px;
+      background: #f0f;
+      color: #000;
       cursor: pointer;
-      box-shadow: 0 3px #6b6b6b;
+      font-family: 'Press Start 2P', monospace;
+      border: 4px solid #ff0;
+      margin-top: 50px;
     }
+    #backBtn:active {
+      filter: brightness(0.8);
+    }
+    #gameWrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+    #startBtn {
+      position: absolute;
+      z-index: 10;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+   
+  
     /* Обертка игры */
     #gameWrapper {
       position: relative;
@@ -117,20 +135,12 @@
       height: 100%;
     }
     /* Кнопка Start – по центру меню */
-    #startBtn {
+     #startBtn {
       position: absolute;
-      z-index: 1100;
+      z-index: 10;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 12px;
-      padding: 10px 20px;
-      background: #06B6D1;
-      color: #262626;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      box-shadow: 0 3px #6b6b6b;
     }
     /* Временной индикатор */
     #timeBarContainer {
