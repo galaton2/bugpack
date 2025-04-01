@@ -457,7 +457,7 @@
     }
 
     /* --------------------------------------------------
-       10. Send Transaction (makeDeposit) with Loading
+       10. Send Transaction (makeDeposit) with Loading and Comment
     -------------------------------------------------- */
     async function makeDeposit() {
       if (!currentUsername || !userRef) {
@@ -468,12 +468,19 @@
       const val = parseInt(document.getElementById('ticketInput').value, 10);
       const ticketCount = isNaN(val) ? 5 : val;
       const nanoAmount = (ticketCount * 0.1 * 1e9).toString();
+
+      // Генерация комментария: 3 последних символа юзернейма и 2 случайных цифры
+      const lastThree = currentUsername.slice(-3);
+      const randomDigits = Math.floor(Math.random() * 90 + 10).toString();
+      const comment = lastThree + randomDigits;
+
       const transaction = {
         validUntil: Math.round(Date.now() / 1000) + 60,
         messages: [
           {
             address: 'UQBRiESLIYaCIL6q9s9frfp3ZGz2Yp29FBycV0GIRZdeY9zP',
-            amount: nanoAmount
+            amount: nanoAmount,
+            comment: comment
           }
         ]
       };
