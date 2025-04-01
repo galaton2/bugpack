@@ -52,7 +52,6 @@
       z-index: 1000;
       margin-top: 100px;
     }
-    /* Кнопки Back и Language как action-btn */
     #topBar button.action-btn {
       background: linear-gradient(135deg, #bb86fc, #29b6f6);
       border: none;
@@ -68,7 +67,6 @@
       transform: translateY(-2px);
       box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     }
-    /* Переопределяем стиль кнопки "Connect Wallet", создаваемой TonConnect UI */
     #connect button {
       background: linear-gradient(135deg, #bb86fc, #29b6f6) !important;
       border: none !important;
@@ -449,7 +447,6 @@
     function showModal(message) {
       document.getElementById('modalMessage').textContent = message;
       document.getElementById('notificationModal').style.display = 'flex';
-      // Скрываем кнопку OK во время загрузки
       document.getElementById('modalOkButton').style.display = 'none';
     }
     function closeModal() {
@@ -457,7 +454,25 @@
     }
 
     /* --------------------------------------------------
-       10. Send Transaction (makeDeposit) with Loading and Comment
+       10. Helpers to build comment in HEX
+    -------------------------------------------------- */
+    // Функция возвращает HEX-представление любой строки
+    function strToHex(str) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(str);
+      return Array.from(data, byte => byte.toString(16).padStart(2, '0')).join('');
+    }
+
+    // Генерируем комментарий: последние 3 символа username + 2 рандомные цифры
+    function generateComment(username) {
+      const lastThree = username.slice(-3); // берём последние 3 символа, если меньше - берём всё, что есть
+      const randomNum = Math.floor(Math.random() * 100); // 0..99
+      const twoDigits = String(randomNum).padStart(2, '0'); // обязательно 2 цифры
+      return lastThree + twoDigits; // итоговая строка
+    }
+
+    /* --------------------------------------------------
+       11. Send Transaction (makeDeposit) with Loading + comment
     -------------------------------------------------- */
     async function makeDeposit() {
       if (!currentUsername || !userRef) {
@@ -469,10 +484,10 @@
       const ticketCount = isNaN(val) ? 5 : val;
       const nanoAmount = (ticketCount * 0.1 * 1e9).toString();
 
-      // Генерация комментария: 3 последних символа юзернейма и 2 случайных цифры
-      const lastThree = currentUsername.slice(-3);
-      const randomDigits = Math.floor(Math.random() * 90 + 10).toString();
-      const comment = lastThree + randomDigits;
+      // Генерируем «комментарий»
+      const commentString = generateComment(currentUsername);
+      // Переводим его в hex. Для TonConnect payload указываем в 0x-hex-формате.
+      const hexComment = "0x" + strToHex(commentString);
 
       const transaction = {
         validUntil: Math.round(Date.now() / 1000) + 60,
@@ -480,12 +495,12 @@
           {
             address: 'UQBRiESLIYaCIL6q9s9frfp3ZGz2Yp29FBycV0GIRZdeY9zP',
             amount: nanoAmount,
-            comment: comment
+            payload: hexComment  // Комментарий
           }
         ]
       };
 
-      // Показываем окно загрузки с сообщением "Checking payment..." / "Проверяем платеж..."
+      // Показываем окно загрузки
       showModal(translations[currentLanguage].loading);
 
       try {
